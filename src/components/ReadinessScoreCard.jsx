@@ -73,11 +73,11 @@ export default function ReadinessScoreCard({ history = [], userProfile, onStartP
   }
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem', marginBottom: '2.5rem' }}>
+    <div className="grid-2" style={{ marginBottom: '2.5rem' }}>
       {/* 1. Interview Readiness Score Card */}
       <div className="card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
         <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
             <span className="badge badge-cyan">AI Assessment</span>
             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Target: {userProfile?.targetRole || 'Software Engineer'}</span>
           </div>
@@ -193,16 +193,17 @@ export default function ReadinessScoreCard({ history = [], userProfile, onStartP
                   onChange={() => {}}
                   style={{ accentColor: 'var(--accent-cyan)', cursor: 'pointer', width: '16px', height: '16px' }}
                 />
-                <div style={{ flex: 1 }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{
                     fontSize: '0.85rem',
                     fontWeight: 700,
                     color: dayItem.completed ? 'var(--accent-cyan)' : 'var(--text-primary)',
-                    textDecoration: dayItem.completed ? 'line-through' : 'none'
+                    textDecoration: dayItem.completed ? 'line-through' : 'none',
+                    wordBreak: 'break-word'
                   }}>
                     Day {dayItem.day} &rarr; {dayItem.title}
                   </div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', wordBreak: 'break-word' }}>
                     {dayItem.topic}
                   </div>
                 </div>

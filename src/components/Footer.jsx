@@ -6,34 +6,21 @@ export default function Footer({ setActivePage }) {
     <footer style={{
       backgroundColor: 'var(--bg-secondary)',
       borderTop: '1px solid var(--border-subtle)',
-      padding: '3rem 1.5rem 2rem',
+      padding: 'clamp(2rem, 4vw, 3rem) 1rem 1.5rem',
       marginTop: 'auto'
     }}>
       <div style={{
         maxWidth: '1280px',
         margin: '0 auto',
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-        gap: '2.5rem',
-        marginBottom: '2.5rem'
+        gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))',
+        gap: '2rem',
+        marginBottom: '2rem'
       }}>
         {/* Col 1: Brand info */}
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1rem' }}>
-            <div style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: 'var(--radius-sm)',
-              backgroundColor: 'var(--surface-card)',
-              border: '1px solid var(--accent-cyan)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'var(--accent-cyan)'
-            }}>
-              <Terminal size={18} />
-            </div>
-            <span style={{ fontWeight: 800, fontSize: '1.2rem', color: 'var(--text-primary)' }}>
+          <div style={{ marginBottom: '1rem' }}>
+            <span style={{ fontWeight: 800, fontSize: '1.25rem', color: 'var(--text-primary)' }}>
               InterVue<span style={{ color: 'var(--accent-cyan)' }}>X</span>
             </span>
           </div>
@@ -96,12 +83,12 @@ export default function Footer({ setActivePage }) {
         flexWrap: 'wrap',
         justifyContent: 'space-between',
         alignItems: 'center',
-        gap: '1rem',
+        gap: '0.75rem',
         fontSize: '0.8rem',
         color: 'var(--text-dim)'
       }}>
         <div>&copy; {new Date().getFullYear()} InterVueX. Built for elite technical interview preparation.</div>
-        <div style={{ display: 'flex', gap: '1.25rem' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem 1rem' }}>
           <span>Strict 2-Color Architecture</span>
           <span>&bull;</span>
           <span>Web Speech Synthesis & Speech-to-Text</span>

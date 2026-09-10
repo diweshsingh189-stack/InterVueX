@@ -39,20 +39,17 @@ export default function HistoryPage({ history = [], onViewReport, onStartNew, on
       }}>
         <div>
           <span className="badge badge-cyan" style={{ marginBottom: '0.4rem' }}>Historical Archive</span>
-          <h1 style={{ fontSize: '2.2rem', color: 'var(--text-primary)' }}>Interview Simulation History</h1>
+          <h1 style={{ fontSize: 'clamp(1.5rem, 3.5vw, 2.2rem)', color: 'var(--text-primary)', lineHeight: 1.25 }}>Interview Simulation History</h1>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
             Review past transcripts, performance trajectories, and detailed rubrics.
           </p>
         </div>
 
-        <button onClick={onStartNew} className="btn btn-primary">
-          <Play size={16} /> Start New Interview
-        </button>
       </div>
 
       {/* Filter controls */}
-      <div className="card" style={{ marginBottom: '1.5rem', padding: '1.25rem' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', alignItems: 'center' }}>
+      <div className="card" style={{ marginBottom: '1.5rem', padding: '1rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '0.75rem', alignItems: 'center' }}>
           <div style={{ position: 'relative' }}>
             <Search size={16} style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
             <input
@@ -81,7 +78,7 @@ export default function HistoryPage({ history = [], onViewReport, onStartNew, on
       {/* History Table / Cards */}
       <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
         {filteredHistory.length === 0 ? (
-          <div style={{ padding: '3.5rem 1rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+          <div style={{ padding: '3rem 1rem', textAlign: 'center', color: 'var(--text-muted)' }}>
             <History size={40} style={{ color: 'var(--border-subtle)', margin: '0 auto 1rem' }} />
             <h3 style={{ color: 'var(--text-primary)', marginBottom: '0.5rem' }}>No Interview Sessions Found</h3>
             <p style={{ fontSize: '0.875rem', marginBottom: '1.5rem' }}>
@@ -92,11 +89,11 @@ export default function HistoryPage({ history = [], onViewReport, onStartNew, on
             </button>
           </div>
         ) : (
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
+          <div className="table-responsive" style={{ margin: 0 }}>
+            <table style={{ width: '100%', minWidth: '550px', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
               <thead>
                 <tr style={{ backgroundColor: 'var(--bg-secondary)', borderBottom: '1px solid var(--border-subtle)', color: 'var(--text-muted)' }}>
-                  <th style={{ padding: '1rem 1.25rem' }}>Date</th>
+                  <th style={{ padding: '0.85rem 1rem' }}>Date</th>
                   <th style={{ padding: '1rem 1.25rem' }}>Role Track</th>
                   <th style={{ padding: '1rem 1.25rem' }}>Format</th>
                   <th style={{ padding: '1rem 1.25rem' }}>Difficulty</th>

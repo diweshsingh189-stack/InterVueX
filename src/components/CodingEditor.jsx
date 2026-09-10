@@ -228,15 +228,17 @@ export default function CodingEditor({
                   fontSize: '0.8rem',
                   fontFamily: 'var(--font-mono)',
                   display: 'flex',
+                  flexWrap: 'wrap',
                   justifyContent: 'space-between',
-                  alignItems: 'center'
+                  alignItems: 'center',
+                  gap: '0.4rem'
                 }}
               >
-                <div>
+                <div style={{ wordBreak: 'break-word', minWidth: '180px', flex: '1 1 auto' }}>
                   <span style={{ color: 'var(--text-muted)' }}>Case {idx + 1}: </span>
                   <span style={{ color: 'var(--text-primary)' }}>{tc.input}</span>
                 </div>
-                <div style={{ color: 'var(--accent-cyan)' }}>
+                <div style={{ color: 'var(--accent-cyan)', whiteSpace: 'nowrap' }}>
                   Expected: {tc.expected}
                 </div>
               </div>

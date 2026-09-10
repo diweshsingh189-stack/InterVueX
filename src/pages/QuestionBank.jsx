@@ -91,15 +91,15 @@ export default function QuestionBank({ onStartCustomInterview }) {
       </div>
 
       {/* Filter & Search Bar */}
-      <div className="card" style={{ marginBottom: '2rem', padding: '1.25rem' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem' }}>
+      <div className="card" style={{ marginBottom: '1.5rem', padding: '1rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 150px), 1fr))', gap: '0.65rem' }}>
           {/* Search Input */}
-          <div style={{ position: 'relative' }}>
+          <div style={{ position: 'relative', gridColumn: '1 / -1' }}>
             <Search size={16} style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
             <input
               type="text"
               className="form-input"
-              placeholder="Search concepts, algorithms..."
+              placeholder="Search concepts, algorithms, topics..."
               style={{ paddingLeft: '2.4rem' }}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -156,7 +156,7 @@ export default function QuestionBank({ onStartCustomInterview }) {
       </div>
 
       {/* Results Count & Action */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem' }}>
         <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
           Showing <strong style={{ color: 'var(--text-primary)' }}>{filteredQuestions.length}</strong> questions
         </div>

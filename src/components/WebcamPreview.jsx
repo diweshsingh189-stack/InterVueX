@@ -35,11 +35,13 @@ export default function WebcamPreview({ isSpeaking = false, isListening = false 
   }, [cameraActive]);
 
   return (
-    <div style={{
+    <div className="webcam-preview-container" style={{
       display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-      gap: '1rem',
-      marginBottom: '1.5rem'
+      gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 160px), 1fr))',
+      gap: '0.75rem',
+      marginBottom: '1.25rem',
+      width: '100%',
+      boxSizing: 'border-box'
     }}>
       {/* AI Interviewer Stage */}
       <div style={{

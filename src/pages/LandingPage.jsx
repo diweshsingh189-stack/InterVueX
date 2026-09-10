@@ -17,9 +17,12 @@ import {
   Zap
 } from 'lucide-react';
 import { JOB_ROLES, INTERVIEW_TYPES } from '../data/questionsData';
+import ThreeDCarousel from '../components/ThreeDCarousel';
 
 export default function LandingPage({ setActivePage }) {
   const [openFaq, setOpenFaq] = useState(null);
+  const [currentSlide, setCurrentSlide] = useState(0);
+
 
   const faqs = [
     {
@@ -45,119 +48,123 @@ export default function LandingPage({ setActivePage }) {
   ];
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '5rem', paddingBottom: '3rem' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(1rem, 2vw, 1.75rem)', paddingBottom: '2.5rem' }}>
       {/* Hero Section */}
-      <section style={{
-        textAlign: 'center',
-        padding: '2.5rem 1rem 2rem',
-        maxWidth: '900px',
-        margin: '0 auto'
+      {/* Hero Section with Responsive 3D 5-Page Auto-Scroller Showcase */}
+      <section className="landing-hero-section" style={{
+        maxWidth: '1360px',
+        margin: '0 auto',
+        padding: '0.5rem 0.5rem 0.25rem',
+        width: '100%',
+        boxSizing: 'border-box'
       }}>
-        {/* Badge Centered */}
-        <div style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '0.5rem',
-          backgroundColor: 'var(--accent-cyan-light)',
-          border: '1px solid var(--accent-cyan)',
-          borderRadius: 'var(--radius-full)',
-          padding: '0.4rem 1.2rem',
-          fontSize: '0.8rem',
-          fontWeight: 700,
-          color: 'var(--accent-cyan)',
-          letterSpacing: '0.06em',
-          textTransform: 'uppercase',
-          marginBottom: '1.75rem'
-        }}>
-          <Sparkles size={14} /> Production-Grade Interview Simulation
-        </div>
+        <div className="landing-hero-grid">
+          {/* Left Column: Hero Text Content & Highlights */}
+          <div className="landing-hero-content" style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+            textAlign: 'left',
+            width: '100%'
+          }}>
+            {/* Badge - shifted slightly to right as requested */}
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              backgroundColor: 'var(--accent-cyan-light)',
+              border: '1px solid var(--accent-cyan)',
+              borderRadius: 'var(--radius-full)',
+              padding: '0.4rem 1.15rem',
+              fontSize: '0.75rem',
+              fontWeight: 700,
+              color: 'var(--accent-cyan)',
+              letterSpacing: '0.06em',
+              textTransform: 'uppercase',
+              marginBottom: '1rem',
+              marginLeft: 'clamp(0.5rem, 2.5vw, 1.85rem)',
+              boxShadow: '0 0 16px rgba(6, 182, 212, 0.15)'
+            }}>
+              <Sparkles size={14} /> Production-Grade Interview Simulation
+            </div>
 
-        {/* Heading */}
-        <h1 style={{
-          fontSize: 'clamp(2.5rem, 5vw, 4rem)',
-          fontWeight: 800,
-          lineHeight: '1.15',
-          letterSpacing: '-0.03em',
-          marginBottom: '1.5rem',
-          color: 'var(--text-primary)'
-        }}>
-          Practice Smarter. <br />
-          <span style={{ color: 'var(--accent-cyan)' }}>Interview Better.</span>
-        </h1>
+            {/* Heading */}
+            <h1 style={{
+              fontSize: 'clamp(1.85rem, 4.5vw, 3.4rem)',
+              fontWeight: 800,
+              lineHeight: '1.18',
+              letterSpacing: '-0.03em',
+              marginBottom: '1rem',
+              color: 'var(--text-primary)'
+            }}>
+              Practice Smarter. <br />
+              <span style={{ color: 'var(--accent-cyan)' }}>Interview Better.</span>
+            </h1>
 
-        {/* Subtitle */}
-        <p style={{
-          fontSize: 'clamp(1.05rem, 2vw, 1.25rem)',
-          color: 'var(--text-secondary)',
-          lineHeight: '1.6',
-          maxWidth: '720px',
-          margin: '0 auto 2.25rem'
-        }}>
-          Realistic, role-tailored technical and behavioral interview practice with instant rubric evaluation, speech recognition, and actionable feedback.
-        </p>
+            {/* Subtitle */}
+            <p style={{
+              fontSize: 'clamp(0.95rem, 1.8vw, 1.15rem)',
+              color: 'var(--text-secondary)',
+              lineHeight: '1.6',
+              maxWidth: '560px',
+              marginBottom: '1.5rem'
+            }}>
+              Realistic, role-tailored technical and behavioral interview practice with instant rubric evaluation, speech recognition, and actionable feedback.
+            </p>
 
-        {/* CTAs */}
-        <div style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '1rem'
-        }}>
-          <button
-            onClick={() => setActivePage('setup')}
-            className="btn btn-primary btn-lg"
-          >
-            Start Interview <ArrowRight size={18} />
-          </button>
-          <button
-            onClick={() => {
-              const el = document.getElementById('how-it-works');
-              el?.scrollIntoView({ behavior: 'smooth' });
-            }}
-            className="btn btn-secondary btn-lg"
-          >
-            Explore Features
-          </button>
-        </div>
-
-        {/* Quick Highlights Bar */}
-        <div style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          justifyContent: 'center',
-          gap: '2rem',
-          marginTop: '3.5rem',
-          paddingTop: '2rem',
-          borderTop: '1px solid var(--border-subtle)',
-          color: 'var(--text-muted)',
-          fontSize: '0.875rem'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <CheckCircle2 size={16} style={{ color: 'var(--accent-cyan)' }} />
-            <span>8 Technical Roles</span>
+            {/* CTAs */}
+            <div className="hero-cta-group" style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              gap: '0.75rem',
+              width: '100%',
+              marginBottom: '0'
+            }}>
+              <button
+                onClick={() => setActivePage('setup')}
+                className="btn btn-primary btn-lg hero-btn"
+                style={{ minWidth: '200px' }}
+              >
+                Start Interview <ArrowRight size={18} />
+              </button>
+              <button
+                onClick={() => {
+                  const el = document.getElementById('how-it-works');
+                  el?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="btn btn-secondary btn-lg hero-btn"
+                style={{ minWidth: '180px' }}
+              >
+                Explore Features
+              </button>
+            </div>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <CheckCircle2 size={16} style={{ color: 'var(--accent-cyan)' }} />
-            <span>Real-Time AI Scoring</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <CheckCircle2 size={16} style={{ color: 'var(--accent-cyan)' }} />
-            <span>Voice & Audio Speech</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <CheckCircle2 size={16} style={{ color: 'var(--accent-cyan)' }} />
-            <span>STAR Rubric Evaluation</span>
+
+          {/* Right Column: Premium 3D 5-Page Auto-Scroller Visual Showcase */}
+          <div className="landing-hero-visual-wrapper" style={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '100%',
+            maxWidth: '750px',
+            margin: '0 auto'
+          }}>
+            <ThreeDCarousel 
+              currentSlide={currentSlide} 
+              onSlideChange={setCurrentSlide} 
+            />
           </div>
         </div>
       </section>
 
       {/* How It Works Section */}
       <section id="how-it-works">
-        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-          <span className="badge badge-cyan" style={{ marginBottom: '0.5rem' }}>Workflow</span>
-          <h2 style={{ fontSize: '2rem', color: 'var(--text-primary)' }}>How InterVueX Works</h2>
-          <p style={{ color: 'var(--text-muted)', marginTop: '0.4rem', fontSize: '0.95rem' }}>
+        <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+          <span className="badge badge-cyan" style={{ marginBottom: '0.4rem' }}>Workflow</span>
+          <h2 style={{ fontSize: 'clamp(1.5rem, 4vw, 2rem)', color: 'var(--text-primary)' }}>How InterVueX Works</h2>
+          <p style={{ color: 'var(--text-muted)', marginTop: '0.3rem', fontSize: '0.95rem' }}>
             Four structured steps from setup to deep performance breakdown.
           </p>
         </div>
@@ -250,11 +257,11 @@ export default function LandingPage({ setActivePage }) {
       </section>
 
       {/* Role Tracks Grid */}
-      <section>
-        <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-          <span className="badge badge-cyan" style={{ marginBottom: '0.5rem' }}>Specializations</span>
-          <h2 style={{ fontSize: '2rem', color: 'var(--text-primary)' }}>8 Tailored Engineering Tracks</h2>
-          <p style={{ color: 'var(--text-muted)', marginTop: '0.4rem', fontSize: '0.95rem' }}>
+      <section id="specializations-tracks">
+        <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+          <span className="badge badge-cyan" style={{ marginBottom: '0.4rem' }}>Specializations</span>
+          <h2 style={{ fontSize: 'clamp(1.5rem, 3.5vw, 2rem)', color: 'var(--text-primary)' }}>8 Tailored Engineering Tracks</h2>
+          <p style={{ color: 'var(--text-muted)', marginTop: '0.3rem', fontSize: '0.95rem' }}>
             Questions calibrated precisely for each technology domain and hiring level.
           </p>
         </div>
@@ -289,52 +296,52 @@ export default function LandingPage({ setActivePage }) {
       </section>
 
       {/* Why InterVueX Comparison */}
-      <section style={{
+      <section id="why-choose-us" style={{
         backgroundColor: 'var(--surface-card)',
         border: '1px solid var(--border-subtle)',
         borderRadius: 'var(--radius-lg)',
-        padding: '2.5rem'
+        padding: 'clamp(1.25rem, 2.5vw, 2rem)'
       }}>
-        <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-          <span className="badge badge-cyan" style={{ marginBottom: '0.5rem' }}>Value Proposition</span>
-          <h2 style={{ fontSize: '2rem', color: 'var(--text-primary)' }}>Why Choose InterVueX?</h2>
-          <p style={{ color: 'var(--text-muted)', marginTop: '0.4rem', fontSize: '0.95rem' }}>
+        <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+          <span className="badge badge-cyan" style={{ marginBottom: '0.4rem' }}>Value Proposition</span>
+          <h2 style={{ fontSize: 'clamp(1.4rem, 4vw, 2rem)', color: 'var(--text-primary)' }}>Why Choose InterVueX?</h2>
+          <p style={{ color: 'var(--text-muted)', marginTop: '0.3rem', fontSize: '0.95rem' }}>
             Engineered specifically to mirror real FAANG, tier-1 tech, and enterprise hiring rubrics.
           </p>
         </div>
 
         <div className="grid-3">
-          <div style={{ display: 'flex', gap: '1rem' }}>
-            <div style={{ color: 'var(--accent-cyan)', marginTop: '0.2rem' }}>
-              <ShieldCheck size={24} />
+          <div style={{ display: 'flex', gap: '0.85rem' }}>
+            <div style={{ color: 'var(--accent-cyan)', marginTop: '0.2rem', flexShrink: 0 }}>
+              <ShieldCheck size={22} />
             </div>
             <div>
               <h3 style={{ fontSize: '1.05rem', color: 'var(--text-primary)', marginBottom: '0.4rem' }}>Zero Fake Fluff</h3>
-              <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', lineHeight: '1.6' }}>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.6' }}>
                 No generic chatbot responses. Every evaluation is grounded in concrete concepts, algorithmic accuracy, and delivery clarity.
               </p>
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: '1rem' }}>
-            <div style={{ color: 'var(--accent-cyan)', marginTop: '0.2rem' }}>
-              <MessageSquareCode size={24} />
+          <div style={{ display: 'flex', gap: '0.85rem' }}>
+            <div style={{ color: 'var(--accent-cyan)', marginTop: '0.2rem', flexShrink: 0 }}>
+              <MessageSquareCode size={22} />
             </div>
             <div>
               <h3 style={{ fontSize: '1.05rem', color: 'var(--text-primary)', marginBottom: '0.4rem' }}>STAR Method Scoring</h3>
-              <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', lineHeight: '1.6' }}>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.6' }}>
                 Behavioral questions evaluate Situation, Task, Action, and Result formatting to ensure answers stand out in leadership rounds.
               </p>
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: '1rem' }}>
-            <div style={{ color: 'var(--accent-cyan)', marginTop: '0.2rem' }}>
-              <BarChart3 size={24} />
+          <div style={{ display: 'flex', gap: '0.85rem' }}>
+            <div style={{ color: 'var(--accent-cyan)', marginTop: '0.2rem', flexShrink: 0 }}>
+              <BarChart3 size={22} />
             </div>
             <div>
               <h3 style={{ fontSize: '1.05rem', color: 'var(--text-primary)', marginBottom: '0.4rem' }}>Quantified Skill Radars</h3>
-              <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', lineHeight: '1.6' }}>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.6' }}>
                 Track metrics across sessions to visually pinpoint your exact weak points before stepping into real interview loops.
               </p>
             </div>
@@ -344,15 +351,15 @@ export default function LandingPage({ setActivePage }) {
 
       {/* FAQ Section */}
       <section style={{ maxWidth: '800px', margin: '0 auto', width: '100%' }}>
-        <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
           <span className="badge badge-cyan" style={{ marginBottom: '0.5rem' }}>FAQ</span>
-          <h2 style={{ fontSize: '2rem', color: 'var(--text-primary)' }}>Frequently Asked Questions</h2>
+          <h2 style={{ fontSize: 'clamp(1.4rem, 4vw, 2rem)', color: 'var(--text-primary)' }}>Frequently Asked Questions</h2>
           <p style={{ color: 'var(--text-muted)', marginTop: '0.4rem', fontSize: '0.95rem' }}>
             Everything you need to know about the simulator and evaluation engine.
           </p>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           {faqs.map((faq, index) => {
             const isOpen = openFaq === index;
             return (
@@ -370,37 +377,40 @@ export default function LandingPage({ setActivePage }) {
                   onClick={() => setOpenFaq(isOpen ? null : index)}
                   style={{
                     width: '100%',
-                    padding: '1.25rem 1.5rem',
+                    padding: '1rem 1.25rem',
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
                     background: 'none',
                     border: 'none',
                     color: 'var(--text-primary)',
-                    fontSize: '1rem',
+                    fontSize: '0.95rem',
                     fontWeight: 600,
                     textAlign: 'left',
-                    cursor: 'pointer'
+                    cursor: 'pointer',
+                    gap: '0.75rem'
                   }}
                 >
-                  <span>{faq.q}</span>
+                  <span style={{ wordBreak: 'break-word' }}>{faq.q}</span>
                   <ChevronDown
                     size={18}
                     style={{
                       transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
                       transition: 'transform 0.2s ease',
-                      color: isOpen ? 'var(--accent-cyan)' : 'var(--text-muted)'
+                      color: isOpen ? 'var(--accent-cyan)' : 'var(--text-muted)',
+                      flexShrink: 0
                     }}
                   />
                 </button>
                 {isOpen && (
                   <div style={{
-                    padding: '0 1.5rem 1.25rem',
+                    padding: '0 1.25rem 1.25rem',
                     color: 'var(--text-secondary)',
-                    fontSize: '0.9rem',
+                    fontSize: '0.875rem',
                     lineHeight: '1.6',
                     borderTop: '1px solid var(--border-subtle)',
-                    paddingTop: '0.75rem'
+                    paddingTop: '0.75rem',
+                    wordBreak: 'break-word'
                   }}>
                     {faq.a}
                   </div>
@@ -416,19 +426,20 @@ export default function LandingPage({ setActivePage }) {
         backgroundColor: 'var(--bg-secondary)',
         border: '1px solid var(--accent-cyan)',
         borderRadius: 'var(--radius-lg)',
-        padding: '3.5rem 2rem',
+        padding: 'clamp(1.75rem, 4vw, 3rem) 1.25rem',
         textAlign: 'center',
         boxShadow: '0 0 25px rgba(6, 182, 212, 0.1)'
       }}>
-        <h2 style={{ fontSize: '2.2rem', color: 'var(--text-primary)', marginBottom: '1rem' }}>
+        <h2 style={{ fontSize: 'clamp(1.5rem, 4vw, 2.2rem)', color: 'var(--text-primary)', marginBottom: '0.75rem', lineHeight: 1.25 }}>
           Ready to Ace Your Next Technical Round?
         </h2>
-        <p style={{ color: 'var(--text-secondary)', maxWidth: '600px', margin: '0 auto 2rem', fontSize: '1.05rem', lineHeight: '1.6' }}>
+        <p style={{ color: 'var(--text-secondary)', maxWidth: '600px', margin: '0 auto 1.75rem', fontSize: '0.95rem', lineHeight: '1.6' }}>
           Start your first simulation in seconds. No sign-up required to test questions.
         </p>
         <button
           onClick={() => setActivePage('setup')}
           className="btn btn-primary btn-lg"
+          style={{ maxWidth: '280px', margin: '0 auto' }}
         >
           <Sparkles size={18} /> Launch Simulator Now
         </button>

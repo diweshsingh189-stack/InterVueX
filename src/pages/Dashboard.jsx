@@ -77,21 +77,13 @@ export default function Dashboard({ history = [], userProfile, onStartNew, onVie
             <span className="badge badge-cyan">Candidate Overview</span>
             <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Target: {userProfile?.targetRole || 'Full Stack Developer'}</span>
           </div>
-          <h1 style={{ fontSize: '2.2rem', color: 'var(--text-primary)' }}>
+          <h1 style={{ fontSize: 'clamp(1.5rem, 3.5vw, 2.2rem)', color: 'var(--text-primary)', lineHeight: 1.25 }}>
             Welcome Back, {userProfile?.name || 'Engineer'}
           </h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', marginTop: '0.35rem' }}>
             Track your interview progression, benchmark your rubric scores, and eliminate weak points.
           </p>
         </div>
-
-        <button
-          onClick={onStartNew}
-          className="btn btn-primary btn-lg"
-          style={{ boxShadow: '0 4px 15px rgba(6, 182, 212, 0.25)' }}
-        >
-          <PlayCircle size={20} /> Start New Session
-        </button>
       </div>
 
       {/* NEW: Interview Readiness Score & 7-Day Improvement Plan */}
@@ -309,8 +301,8 @@ export default function Dashboard({ history = [], userProfile, onStartNew, onVie
             No interview records found. Start your first session above!
           </div>
         ) : (
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.875rem' }}>
+          <div className="table-responsive">
+            <table style={{ width: '100%', minWidth: '550px', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.875rem' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid var(--border-subtle)', color: 'var(--text-muted)' }}>
                   <th style={{ padding: '0.75rem 1rem' }}>Date</th>

@@ -45,11 +45,18 @@ export const COMPANIES = [
   { id: 'netflix', name: 'Netflix', subName: 'Senior Software Dev', category: 'product', tier: 'Top Product (Tier-1)', lpa: '45 - 80 LPA', icon: '🍿', focus: 'Distributed Systems, High Throughput, Microservices' },
   { id: 'uber', name: 'Uber', subName: 'Software Engineer', category: 'product', tier: 'Top Product (Tier-1)', lpa: '35 - 60 LPA', icon: '🚗', focus: 'Geospatial algorithms, Real-time APIs, Low Latency' },
   { id: 'adobe', name: 'Adobe', subName: 'MTS / Software Dev', category: 'product', tier: 'Top Product (Tier-1)', lpa: '24 - 45 LPA', icon: '🎨', focus: 'Algorithms, C++, OOP Architecture, Graphics' },
+  { id: 'apple', name: 'Apple', subName: 'ICT3 / ICT4 Engineer', category: 'product', tier: 'Top Product (Tier-1)', lpa: '35 - 65 LPA', icon: '🍎', focus: 'OS Internals, Swift/C++, Low Latency, Systems' },
+  { id: 'atlassian', name: 'Atlassian', subName: 'P3 / P4 Software Eng', category: 'product', tier: 'Top Product (Tier-1)', lpa: '32 - 58 LPA', icon: '🔷', focus: 'Distributed Systems, Java/React, Microservices & Scale' },
+  { id: 'flipkart', name: 'Flipkart', subName: 'SDE-1 / SDE-2', category: 'product', tier: 'Top Product (Tier-1)', lpa: '26 - 48 LPA', icon: '🛍️', focus: 'High Scale E-Commerce, Concurrency, Kafka & Redis' },
+  { id: 'goldman-sachs', name: 'Goldman Sachs', subName: 'Analyst / Associate', category: 'product', tier: 'Top Product (Tier-1)', lpa: '28 - 52 LPA', icon: '📈', focus: 'FinTech Systems, Core Java, Algorithms & Math' },
+  { id: 'oracle', name: 'Oracle', subName: 'SMTS / Software Dev', category: 'product', tier: 'Top Product (Tier-1)', lpa: '22 - 42 LPA', icon: '🏛️', focus: 'Cloud Infrastructure, Database Internals, High Availability' },
   // Service / Enterprise Companies
   { id: 'tcs', name: 'TCS', subName: 'Digital / Prime / Ninja', category: 'service', tier: 'Service / Enterprise', lpa: '3.6 - 9.5 LPA', icon: '💼', focus: 'Core CS, Aptitude, Java/C++, DBMS & SQL' },
   { id: 'infosys', name: 'Infosys', subName: 'DSE / SP / SE', category: 'service', tier: 'Service / Enterprise', lpa: '3.6 - 9.5 LPA', icon: '🏢', focus: 'Core CS, Algorithms, OOP, Database Queries' },
   { id: 'wipro', name: 'Wipro', subName: 'Turbo / Elite', category: 'service', tier: 'Service / Enterprise', lpa: '3.6 - 8.5 LPA', icon: '⚡', focus: 'Java, Python, SQL, Aptitude, Core Fundamentals' },
-  { id: 'accenture', name: 'Accenture', subName: 'ASE / FSE', category: 'service', tier: 'Service / Enterprise', lpa: '4.5 - 11.5 LPA', icon: '🚀', focus: 'Cloud fundamentals, Problem solving, Full Stack' }
+  { id: 'accenture', name: 'Accenture', subName: 'ASE / FSE', category: 'service', tier: 'Service / Enterprise', lpa: '4.5 - 11.5 LPA', icon: '🚀', focus: 'Cloud fundamentals, Problem solving, Full Stack' },
+  { id: 'cognizant', name: 'Cognizant', subName: 'GenC Next / Pro', category: 'service', tier: 'Service / Enterprise', lpa: '4.0 - 10.0 LPA', icon: '💡', focus: 'Java, Full Stack, Cloud & Problem Solving' },
+  { id: 'hcl', name: 'HCLTech', subName: 'Software Engineer', category: 'service', tier: 'Service / Enterprise', lpa: '3.6 - 8.5 LPA', icon: '⚙️', focus: 'Core CS, C++, Python, Data Engineering & Support' }
 ];
 
 export const CS_SUBJECTS = [

@@ -87,37 +87,40 @@ export default function InterviewReport({ report, onRetake, onGoDashboard, onBro
           </p>
         </div>
 
-        <div style={{ display: 'flex', gap: '0.75rem' }}>
+        <div className="report-actions-header" style={{ display: 'flex', flexWrap: 'wrap', gap: '0.65rem' }}>
+          <button onClick={onGoDashboard} className="btn btn-secondary">
+            Dashboard
+          </button>
+          <button onClick={onRetake} className="btn btn-primary">
+            <RotateCcw size={16} /> Retake Session
+          </button>
           <button onClick={handlePrint} className="btn btn-sm btn-secondary">
             <Printer size={16} /> Print Report
           </button>
           <button onClick={handleDownloadJSON} className="btn btn-sm btn-secondary">
             <Download size={16} /> Export JSON
           </button>
-          <button onClick={onRetake} className="btn btn-sm btn-primary">
-            <RotateCcw size={16} /> New Session
-          </button>
         </div>
       </div>
 
       {/* Main Scorecard Banner */}
-      <div style={{
+      <div className="report-main-card" style={{
         backgroundColor: 'var(--surface-card)',
         border: '1px solid var(--accent-cyan)',
         borderRadius: 'var(--radius-lg)',
-        padding: '2rem',
+        padding: '1.5rem',
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-        gap: '2rem',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
+        gap: '1.5rem',
         alignItems: 'center',
         marginBottom: '2rem',
         boxShadow: '0 0 30px rgba(6, 182, 212, 0.12)'
       }}>
         {/* Left: Overall Score Dial */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.75rem' }}>
+        <div className="report-dial-box" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', minWidth: 0 }}>
           <div style={{
-            width: '120px',
-            height: '120px',
+            width: '100px',
+            height: '100px',
             borderRadius: '50%',
             backgroundColor: 'var(--bg-secondary)',
             border: '4px solid var(--accent-cyan)',
@@ -128,22 +131,22 @@ export default function InterviewReport({ report, onRetake, onGoDashboard, onBro
             boxShadow: '0 0 20px var(--accent-cyan-glow)',
             flexShrink: 0
           }}>
-            <div style={{ fontSize: '2.4rem', fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1 }}>
+            <div style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1 }}>
               {report.overallScore}
             </div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--accent-cyan)', fontWeight: 700, textTransform: 'uppercase' }}>
+            <div style={{ fontSize: '0.7rem', color: 'var(--accent-cyan)', fontWeight: 700, textTransform: 'uppercase' }}>
               Out of 10
             </div>
           </div>
 
-          <div>
+          <div style={{ minWidth: 0 }}>
             <span className="badge badge-cyan" style={{ marginBottom: '0.4rem' }}>
               {getScoreLabel(report.overallScore)}
             </span>
-            <h3 style={{ fontSize: '1.4rem', color: 'var(--text-primary)', marginBottom: '0.4rem' }}>
+            <h3 style={{ fontSize: '1.25rem', color: 'var(--text-primary)', marginBottom: '0.4rem', wordBreak: 'break-word' }}>
               {report.overallScore >= 8.0 ? 'Exceptional Candidate Level' : 'Solid Foundation Demonstrated'}
             </h3>
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.5' }}>
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.5', wordBreak: 'break-word' }}>
               {report.summary}
             </p>
           </div>
@@ -153,33 +156,33 @@ export default function InterviewReport({ report, onRetake, onGoDashboard, onBro
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(2, 1fr)',
-          gap: '1rem',
+          gap: '0.85rem',
           backgroundColor: 'var(--bg-secondary)',
-          padding: '1.25rem',
+          padding: '1rem',
           borderRadius: 'var(--radius-md)',
           border: '1px solid var(--border-subtle)'
         }}>
           <div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Questions Answered</div>
-            <div style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+            <div style={{ fontSize: '0.725rem', color: 'var(--text-muted)' }}>Questions Answered</div>
+            <div style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-primary)' }}>
               {report.answeredCount || report.answers?.length || 0} / {report.questionCount || 5}
             </div>
           </div>
           <div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Session Duration</div>
-            <div style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+            <div style={{ fontSize: '0.725rem', color: 'var(--text-muted)' }}>Session Duration</div>
+            <div style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-primary)' }}>
               {formatTime(report.durationSeconds || 420)}
             </div>
           </div>
           <div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Difficulty Caliber</div>
-            <div style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--accent-cyan)', textTransform: 'capitalize' }}>
+            <div style={{ fontSize: '0.725rem', color: 'var(--text-muted)' }}>Difficulty Caliber</div>
+            <div style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--accent-cyan)', textTransform: 'capitalize' }}>
               {report.difficulty || 'Medium'}
             </div>
           </div>
           <div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Completion Status</div>
-            <div style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+            <div style={{ fontSize: '0.725rem', color: 'var(--text-muted)' }}>Completion Status</div>
+            <div style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-primary)' }}>
               {report.status || 'Completed'}
             </div>
           </div>
@@ -304,10 +307,10 @@ export default function InterviewReport({ report, onRetake, onGoDashboard, onBro
                 }}
               >
                 {/* Question Header */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem', marginBottom: '0.75rem' }}>
-                  <div style={{ display: 'flex', gap: '0.6rem' }}>
-                    <span style={{ fontWeight: 800, color: 'var(--accent-cyan)', fontSize: '0.9rem' }}>Q{idx + 1}.</span>
-                    <span style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '0.95rem' }}>{ans.question}</span>
+                <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                  <div style={{ display: 'flex', gap: '0.6rem', flex: '1 1 220px', minWidth: 0 }}>
+                    <span style={{ fontWeight: 800, color: 'var(--accent-cyan)', fontSize: '0.9rem', flexShrink: 0 }}>Q{idx + 1}.</span>
+                    <span style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '0.95rem', wordBreak: 'break-word' }}>{ans.question}</span>
                   </div>
                   <div style={{
                     backgroundColor: 'var(--surface-card)',
@@ -352,6 +355,21 @@ export default function InterviewReport({ report, onRetake, onGoDashboard, onBro
           })}
         </div>
       </div>
+
+      {/* Scoped CSS */}
+      <style>{`
+        @media (max-width: 640px) {
+          .report-main-card {
+            padding: 1rem !important;
+            gap: 1rem !important;
+          }
+          .report-dial-box {
+            flex-direction: column !important;
+            text-align: center !important;
+            align-items: center !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

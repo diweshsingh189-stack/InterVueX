@@ -127,27 +127,38 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
       </div>
 
       {/* Mode Switcher Tabs */}
-      <div style={{
+      <div className="setup-mode-tabs" style={{
         display: 'flex',
+        flexWrap: 'wrap',
         justifyContent: 'center',
-        gap: '0.75rem',
-        marginBottom: '2rem'
+        gap: '0.65rem',
+        marginBottom: '2rem',
+        width: '100%',
+        boxSizing: 'border-box'
       }}>
         <button
           type="button"
           onClick={() => setSetupMode('manual')}
-          className={`btn ${setupMode === 'manual' ? 'btn-primary' : 'btn-secondary'}`}
-          style={{ padding: '0.65rem 1.25rem', borderRadius: 'var(--radius-full)' }}
+          className={`btn ${setupMode === 'manual' ? 'btn-primary' : 'btn-secondary'} setup-mode-btn`}
+          style={{ 
+            padding: '0.65rem 1.15rem', 
+            borderRadius: 'var(--radius-full)',
+            fontSize: '0.875rem'
+          }}
         >
-          <Briefcase size={16} /> Manual Role Calibration
+          <Briefcase size={16} /> <span>Manual Role Calibration</span>
         </button>
         <button
           type="button"
           onClick={() => setSetupMode('resume')}
-          className={`btn ${setupMode === 'resume' ? 'btn-primary' : 'btn-secondary'}`}
-          style={{ padding: '0.65rem 1.25rem', borderRadius: 'var(--radius-full)' }}
+          className={`btn ${setupMode === 'resume' ? 'btn-primary' : 'btn-secondary'} setup-mode-btn`}
+          style={{ 
+            padding: '0.65rem 1.15rem', 
+            borderRadius: 'var(--radius-full)',
+            fontSize: '0.875rem'
+          }}
         >
-          <FileText size={16} /> Resume-Based Interview
+          <FileText size={16} /> <span>Resume-Based Interview</span>
         </button>
       </div>
 
@@ -265,7 +276,7 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
               </div>
             </div>
 
-            <div className="grid-4" style={{ gap: '0.75rem' }}>
+            <div className="setup-roles-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '0.75rem' }}>
               {JOB_ROLES.map((role) => {
                 const isSelected = selectedRole === role.id;
                 return (
@@ -358,7 +369,7 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
                 }}>
                   ⭐ Top Product Companies (MAANG / Tier-1)
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))', gap: '0.6rem' }}>
+                <div className="setup-companies-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 140px), 1fr))', gap: '0.6rem' }}>
                   {COMPANIES.filter(c => c.category === 'product').map((comp) => {
                     const isSelected = selectedCompany === comp.id;
                     return (
@@ -378,7 +389,7 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
                           transition: 'all 0.2s ease'
                         }}
                       >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', minWidth: 0 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', minWidth: 0, flex: '1 1 auto' }}>
                           <span style={{ fontSize: '1.1rem', flexShrink: 0 }}>{comp.icon}</span>
                           <div style={{ minWidth: 0 }}>
                             <div style={{
@@ -437,7 +448,7 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
                 }}>
                   🏢 Service / IT Enterprise Companies
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))', gap: '0.6rem' }}>
+                <div className="setup-companies-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 140px), 1fr))', gap: '0.6rem' }}>
                   {COMPANIES.filter(c => c.category === 'service').map((comp) => {
                     const isSelected = selectedCompany === comp.id;
                     return (
@@ -457,7 +468,7 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
                           transition: 'all 0.2s ease'
                         }}
                       >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', minWidth: 0 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', minWidth: 0, flex: '1 1 auto' }}>
                           <span style={{ fontSize: '1.1rem', flexShrink: 0 }}>{comp.icon}</span>
                           <div style={{ minWidth: 0 }}>
                             <div style={{
@@ -608,7 +619,7 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.5rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.6rem' }}>
                 {EXPERIENCE_LEVELS.map((level) => {
                   const isSelected = selectedLevel === level.id;
                   return (
@@ -621,9 +632,14 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
                         backgroundColor: isSelected ? 'var(--accent-cyan-light)' : 'var(--bg-secondary)',
                         border: isSelected ? '1px solid var(--accent-cyan)' : '1px solid var(--border-subtle)',
                         color: isSelected ? 'var(--accent-cyan)' : 'var(--text-primary)',
-                        padding: '0.6rem 0.5rem',
-                        fontSize: '0.8rem',
-                        fontWeight: 600
+                        padding: '0.65rem 0.75rem',
+                        fontSize: '0.825rem',
+                        fontWeight: 600,
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        justifyContent: 'center',
+                        width: '100%'
                       }}
                     >
                       {level.name}
@@ -643,7 +659,7 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem', marginBottom: '0.75rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 80px), 1fr))', gap: '0.5rem', marginBottom: '0.75rem' }}>
                 {DIFFICULTIES.map((diff) => {
                   const isSelected = selectedDifficulty === diff.id;
                   return (
@@ -708,7 +724,7 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 80px), 1fr))', gap: '0.5rem' }}>
                 {[
                   { label: '2 Mins / Q', val: 120 },
                   { label: '3 Mins / Q', val: 180 },
@@ -745,7 +761,7 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 80px), 1fr))', gap: '0.5rem' }}>
                 {[3, 5, 10].map((cnt) => {
                   const isSelected = questionCount === cnt;
                   return (
@@ -761,7 +777,7 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
                         fontWeight: 700
                       }}
                     >
-                      {cnt} Questions
+                      {cnt} Qs
                     </button>
                   );
                 })}
@@ -772,39 +788,75 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
       )}
 
       {/* Launch Summary Card */}
-      <div style={{
+      <div className="setup-launch-card" style={{
         backgroundColor: 'var(--bg-secondary)',
         border: '1px solid var(--accent-cyan)',
         borderRadius: 'var(--radius-lg)',
-        padding: '1.75rem',
+        padding: '1.25rem',
         display: 'flex',
         flexWrap: 'wrap',
         alignItems: 'center',
         justifyContent: 'space-between',
-        gap: '1.5rem',
+        gap: '1.25rem',
         marginTop: '2rem',
         boxShadow: '0 0 20px rgba(6, 182, 212, 0.1)'
       }}>
-        <div>
+        <div style={{ flex: '1 1 240px', minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
-            <Sparkles size={18} style={{ color: 'var(--accent-cyan)' }} />
-            <h4 style={{ fontSize: '1.1rem', color: 'var(--text-primary)' }}>
+            <Sparkles size={18} style={{ color: 'var(--accent-cyan)', flexShrink: 0 }} />
+            <h4 style={{ fontSize: '1.05rem', color: 'var(--text-primary)' }}>
               {setupMode === 'resume' ? 'Resume Simulation Configured' : 'Ready for Live Simulation'}
             </h4>
           </div>
-          <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>
+          <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.5' }}>
             Track: <strong style={{ color: 'var(--accent-cyan)' }}>{setupMode === 'resume' && parsedResume ? parsedResume.detectedRole : (JOB_ROLES.find(r => r.id === selectedRole)?.name)}</strong> &bull; Format: <strong style={{ color: 'var(--text-secondary)' }}>{INTERVIEW_TYPES.find(t => t.id === selectedType)?.name}</strong> &bull; Adaptive: <strong style={{ color: isAdaptive ? 'var(--accent-cyan)' : 'var(--text-dim)' }}>{isAdaptive ? 'Enabled' : 'Disabled'}</strong>
           </p>
         </div>
 
         <button
           onClick={handleLaunch}
-          className="btn btn-primary btn-lg"
-          style={{ minWidth: '220px' }}
+          className="btn btn-primary btn-lg setup-launch-btn"
+          style={{ flex: '1 1 200px' }}
         >
           <Play size={18} /> Start Interview
         </button>
       </div>
+
+      {/* Scoped CSS for Setup */}
+      <style>{`
+        @media (max-width: 640px) {
+          .setup-mode-tabs {
+            flex-direction: column !important;
+            width: 100% !important;
+            gap: 0.5rem !important;
+          }
+          .setup-mode-btn {
+            width: 100% !important;
+            justify-content: center !important;
+            padding: 0.65rem 1rem !important;
+            font-size: 0.85rem !important;
+          }
+          .setup-roles-grid {
+            grid-template-columns: 1fr !important;
+            gap: 0.6rem !important;
+          }
+          .setup-companies-grid {
+            grid-template-columns: 1fr !important;
+            gap: 0.5rem !important;
+          }
+          .setup-launch-card {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            text-align: left !important;
+            padding: 1rem !important;
+          }
+          .setup-launch-btn {
+            width: 100% !important;
+            flex: 1 1 auto !important;
+            justify-content: center !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

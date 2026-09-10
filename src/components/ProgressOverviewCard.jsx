@@ -97,9 +97,8 @@ export default function ProgressOverviewCard({ history = [] }) {
       </div>
 
       {/* 2. Top Row: Line Graph & Circular Gauge */}
-      <div style={{
+      <div className="progress-top-grid" style={{
         display: 'grid',
-        gridTemplateColumns: '1.45fr 1fr',
         gap: '0.75rem'
       }}>
         {/* Left Card: Average Score Trend */}
@@ -110,10 +109,11 @@ export default function ProgressOverviewCard({ history = [] }) {
           padding: '0.85rem 0.85rem 0.65rem 0.85rem',
           display: 'flex',
           flexDirection: 'column',
-          justifyContent: 'space-between'
+          justifyContent: 'space-between',
+          minWidth: 0
         }}>
           {/* Card Header with Dropdown */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem', flexWrap: 'wrap', gap: '0.4rem' }}>
             <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#F8FAFC' }}>
               Average Score Trend
             </span>
@@ -136,7 +136,7 @@ export default function ProgressOverviewCard({ history = [] }) {
 
           {/* SVG Line Chart */}
           <div style={{ width: '100%', overflow: 'hidden' }}>
-            <svg width="100%" height={svgHeight} viewBox={`0 0 ${svgWidth} ${svgHeight}`} style={{ overflow: 'visible' }}>
+            <svg width="100%" height={svgHeight} viewBox={`0 0 ${svgWidth} ${svgHeight}`} style={{ overflow: 'visible', maxWidth: '100%', height: 'auto', display: 'block' }}>
               <defs>
                 <linearGradient id="cyanAreaGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#06B6D4" stopOpacity="0.32" />
@@ -223,7 +223,8 @@ export default function ProgressOverviewCard({ history = [] }) {
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          textAlign: 'center'
+          textAlign: 'center',
+          minWidth: 0
         }}>
           {/* Circular Donut Gauge */}
           <div style={{ position: 'relative', width: '100px', height: '100px', margin: '0 auto 0.4rem auto' }}>
@@ -299,9 +300,8 @@ export default function ProgressOverviewCard({ history = [] }) {
       </div>
 
       {/* 3. Middle Row: 4 Metric Cards */}
-      <div style={{
+      <div className="progress-metrics-grid" style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(4, 1fr)',
         gap: '0.65rem'
       }}>
         {/* Total Interviews */}
@@ -309,18 +309,19 @@ export default function ProgressOverviewCard({ history = [] }) {
           backgroundColor: '#0B1222',
           border: '1px solid #1E293B',
           borderRadius: '8px',
-          padding: '0.85rem 0.5rem',
+          padding: '0.75rem 0.5rem',
           textAlign: 'center',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          justifyContent: 'center'
+          justifyContent: 'center',
+          minWidth: 0
         }}>
           <FileText size={18} style={{ color: '#06B6D4' }} />
-          <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#FFFFFF', margin: '0.25rem 0 0.1rem 0' }}>
+          <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#FFFFFF', margin: '0.25rem 0 0.1rem 0' }}>
             {totalInterviews}
           </div>
-          <div style={{ fontSize: '0.72rem', color: '#94A3B8' }}>
+          <div style={{ fontSize: '0.7rem', color: '#94A3B8', whiteSpace: 'nowrap' }}>
             Total Interviews
           </div>
         </div>
@@ -330,18 +331,19 @@ export default function ProgressOverviewCard({ history = [] }) {
           backgroundColor: '#0B1222',
           border: '1px solid #1E293B',
           borderRadius: '8px',
-          padding: '0.85rem 0.5rem',
+          padding: '0.75rem 0.5rem',
           textAlign: 'center',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          justifyContent: 'center'
+          justifyContent: 'center',
+          minWidth: 0
         }}>
           <Star size={18} style={{ color: '#06B6D4', fill: '#06B6D4' }} />
-          <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#FFFFFF', margin: '0.25rem 0 0.1rem 0' }}>
+          <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#FFFFFF', margin: '0.25rem 0 0.1rem 0' }}>
             {avgScore}%
           </div>
-          <div style={{ fontSize: '0.72rem', color: '#94A3B8' }}>
+          <div style={{ fontSize: '0.7rem', color: '#94A3B8', whiteSpace: 'nowrap' }}>
             Average Score
           </div>
         </div>
@@ -351,18 +353,19 @@ export default function ProgressOverviewCard({ history = [] }) {
           backgroundColor: '#0B1222',
           border: '1px solid #1E293B',
           borderRadius: '8px',
-          padding: '0.85rem 0.5rem',
+          padding: '0.75rem 0.5rem',
           textAlign: 'center',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          justifyContent: 'center'
+          justifyContent: 'center',
+          minWidth: 0
         }}>
           <TrendingUp size={18} style={{ color: '#06B6D4' }} />
-          <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#FFFFFF', margin: '0.25rem 0 0.1rem 0' }}>
+          <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#FFFFFF', margin: '0.25rem 0 0.1rem 0' }}>
             {bestScore}%
           </div>
-          <div style={{ fontSize: '0.72rem', color: '#94A3B8' }}>
+          <div style={{ fontSize: '0.7rem', color: '#94A3B8', whiteSpace: 'nowrap' }}>
             Best Score
           </div>
         </div>
@@ -372,39 +375,40 @@ export default function ProgressOverviewCard({ history = [] }) {
           backgroundColor: '#0B1222',
           border: '1px solid #1E293B',
           borderRadius: '8px',
-          padding: '0.85rem 0.5rem',
+          padding: '0.75rem 0.5rem',
           textAlign: 'center',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          justifyContent: 'center'
+          justifyContent: 'center',
+          minWidth: 0
         }}>
           <Clock size={18} style={{ color: '#06B6D4' }} />
-          <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#FFFFFF', margin: '0.25rem 0 0.1rem 0' }}>
+          <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#FFFFFF', margin: '0.25rem 0 0.1rem 0' }}>
             {streakDays}
           </div>
-          <div style={{ fontSize: '0.72rem', color: '#94A3B8' }}>
+          <div style={{ fontSize: '0.7rem', color: '#94A3B8', whiteSpace: 'nowrap' }}>
             Days Streak
           </div>
         </div>
       </div>
 
       {/* 4. Bottom Motivation Banner */}
-      <div style={{
+      <div className="progress-quote-banner" style={{
         backgroundColor: '#0B1222',
         border: '1px solid #1E293B',
         borderRadius: '10px',
-        padding: '0.75rem 1.25rem',
+        padding: '0.75rem 1rem',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        gap: '1rem'
+        gap: '0.75rem'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           {/* Target concentric ring badge */}
           <div style={{
-            width: '40px',
-            height: '40px',
+            width: '36px',
+            height: '36px',
             borderRadius: '50%',
             border: '1.5px solid #06B6D4',
             backgroundColor: 'rgba(6, 182, 212, 0.08)',
@@ -413,32 +417,61 @@ export default function ProgressOverviewCard({ history = [] }) {
             justifyContent: 'center',
             flexShrink: 0
           }}>
-            <Target size={22} style={{ color: '#06B6D4' }} />
+            <Target size={20} style={{ color: '#06B6D4' }} />
           </div>
           <div style={{
-            fontSize: '0.875rem',
+            fontSize: '0.825rem',
             fontWeight: 600,
             color: '#F8FAFC',
             lineHeight: 1.3
           }}>
-            “Small steps every day<br />lead to big results.”
+            “Small steps every day lead to big results.”
           </div>
         </div>
 
         {/* Right message with vertical divider */}
-        <div style={{
+        <div className="progress-quote-right" style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '1rem',
-          paddingLeft: '1rem',
-          borderLeft: '1px solid #1E293B'
+          paddingLeft: '0.75rem',
+          borderLeft: '1px solid #1E293B',
+          flexShrink: 0
         }}>
-          <div style={{ textAlign: 'left', fontSize: '0.78rem', lineHeight: 1.3 }}>
+          <div style={{ textAlign: 'left', fontSize: '0.75rem', lineHeight: 1.3 }}>
             <div style={{ color: '#38BDF8' }}>Keep practicing,</div>
             <div style={{ color: '#06B6D4', fontWeight: 600 }}>you're doing great!</div>
           </div>
         </div>
       </div>
+
+      {/* Scoped CSS for Mobile */}
+      <style>{`
+        .progress-top-grid {
+          grid-template-columns: 1.45fr 1fr;
+        }
+        .progress-metrics-grid {
+          grid-template-columns: repeat(4, 1fr);
+        }
+        @media (max-width: 640px) {
+          .progress-top-grid {
+            grid-template-columns: 1fr !important;
+          }
+          .progress-metrics-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+          .progress-quote-banner {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+          }
+          .progress-quote-right {
+            border-left: none !important;
+            border-top: 1px solid #1E293B !important;
+            padding-left: 0 !important;
+            padding-top: 0.5rem !important;
+            width: 100% !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

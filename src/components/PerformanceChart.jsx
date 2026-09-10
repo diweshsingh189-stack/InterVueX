@@ -31,8 +31,13 @@ export function RadarChart({ scores = {}, size = 260 }) {
   }).join(' ');
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', overflow: 'hidden' }}>
+      <svg
+        width="100%"
+        height="100%"
+        viewBox={`0 0 ${size} ${size}`}
+        style={{ maxWidth: `${size}px`, maxHeight: `${size}px`, width: '100%', height: 'auto', display: 'block' }}
+      >
         {/* Background Grid Rings */}
         {levels.map((lvl) => {
           const ringPoints = categories.map((_, i) => {
@@ -142,8 +147,8 @@ export function TrendChart({ history = [] }) {
   const polylineStr = points.map(p => `${p.x},${p.y}`).join(' ');
 
   return (
-    <div style={{ width: '100%', overflowX: 'auto' }}>
-      <svg width="100%" height={height} viewBox={`0 0 ${width} ${height}`} style={{ minWidth: '320px' }}>
+    <div style={{ width: '100%', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+      <svg width="100%" height={height} viewBox={`0 0 ${width} ${height}`} style={{ minWidth: '280px', width: '100%', display: 'block' }}>
         {/* Horizontal grid lines for scores 5.0, 7.5, 10.0 */}
         {[5, 7.5, 10].map(score => {
           const y = (height - padY) - ((score / 10) * (height - padY * 2));

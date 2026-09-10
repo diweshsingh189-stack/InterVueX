@@ -82,9 +82,9 @@ export default function ProfilePage({ userProfile, onSaveProfile, history = [] }
   return (
     <div style={{ maxWidth: '960px', margin: '0 auto', paddingBottom: '4rem' }}>
       {/* Header */}
-      <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+      <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
         <span className="badge badge-cyan" style={{ marginBottom: '0.5rem' }}>Candidate Portfolio</span>
-        <h1 style={{ fontSize: '2.2rem', color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
+        <h1 style={{ fontSize: 'clamp(1.5rem, 3.5vw, 2.2rem)', color: 'var(--text-primary)', marginBottom: '0.5rem', lineHeight: 1.25 }}>
           Profile & Target Configuration
         </h1>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
@@ -97,13 +97,14 @@ export default function ProfilePage({ userProfile, onSaveProfile, history = [] }
           backgroundColor: 'rgba(6, 182, 212, 0.12)',
           border: '1px solid var(--accent-cyan)',
           borderRadius: 'var(--radius-md)',
-          padding: '1rem',
+          padding: '0.85rem 1rem',
           display: 'flex',
           alignItems: 'center',
           gap: '0.6rem',
           color: 'var(--accent-cyan)',
           marginBottom: '1.5rem',
-          animation: 'fadeIn 0.2s ease'
+          animation: 'fadeIn 0.2s ease',
+          fontSize: '0.875rem'
         }}>
           <CheckCircle2 size={18} />
           <span>Profile configuration saved successfully to local storage!</span>
@@ -111,22 +112,19 @@ export default function ProfilePage({ userProfile, onSaveProfile, history = [] }
       )}
 
       {/* Top Profile Summary Card */}
-      <div style={{
-        backgroundColor: 'var(--surface-card)',
-        border: '1px solid var(--border-subtle)',
-        borderRadius: 'var(--radius-lg)',
-        padding: '2rem',
+      <div className="card profile-summary-card" style={{
+        padding: '1.5rem',
         display: 'flex',
         flexWrap: 'wrap',
         justifyContent: 'space-between',
         alignItems: 'center',
-        gap: '1.5rem',
+        gap: '1.25rem',
         marginBottom: '2rem'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', minWidth: 0 }}>
           <div style={{
-            width: '68px',
-            height: '68px',
+            width: '56px',
+            height: '56px',
             borderRadius: '50%',
             backgroundColor: 'var(--bg-secondary)',
             border: '2px solid var(--accent-cyan)',
@@ -134,15 +132,16 @@ export default function ProfilePage({ userProfile, onSaveProfile, history = [] }
             alignItems: 'center',
             justifyContent: 'center',
             color: 'var(--accent-cyan)',
-            fontSize: '1.5rem',
-            fontWeight: 800
+            fontSize: '1.35rem',
+            fontWeight: 800,
+            flexShrink: 0
           }}>
             {formData.name.charAt(0)}
           </div>
-          <div>
-            <h2 style={{ fontSize: '1.4rem', color: 'var(--text-primary)' }}>{formData.name}</h2>
-            <div style={{ fontSize: '0.875rem', color: 'var(--text-muted)', display: 'flex', gap: '0.75rem', marginTop: '0.2rem' }}>
-              <span>{formData.email}</span>
+          <div style={{ minWidth: 0 }}>
+            <h2 style={{ fontSize: '1.25rem', color: 'var(--text-primary)', wordBreak: 'break-word' }}>{formData.name}</h2>
+            <div style={{ fontSize: '0.825rem', color: 'var(--text-muted)', display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.2rem' }}>
+              <span style={{ wordBreak: 'break-all' }}>{formData.email}</span>
               <span>&bull;</span>
               <span style={{ color: 'var(--accent-cyan)', fontWeight: 600 }}>{formData.targetRole}</span>
             </div>
@@ -150,14 +149,14 @@ export default function ProfilePage({ userProfile, onSaveProfile, history = [] }
         </div>
 
         {/* Stats summary */}
-        <div style={{ display: 'flex', gap: '2rem', borderLeft: '1px solid var(--border-subtle)', paddingLeft: '1.5rem' }}>
+        <div className="profile-stats-box" style={{ display: 'flex', gap: '1.5rem', borderLeft: '1px solid var(--border-subtle)', paddingLeft: '1.5rem' }}>
           <div>
             <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Interviews Done</div>
-            <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)' }}>{totalInterviews}</div>
+            <div style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-primary)' }}>{totalInterviews}</div>
           </div>
           <div>
             <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Avg Rubric Score</div>
-            <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--accent-cyan)' }}>{avgScore} / 10</div>
+            <div style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--accent-cyan)' }}>{avgScore} / 10</div>
           </div>
         </div>
       </div>
@@ -370,6 +369,24 @@ export default function ProfilePage({ userProfile, onSaveProfile, history = [] }
           </button>
         </div>
       </form>
+
+      {/* Scoped Responsive CSS */}
+      <style>{`
+        @media (max-width: 640px) {
+          .profile-summary-card {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+          }
+          .profile-stats-box {
+            border-left: none !important;
+            border-top: 1px solid var(--border-subtle) !important;
+            padding-left: 0 !important;
+            padding-top: 1rem !important;
+            width: 100% !important;
+            justifyContent: space-around !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
