@@ -312,17 +312,37 @@ export default function InterviewReport({ report, onRetake, onGoDashboard, onBro
                     <span style={{ fontWeight: 800, color: 'var(--accent-cyan)', fontSize: '0.9rem', flexShrink: 0 }}>Q{idx + 1}.</span>
                     <span style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '0.95rem', wordBreak: 'break-word' }}>{ans.question}</span>
                   </div>
-                  <div style={{
-                    backgroundColor: 'var(--surface-card)',
-                    border: '1px solid var(--border-subtle)',
-                    padding: '0.2rem 0.6rem',
-                    borderRadius: 'var(--radius-sm)',
-                    fontSize: '0.85rem',
-                    fontWeight: 700,
-                    color: 'var(--accent-cyan)',
-                    whiteSpace: 'nowrap'
-                  }}>
-                    {qScore} / 10
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    {ev.status && (
+                      <span style={{
+                        padding: '0.2rem 0.5rem',
+                        borderRadius: 'var(--radius-sm)',
+                        fontSize: '0.72rem',
+                        fontWeight: 700,
+                        backgroundColor: ev.status === 'Correct' ? 'rgba(6, 182, 212, 0.15)' : (ev.status === 'Partially Correct' ? 'rgba(245, 158, 11, 0.15)' : 'rgba(239, 68, 68, 0.15)'),
+                        color: ev.status === 'Correct' ? 'var(--accent-cyan)' : (ev.status === 'Partially Correct' ? '#F59E0B' : '#EF4444'),
+                        border: ev.status === 'Correct' ? '1px solid var(--accent-cyan)' : (ev.status === 'Partially Correct' ? '1px solid #F59E0B' : '1px solid #EF4444')
+                      }}>
+                        {ev.status}
+                      </span>
+                    )}
+                    {ev.testSummary && (
+                      <span className="badge badge-cyan" style={{ fontSize: '0.7rem' }}>
+                        {ev.testSummary}
+                      </span>
+                    )}
+                    <div style={{
+                      backgroundColor: 'var(--surface-card)',
+                      border: '1px solid var(--border-subtle)',
+                      padding: '0.2rem 0.6rem',
+                      borderRadius: 'var(--radius-sm)',
+                      fontSize: '0.85rem',
+                      fontWeight: 700,
+                      color: 'var(--accent-cyan)',
+                      whiteSpace: 'nowrap'
+                    }}>
+                      {qScore} / 10
+                    </div>
                   </div>
                 </div>
 
@@ -335,9 +355,12 @@ export default function InterviewReport({ report, onRetake, onGoDashboard, onBro
                   color: 'var(--text-secondary)',
                   lineHeight: '1.6',
                   marginBottom: '1rem',
-                  borderLeft: '3px solid var(--accent-cyan)'
+                  borderLeft: '3px solid var(--accent-cyan)',
+                  fontFamily: ans.userAnswer && (ans.userAnswer.includes('function') || ans.userAnswer.includes('def ') || ans.userAnswer.includes('class ') || ans.userAnswer.includes('{')) ? 'var(--font-mono)' : 'inherit',
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-word'
                 }}>
-                  <strong style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.75rem', marginBottom: '0.2rem' }}>Your Answer:</strong>
+                  <strong style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.75rem', marginBottom: '0.2rem', fontFamily: 'var(--font-sans)' }}>Your Answer:</strong>
                   {ans.userAnswer}
                 </div>
 

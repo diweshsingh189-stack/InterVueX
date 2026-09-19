@@ -12,6 +12,8 @@ import {
 } from 'lucide-react';
 import { formatDate, formatTime, getScoreColor, getScoreLabel } from '../utils/formatters';
 
+import CustomSelect from '../components/CustomSelect';
+
 export default function HistoryPage({ history = [], onViewReport, onStartNew, onClearHistory }) {
   const [search, setSearch] = useState('');
   const [filterRole, setFilterRole] = useState('all');
@@ -48,8 +50,8 @@ export default function HistoryPage({ history = [], onViewReport, onStartNew, on
       </div>
 
       {/* Filter controls */}
-      <div className="card" style={{ marginBottom: '1.5rem', padding: '1rem' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '0.75rem', alignItems: 'center' }}>
+      <div className="card" style={{ marginBottom: '1.5rem', padding: '1rem', position: 'relative', zIndex: 40, overflow: 'visible' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '0.75rem', alignItems: 'center', position: 'relative', overflow: 'visible' }}>
           <div style={{ position: 'relative' }}>
             <Search size={16} style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
             <input
@@ -62,16 +64,15 @@ export default function HistoryPage({ history = [], onViewReport, onStartNew, on
             />
           </div>
 
-          <select
-            className="form-select"
+          <CustomSelect
             value={filterRole}
-            onChange={(e) => setFilterRole(e.target.value)}
-          >
-            <option value="all">All Track Roles</option>
-            {uniqueRoles.map(r => (
-              <option key={r} value={r}>{r}</option>
-            ))}
-          </select>
+            onChange={(val) => setFilterRole(val)}
+            options={[
+              { id: 'all', name: 'All Track Roles' },
+              ...uniqueRoles.map(r => ({ id: r, name: r }))
+            ]}
+            placeholder="All Track Roles"
+          />
         </div>
       </div>
 

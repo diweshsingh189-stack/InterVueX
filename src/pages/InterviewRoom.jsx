@@ -11,6 +11,8 @@ import {
   ChevronRight, 
   AlertOctagon, 
   CheckCircle2, 
+  XCircle,
+  AlertTriangle,
   Sparkles, 
   HelpCircle,
   Award,
@@ -21,20 +23,25 @@ import {
   CornerDownRight,
   BrainCircuit,
   Code2,
-  Hourglass
+  Hourglass,
+  Layers,
+  Terminal,
+  FileCode
 } from 'lucide-react';
 import WebcamPreview from '../components/WebcamPreview';
 import CodingEditor from '../components/CodingEditor';
 import { speechService } from '../services/speechService';
 import { evaluateAnswer } from '../services/evaluationService';
 import { adaptiveService } from '../services/adaptiveService';
+import { getQuestionStarterCode } from '../services/codeExecutionService';
 import { formatTime, getScoreColor, getScoreLabel } from '../utils/formatters';
 
 export default function InterviewRoom({ session, onFinishInterview, onExit, userProfile }) {
   const [sessionQuestions, setSessionQuestions] = useState(() => session?.questions || []);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [userAnswers, setUserAnswers] = useState({}); // { [qIndex]: { text, evaluation, timestamp } }
+  const [userAnswers, setUserAnswers] = useState({}); // { [qIndex]: { text, evaluation, timestamp, language } }
   const [currentText, setCurrentText] = useState('');
+  const [currentLanguage, setCurrentLanguage] = useState('javascript');
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [currentFeedback, setCurrentFeedback] = useState(null);
   const [adaptiveNotice, setAdaptiveNotice] = useState(null);
@@ -85,10 +92,11 @@ export default function InterviewRoom({ session, onFinishInterview, onExit, user
     if (currentQuestion) {
       // Load saved answer for this index
       if (userAnswers[currentIndex]) {
-        setCurrentText(userAnswers[currentIndex].text || userAnswers[currentIndex].userAnswer || '');
+        setCurrentText(userAnswers[currentIndex].userAnswer || userAnswers[currentIndex].text || '');
+        setCurrentLanguage(userAnswers[currentIndex].language || 'javascript');
         setCurrentFeedback(userAnswers[currentIndex].evaluation || null);
       } else {
-        const defaultCode = currentQuestion.starterCode?.javascript || '';
+        const defaultCode = getQuestionStarterCode(currentQuestion, 'javascript');
         setCurrentText(isCodingQuestion ? defaultCode : '');
         setCurrentFeedback(null);
       }
@@ -153,7 +161,11 @@ export default function InterviewRoom({ session, onFinishInterview, onExit, user
       const evaluation = await evaluateAnswer(
         currentQuestion,
         currentText,
-        { apiKey: userProfile?.apiKey }
+        { 
+          apiKey: userProfile?.apiKey,
+          language: currentLanguage,
+          typeId: isCodingQuestion ? 'coding' : (currentQuestion?.type || session?.typeId)
+        }
       );
 
       const updatedAnswers = {
@@ -163,6 +175,7 @@ export default function InterviewRoom({ session, onFinishInterview, onExit, user
           question: currentQuestion.question,
           category: currentQuestion.category,
           userAnswer: currentText.trim(),
+          language: currentLanguage,
           evaluation,
           timestamp: new Date().toISOString()
         }
@@ -219,6 +232,9 @@ export default function InterviewRoom({ session, onFinishInterview, onExit, user
         userAnswer: '[Skipped by candidate]',
         evaluation: {
           overallScore: 0.0,
+          status: 'Incorrect',
+          statusLabel: 'Question Skipped',
+          verdict: 'Question was skipped without submitting a solution.',
           scores: { technical: 0, relevance: 0, clarity: 0, communication: 0, completeness: 0, confidence: 0 },
           doneWell: 'Identified unfamiliar territory quickly.',
           improvement: 'Question was skipped. Review key concepts for this topic.',
@@ -318,7 +334,7 @@ export default function InterviewRoom({ session, onFinishInterview, onExit, user
       scores,
       status: overallScore >= 7.0 ? 'Passed' : 'Needs Practice',
       summary: overallScore >= 8.0 
-        ? 'High-caliber technical performance with structured system justifications and articulate delivery.'
+        ? 'High-caliber technical performance with structured justifications and articulate delivery.'
         : 'Good fundamental awareness. Refine deeper edge-case coverage and STAR structure for maximum scoring.',
       weakAreas: weakAreas.length > 0 ? weakAreas : ['Further polish architectural trade-off explanations'],
       strongAreas: strongAnswers.length > 0 ? strongAnswers : ['Clear conceptual articulation'],
@@ -329,6 +345,7 @@ export default function InterviewRoom({ session, onFinishInterview, onExit, user
     onFinishInterview(finalReport);
   };
 
+  const answeredCount = Object.keys(userAnswers).length;
   const progressPercent = Math.round(((currentIndex + 1) / totalQuestions) * 100);
   const wordCount = currentText.trim() ? currentText.trim().split(/\s+/).filter(Boolean).length : 0;
 
@@ -365,7 +382,7 @@ export default function InterviewRoom({ session, onFinishInterview, onExit, user
         {/* Center Progress Bar */}
         <div className="interview-progress-bar" style={{ flex: '1 1 120px', minWidth: '100px', maxWidth: '220px', margin: '0 0.25rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.68rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>
-            <span>Progress</span>
+            <span>Progress ({answeredCount}/{totalQuestions})</span>
             <span>{progressPercent}%</span>
           </div>
           <div style={{ height: '5px', backgroundColor: 'var(--bg-secondary)', borderRadius: 'var(--radius-full)', overflow: 'hidden' }}>
@@ -507,7 +524,10 @@ export default function InterviewRoom({ session, onFinishInterview, onExit, user
         <CodingEditor
           question={currentQuestion}
           initialCode={currentText}
-          onChangeCode={(code) => setCurrentText(code)}
+          onChangeCode={(code, lang) => {
+            setCurrentText(code);
+            if (lang) setCurrentLanguage(lang);
+          }}
         />
       ) : (
         <div className="card" style={{ marginBottom: '1.5rem' }}>
@@ -583,7 +603,7 @@ export default function InterviewRoom({ session, onFinishInterview, onExit, user
               className="btn btn-primary"
             >
               {isEvaluating ? (
-                <><RefreshCw size={16} className="live-dot" /> Evaluating Rubric...</>
+                <><RefreshCw size={16} className="live-dot" /> Evaluating Answer...</>
               ) : (
                 <><Send size={16} /> Submit & Evaluate</>
               )}
@@ -609,42 +629,91 @@ export default function InterviewRoom({ session, onFinishInterview, onExit, user
         </div>
       </div>
 
-      {/* Real-Time Evaluation Feedback Modal/Box */}
+      {/* Real-Time Evaluation Feedback Card with Clear Correctness Indicator */}
       {currentFeedback && (
         <div className="card" style={{
           backgroundColor: 'var(--bg-secondary)',
-          border: '1px solid var(--accent-cyan)',
+          border: currentFeedback.status === 'Correct' 
+            ? '1px solid var(--accent-cyan)' 
+            : (currentFeedback.status === 'Partially Correct' ? '1px solid #F59E0B' : '1px solid #EF4444'),
           borderRadius: 'var(--radius-lg)',
           padding: '1.25rem',
-          animation: 'fadeIn 0.3s ease'
+          animation: 'fadeIn 0.3s ease',
+          marginBottom: '1.5rem'
         }}>
-          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+          {/* Status Header Bar */}
+          <div style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: '0.75rem',
+            marginBottom: '1rem',
+            paddingBottom: '0.75rem',
+            borderBottom: '1px solid var(--border-subtle)'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
               <div style={{
-                width: '40px',
-                height: '40px',
+                width: '44px',
+                height: '44px',
                 borderRadius: '50%',
                 backgroundColor: 'var(--surface-card)',
-                border: '2px solid var(--accent-cyan)',
+                border: currentFeedback.status === 'Correct' 
+                  ? '2px solid var(--accent-cyan)' 
+                  : (currentFeedback.status === 'Partially Correct' ? '2px solid #F59E0B' : '2px solid #EF4444'),
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '1.05rem',
+                fontSize: '1.15rem',
                 fontWeight: 800,
-                color: 'var(--accent-cyan)',
+                color: currentFeedback.status === 'Correct' 
+                  ? 'var(--accent-cyan)' 
+                  : (currentFeedback.status === 'Partially Correct' ? '#F59E0B' : '#EF4444'),
                 flexShrink: 0
               }}>
                 {currentFeedback.overallScore}
               </div>
               <div>
-                <h4 style={{ fontSize: '1rem', color: 'var(--text-primary)' }}>AI Rubric Scorecard</h4>
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                  {getScoreLabel(currentFeedback.overallScore)} &bull; Real-time Semantic Evaluation
-                </span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
+                  <span style={{
+                    padding: '0.2rem 0.6rem',
+                    borderRadius: 'var(--radius-sm)',
+                    fontSize: '0.75rem',
+                    fontWeight: 700,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.04em',
+                    backgroundColor: currentFeedback.status === 'Correct' 
+                      ? 'rgba(6, 182, 212, 0.15)' 
+                      : (currentFeedback.status === 'Partially Correct' ? 'rgba(245, 158, 11, 0.15)' : 'rgba(239, 68, 68, 0.15)'),
+                    color: currentFeedback.status === 'Correct' 
+                      ? 'var(--accent-cyan)' 
+                      : (currentFeedback.status === 'Partially Correct' ? '#F59E0B' : '#EF4444'),
+                    border: currentFeedback.status === 'Correct' 
+                      ? '1px solid var(--accent-cyan)' 
+                      : (currentFeedback.status === 'Partially Correct' ? '1px solid #F59E0B' : '1px solid #EF4444'),
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.35rem'
+                  }}>
+                    {currentFeedback.status === 'Correct' && <CheckCircle2 size={13} />}
+                    {currentFeedback.status === 'Partially Correct' && <AlertTriangle size={13} />}
+                    {currentFeedback.status === 'Incorrect' && <XCircle size={13} />}
+                    {currentFeedback.statusLabel || currentFeedback.status}
+                  </span>
+
+                  {currentFeedback.testSummary && (
+                    <span className="badge badge-cyan" style={{ fontSize: '0.72rem' }}>
+                      {currentFeedback.testSummary}
+                    </span>
+                  )}
+                </div>
+                <div style={{ fontSize: '0.85rem', color: 'var(--text-primary)', fontWeight: 600 }}>
+                  {currentFeedback.verdict}
+                </div>
               </div>
             </div>
 
-            {/* Micro Scores Grid */}
+            {/* Score Badges */}
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
               <span className="badge" style={{ fontSize: '0.7rem' }}>Tech: {currentFeedback.scores?.technical}</span>
               <span className="badge" style={{ fontSize: '0.7rem' }}>Rel: {currentFeedback.scores?.relevance}</span>
@@ -654,7 +723,8 @@ export default function InterviewRoom({ session, onFinishInterview, onExit, user
             </div>
           </div>
 
-          <div className="grid-2" style={{ gap: '0.75rem' }}>
+          {/* Details Grid: Strong Aspects & Improvements */}
+          <div className="grid-2" style={{ gap: '0.75rem', marginBottom: '0.85rem' }}>
             <div style={{
               backgroundColor: 'var(--surface-card)',
               padding: '0.85rem',
@@ -683,6 +753,30 @@ export default function InterviewRoom({ session, onFinishInterview, onExit, user
               </p>
             </div>
           </div>
+
+          {/* Suggested Model Solution / Approach */}
+          {currentFeedback.suggestedApproach && (
+            <div style={{
+              backgroundColor: 'var(--surface-card)',
+              padding: '0.85rem',
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid var(--border-subtle)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-primary)', fontWeight: 700, fontSize: '0.825rem', marginBottom: '0.35rem' }}>
+                <Sparkles size={15} style={{ color: 'var(--accent-cyan)' }} /> Suggested Solution / Ideal Approach
+              </div>
+              <pre style={{
+                fontSize: '0.78rem',
+                color: 'var(--text-secondary)',
+                lineHeight: '1.5',
+                whiteSpace: 'pre-wrap',
+                fontFamily: isCodingQuestion ? 'var(--font-mono)' : 'inherit',
+                margin: 0
+              }}>
+                {currentFeedback.suggestedApproach}
+              </pre>
+            </div>
+          )}
         </div>
       )}
 
