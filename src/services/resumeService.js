@@ -33,14 +33,31 @@ export const SAMPLE_CANDIDATES = [
     skills: ['React', 'Node.js', 'TypeScript', 'PostgreSQL', 'Docker', 'AWS', 'Redis', 'GraphQL'],
     avatar: '👨‍💻',
     summary: 'Senior Full Stack Engineer with 4 years building scalable microservices, Next.js web applications, and low-latency APIs.',
-    resumeText: `Alex Chen - Full Stack Engineer
-Summary: Results-oriented Full Stack Developer with 4 years of experience building resilient cloud-native applications. Proficient in React, Node.js, TypeScript, PostgreSQL, Docker, AWS, and Redis.
-Experience:
-- Architected decoupled microservice architecture handling 2.5M daily requests with Node.js and PostgreSQL.
-- Implemented real-time telemetry caching using Redis, reducing API p99 latency by 38%.
-- Built high-performance responsive frontend dashboards using React, TypeScript, and Next.js.
-- Containerized development and staging environments using Docker and automated CI/CD pipelines on AWS.
-Skills: React, Node.js, TypeScript, PostgreSQL, Docker, AWS, Redis, GraphQL, REST API, Git.`
+    resumeText: `👤 ALEX CHEN
+San Francisco, CA | alex.chen@example.com | (555) 349-2810 | linkedin.com/in/alexchen-dev
+
+════════════════════════════════════════════════════════════════
+📌 PROFESSIONAL SUMMARY
+════════════════════════════════════════════════════════════════
+Results-oriented Full Stack Developer with 4 years of experience building resilient cloud-native applications and low-latency distributed microservices.
+
+════════════════════════════════════════════════════════════════
+📌 WORK EXPERIENCE
+════════════════════════════════════════════════════════════════
+Senior Software Engineer — CloudScale Labs (2022 – Present)
+  • Architected decoupled microservice architecture handling 2.5M daily requests with Node.js and PostgreSQL.
+  • Implemented real-time telemetry caching using Redis, reducing API p99 latency by 38%.
+  • Built high-performance responsive frontend dashboards using React, TypeScript, and Next.js.
+  • Containerized development and staging environments using Docker and automated CI/CD pipelines on AWS.
+
+════════════════════════════════════════════════════════════════
+📌 TECHNICAL SKILLS
+════════════════════════════════════════════════════════════════
+  • Languages: JavaScript, TypeScript, Python, SQL, HTML, CSS
+  • Frontend: React, Next.js, Redux, Tailwind CSS, Webpack
+  • Backend: Node.js, Express.js, REST APIs, GraphQL, Microservices
+  • Databases & Caching: PostgreSQL, MongoDB, Redis, Upstash
+  • Cloud & DevOps: Docker, Kubernetes, AWS (ECS, S3, RDS), Git, CI/CD`
   },
   {
     id: 'candidate-priya-sharma',
@@ -52,13 +69,29 @@ Skills: React, Node.js, TypeScript, PostgreSQL, Docker, AWS, Redis, GraphQL, RES
     skills: ['React', 'TypeScript', 'Next.js', 'Redux', 'Tailwind', 'JavaScript', 'HTML', 'CSS'],
     avatar: '👩‍💻',
     summary: 'Frontend Engineer with 3 years specializing in component design systems, state architecture, and Core Web Vitals optimization.',
-    resumeText: `Priya Sharma - Frontend Developer
-Summary: Frontend Engineer with 3 years of expertise in building enterprise web applications with React, TypeScript, Next.js, and Redux.
-Experience:
-- Led frontend design system migration to Tailwind and TypeScript, reducing client bundle size by 30%.
-- Optimized Core Web Vitals (LCP/CLS/INP), improving conversion rates by 22%.
-- Architected scalable client-side caching with Redux Toolkit and React Query for asynchronous data fetching.
-Skills: React, JavaScript, TypeScript, Next.js, Redux, Tailwind, HTML, CSS, REST API, Git.`
+    resumeText: `👤 PRIYA SHARMA
+Bengaluru, Karnataka, India | priya.sharma@example.com | linkedin.com/in/priyasharma
+
+════════════════════════════════════════════════════════════════
+📌 PROFESSIONAL SUMMARY
+════════════════════════════════════════════════════════════════
+Frontend Engineer with 3 years of expertise in building enterprise web applications with React, TypeScript, Next.js, and Redux Toolkit.
+
+════════════════════════════════════════════════════════════════
+📌 WORK EXPERIENCE
+════════════════════════════════════════════════════════════════
+Frontend Engineer — PixelFlow Systems (2023 – Present)
+  • Led frontend design system migration to Tailwind CSS and TypeScript, reducing client bundle size by 30%.
+  • Optimized Core Web Vitals (LCP/CLS/INP), improving end-user conversion rates by 22%.
+  • Architected scalable client-side caching with Redux Toolkit and React Query for asynchronous data fetching.
+
+════════════════════════════════════════════════════════════════
+📌 TECHNICAL SKILLS
+════════════════════════════════════════════════════════════════
+  • Core: React.js, JavaScript (ES6+), TypeScript, HTML5, CSS3/SCSS
+  • Frameworks & State: Next.js, Redux Toolkit, React Query, Zustand
+  • UI & Styling: Tailwind CSS, shadcn/ui, Framer Motion, Material UI
+  • Tools & Testing: Git, Jest, Cypress, Vite, Webpack, Figma`
   },
   {
     id: 'candidate-rahul-verma',
@@ -70,13 +103,29 @@ Skills: React, JavaScript, TypeScript, Next.js, Redux, Tailwind, HTML, CSS, REST
     skills: ['Python', 'FastAPI', 'Django', 'PostgreSQL', 'Redis', 'Docker', 'Kubernetes', 'Microservices'],
     avatar: '👨‍💼',
     summary: 'Backend Systems Engineer with 5 years designing high-throughput distributed microservices, message queues, and caching.',
-    resumeText: `Rahul Verma - Senior Backend Developer
-Summary: Backend specialist with 5 years experience designing distributed REST APIs, relational schemas, and asynchronous event pipelines.
-Experience:
-- Designed and delivered distributed event-driven microservices using Python, FastAPI, Docker, and Kubernetes.
-- Optimized high-concurrency PostgreSQL queries, connection pooling, and multi-region replication.
-- Integrated Redis pub/sub and distributed rate-limiting to protect mission-critical payment gateways.
-Skills: Python, FastAPI, Django, PostgreSQL, Redis, Docker, Kubernetes, Microservices, System Design, Git.`
+    resumeText: `👤 RAHUL VERMA
+Hyderabad, Telangana, India | rahul.verma@example.com | linkedin.com/in/rahulverma
+
+════════════════════════════════════════════════════════════════
+📌 PROFESSIONAL SUMMARY
+════════════════════════════════════════════════════════════════
+Backend specialist with 5 years experience designing distributed REST APIs, high-throughput microservices, and asynchronous event pipelines.
+
+════════════════════════════════════════════════════════════════
+📌 WORK EXPERIENCE
+════════════════════════════════════════════════════════════════
+Lead Backend Engineer — DataPulse Networks (2021 – Present)
+  • Designed and delivered distributed event-driven microservices using Python, FastAPI, Docker, and Kubernetes.
+  • Optimized high-concurrency PostgreSQL queries, connection pooling, and multi-region replication.
+  • Integrated Redis pub/sub and distributed rate-limiting to protect mission-critical payment gateways.
+
+════════════════════════════════════════════════════════════════
+📌 TECHNICAL SKILLS
+════════════════════════════════════════════════════════════════
+  • Languages: Python, Go, SQL, Bash
+  • Backend: FastAPI, Django, Flask, gRPC, RESTful APIs
+  • Databases: PostgreSQL, MongoDB, Redis, Elasticsearch
+  • Distributed Systems: Kafka, RabbitMQ, Docker, Kubernetes, Microservices`
   },
   {
     id: 'candidate-maya-patel',
@@ -88,13 +137,28 @@ Skills: Python, FastAPI, Django, PostgreSQL, Redis, Docker, Kubernetes, Microser
     skills: ['SQL', 'Python', 'Pandas', 'Tableau', 'Data Structures', 'PostgreSQL'],
     avatar: '👩‍🔬',
     summary: 'Data Analyst with 2 years analyzing product telemetry, building SQL pipelines, and creating executive business dashboards.',
-    resumeText: `Maya Patel - Data Analyst
-Summary: Analytical problem solver with 2 years analyzing complex business metrics, customer cohorts, and building SQL pipelines.
-Experience:
-- Authored complex SQL queries (window functions, CTEs, self-joins) over 50M+ rows of event logs.
-- Built interactive Tableau and Power BI dashboards for executive KPI tracking and revenue attribution.
-- Developed automated data cleaning pipelines using Python and Pandas.
-Skills: SQL, PostgreSQL, Python, Pandas, Tableau, Data Structures, Algorithms, Git.`
+    resumeText: `👤 MAYA PATEL
+Mumbai, Maharashtra, India | maya.patel@example.com | linkedin.com/in/mayapatel
+
+════════════════════════════════════════════════════════════════
+📌 PROFESSIONAL SUMMARY
+════════════════════════════════════════════════════════════════
+Analytical problem solver with 2 years analyzing complex business metrics, customer cohorts, and building SQL pipelines.
+
+════════════════════════════════════════════════════════════════
+📌 WORK EXPERIENCE
+════════════════════════════════════════════════════════════════
+Data Analyst — InsightsCorp Analytics (2024 – Present)
+  • Authored complex SQL queries (window functions, CTEs, self-joins) over 50M+ rows of event logs.
+  • Built interactive Tableau and Power BI dashboards for executive KPI tracking and revenue attribution.
+  • Developed automated data cleaning pipelines using Python and Pandas.
+
+════════════════════════════════════════════════════════════════
+📌 TECHNICAL SKILLS
+════════════════════════════════════════════════════════════════
+  • Database & Querying: SQL (PostgreSQL, MySQL, Snowflake), CTEs, Window Functions
+  • Programming & Analytics: Python, Pandas, NumPy, Scikit-learn
+  • Visualization & BI: Tableau, Power BI, Metabase, Excel (Advanced)`
   },
   {
     id: 'candidate-anita-roy',
@@ -106,19 +170,34 @@ Skills: SQL, PostgreSQL, Python, Pandas, Tableau, Data Structures, Algorithms, G
     skills: ['Data Structures', 'Algorithms', 'C++', 'Java', 'SQL', 'OOP'],
     avatar: '🎓',
     summary: 'Computer Science Graduate with strong foundation in DSA, competitive programming, C++, OOP, and operating systems.',
-    resumeText: `Anita Roy - Graduate Software Engineer (Fresher)
-Summary: Recent Computer Science graduate with strong problem-solving skills, solid grounding in Data Structures, Algorithms, and Object-Oriented Design.
-Projects & Experience:
-- Solved 350+ algorithmic problems on LeetCode/CodeForces covering Trees, Dynamic Programming, and Graph Traversals.
-- Built student management system using C++, OOP principles, and SQL database storage.
-- Completed academic coursework in Operating Systems, Database Management Systems, and Computer Networks.
-Skills: Data Structures, Algorithms, C++, Java, SQL, Linux, Git, Object-Oriented Programming.`
+    resumeText: `👤 ANITA ROY
+New Delhi, India | anita.roy@example.com | github.com/anitaroy
+
+════════════════════════════════════════════════════════════════
+📌 EDUCATION
+════════════════════════════════════════════════════════════════
+B.Tech in Computer Science and Engineering (2022 – 2026)
+GPA: 8.8 / 10 | Delhi Technological University
+
+════════════════════════════════════════════════════════════════
+📌 PROJECTS & ACHIEVEMENTS
+════════════════════════════════════════════════════════════════
+  • Solved 350+ algorithmic problems on LeetCode covering Dynamic Programming, Trees, and Graph Traversals.
+  • Built scalable student management system using C++, OOP principles, and SQL database storage.
+  • Completed core academic coursework in Operating Systems, DBMS, Computer Networks, and Compiler Design.
+
+════════════════════════════════════════════════════════════════
+📌 TECHNICAL SKILLS
+════════════════════════════════════════════════════════════════
+  • Core Languages: C++, Java, Python, C, SQL
+  • CS Fundamentals: Data Structures & Algorithms, Object-Oriented Programming (OOP), OS, DBMS, Networks
+  • Tools: Git, GitHub, VS Code, Linux/Unix`
   }
 ];
 
 /**
  * Sanitizes and cleans text by removing binary artifacts, PDF stream tokens,
- * non-printable characters, and formatting clean paragraphs.
+ * non-printable characters.
  */
 export function cleanResumeText(raw) {
   if (!raw || typeof raw !== 'string') return '';
@@ -129,7 +208,6 @@ export function cleanResumeText(raw) {
   const hasPdfSignatures = /%PDF|\bobj\b|\bendobj\b|\bstream\b|\bendstream\b|\bxref\b|FlateDecode/i.test(text);
 
   if (hasPdfSignatures) {
-    // Strip PDF stream blocks and object descriptors
     text = text
       .replace(/%PDF-[0-9.]+/g, '')
       .replace(/<<[\s\S]*?>>/g, ' ')
@@ -145,21 +223,91 @@ export function cleanResumeText(raw) {
   text = text
     .replace(/\uFFFD/g, ' ')
     .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, ' ')
-    .replace(/[^\x20-\x7E\n\r\t•–—]/g, ' ');
+    .replace(/[^\x20-\x7E\n\r\t•–—|/()#+&@%:.,-]/g, ' ');
 
-  // Format into clean, readable lines
+  // Filter out lines that look like raw binary noise
   const lines = text
     .split(/\r?\n/)
     .map(line => line.trim().replace(/\s+/g, ' '))
     .filter(line => {
       if (!line) return false;
-      // Filter out lines that look like raw binary noise
-      const words = line.split(' ');
       const alphaCount = (line.match(/[a-zA-Z]/g) || []).length;
       return alphaCount >= 2 && line.length >= 2;
     });
 
   return lines.join('\n');
+}
+
+/**
+ * Intelligently structures, cleans, and formats any resume text into
+ * an organized, professional layout with clean section dividers.
+ */
+export function formatResumeForDisplay(raw) {
+  if (!raw || typeof raw !== 'string') return '';
+
+  const cleaned = cleanResumeText(raw);
+  if (!cleaned) return '';
+
+  // 1. Remove isolated single-character icon artifacts (e.g. "R vatsal...", "W |", etc.)
+  let text = cleaned
+    .replace(/(^|\s)[A-Za-z]\s+([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g, '$1| $2')
+    .replace(/(^|\s)[A-Za-z]\s*\|\s*/g, ' | ')
+    .replace(/\s+([.,;:])/g, '$1') // Fix "word ." -> "word."
+    .replace(/([(\[{])\s+/g, '$1')
+    .replace(/\s+([)\]}])/g, '$1');
+
+  // 2. Identify Standard Resume Sections
+  const SECTION_KEYWORDS = [
+    'EDUCATION',
+    'EXPERIENCE',
+    'WORK EXPERIENCE',
+    'PROFESSIONAL EXPERIENCE',
+    'INTERNSHIP EXPERIENCE',
+    'TECHNICAL SKILLS',
+    'SKILLS',
+    'CORE COMPETENCIES',
+    'PROJECTS',
+    'KEY PROJECTS',
+    'ACADEMIC PROJECTS',
+    'CERTIFICATIONS',
+    'ACHIEVEMENTS',
+    'PUBLICATIONS',
+    'POSITIONS OF RESPONSIBILITY',
+    'LEADERSHIP',
+    'SUMMARY',
+    'PROFESSIONAL SUMMARY',
+    'PROFILE SUMMARY',
+    'ABOUT ME'
+  ];
+
+  const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  const formattedBlocks = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const normalizedHeader = line.toUpperCase().replace(/[^A-Z\s]/g, '').trim();
+
+    // Check if line is a section header (or starts with a section header)
+    const matchedSection = SECTION_KEYWORDS.find(sec => sec === normalizedHeader);
+
+    if (matchedSection) {
+      formattedBlocks.push(`\n════════════════════════════════════════════════════════════════\n📌 ${matchedSection}\n════════════════════════════════════════════════════════════════`);
+    } else if (/^(Languages|Frontend|Backend|Databases|Developer Tools|Tools|Cloud|DevOps|AI\/ML|Machine Learning|System Design|CS Fundamentals|Frameworks|Libraries|Core Skills):/i.test(line)) {
+      // Subcategories under technical skills
+      formattedBlocks.push(`  • ${line}`);
+    } else if (/^[•\-\*▪–]/.test(line)) {
+      // Bullet points
+      const content = line.replace(/^[•\-\*▪–]\s*/, '').trim();
+      formattedBlocks.push(`  • ${content}`);
+    } else if (i === 0 && line.length < 50 && !line.includes('@') && !line.includes('+')) {
+      // Candidate Name header
+      formattedBlocks.push(`👤 ${line.toUpperCase()}`);
+    } else {
+      formattedBlocks.push(line);
+    }
+  }
+
+  return formattedBlocks.join('\n').trim();
 }
 
 export const resumeService = {
@@ -168,7 +316,7 @@ export const resumeService = {
   },
 
   /**
-   * Extracts clean, readable text from uploaded File (.pdf, .txt, .md, .docx)
+   * Extracts clean, structured text from uploaded File (.pdf, .txt, .md, .docx)
    */
   async extractTextFromFile(file) {
     if (!file) return '';
@@ -210,10 +358,10 @@ export const resumeService = {
 
         const pages = await Promise.all(pageTextPromises);
         const fullPdfText = pages.join('\n\n');
-        const cleaned = cleanResumeText(fullPdfText);
+        const formatted = formatResumeForDisplay(fullPdfText);
 
-        if (cleaned.trim().length >= 30) {
-          return cleaned;
+        if (formatted.trim().length >= 30) {
+          return formatted;
         }
       } catch (pdfErr) {
         console.warn('PDF.js text parsing encountered an error, applying fallback cleaner:', pdfErr);
@@ -223,7 +371,7 @@ export const resumeService = {
     // Standard text fallback for .txt, .md, or unparsed files
     try {
       const raw = await file.text();
-      return cleanResumeText(raw);
+      return formatResumeForDisplay(raw);
     } catch {
       return '';
     }
@@ -231,6 +379,10 @@ export const resumeService = {
 
   cleanResumeText(text) {
     return cleanResumeText(text);
+  },
+
+  formatResumeForDisplay(text) {
+    return formatResumeForDisplay(text);
   },
 
   /**

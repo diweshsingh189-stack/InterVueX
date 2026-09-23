@@ -327,7 +327,28 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
 
             {/* Paste Text Option */}
             <div className="form-group">
-              <label className="form-label">Or Paste Resume Content / Skills Summary:</label>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                <label className="form-label" style={{ marginBottom: 0 }}>
+                  Resume Content / Skills Summary:
+                </label>
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const formatted = resumeService.formatResumeForDisplay(resumeText);
+                      setResumeText(formatted);
+                    }}
+                    className="btn btn-sm btn-ghost"
+                    style={{ fontSize: '0.75rem', padding: '0.2rem 0.6rem', color: 'var(--accent-cyan)' }}
+                    title="Auto-format sections and bullets"
+                  >
+                    <Sparkles size={13} /> Auto-Format Structure
+                  </button>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                    {resumeText.trim() ? `${resumeText.trim().split(/\s+/).length} words` : '0 words'}
+                  </span>
+                </div>
+              </div>
               <textarea
                 className="form-textarea"
                 value={resumeText}
@@ -336,19 +357,45 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
                   setSelectedCandidateId('custom');
                 }}
                 placeholder="Example: Software Developer with 3 years of experience in React, Node.js, PostgreSQL, Docker, AWS. Built scalable microservices, reduced API latency by 40%..."
-                style={{ minHeight: '120px' }}
+                style={{
+                  minHeight: '220px',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '0.85rem',
+                  lineHeight: '1.65',
+                  backgroundColor: 'var(--bg-secondary)',
+                  color: 'var(--text-primary)',
+                  borderRadius: 'var(--radius-md)',
+                  padding: '1rem',
+                  border: '1px solid var(--border-subtle)',
+                  whiteSpace: 'pre-wrap'
+                }}
               />
             </div>
 
-            <button
-              type="button"
-              onClick={() => analyzeResume(resumeText)}
-              disabled={!resumeText.trim() || isAnalyzing}
-              className="btn btn-secondary"
-              style={{ borderColor: 'var(--accent-cyan)', color: 'var(--accent-cyan)' }}
-            >
-              <Sparkles size={16} /> {isAnalyzing ? 'Analyzing Signals...' : 'Re-Analyze Resume Signals'}
-            </button>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.65rem' }}>
+              <button
+                type="button"
+                onClick={() => analyzeResume(resumeText)}
+                disabled={!resumeText.trim() || isAnalyzing}
+                className="btn btn-primary"
+                style={{ flex: '1 1 auto' }}
+              >
+                <Sparkles size={16} /> {isAnalyzing ? 'Analyzing Signals...' : 'Analyze & Calibrate Signals'}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const formatted = resumeService.formatResumeForDisplay(resumeText);
+                  setResumeText(formatted);
+                  analyzeResume(formatted);
+                }}
+                disabled={!resumeText.trim() || isAnalyzing}
+                className="btn btn-secondary"
+                style={{ flex: '1 1 auto' }}
+              >
+                Clean & Format Layout
+              </button>
+            </div>
           </div>
 
           {/* Parsed Resume Signals Preview */}
