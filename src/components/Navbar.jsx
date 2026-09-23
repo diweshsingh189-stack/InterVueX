@@ -22,11 +22,16 @@ import {
   CheckCircle2,
   Phone,
   Mail,
-  MapPin
+  MapPin,
+  Eye,
+  ListChecks
 } from 'lucide-react';
+import { storageService } from '../services/storageService';
+import FeedbackAdminModal from './FeedbackAdminModal';
 
 export default function Navbar({ activePage, setActivePage, userProfile, theme, onToggleTheme, onOpenAuth, onLogout }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [adminModalOpen, setAdminModalOpen] = useState(false);
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
   const [hoverRating, setHoverRating] = useState(0);
   const [selectedBtn, setSelectedBtn] = useState(() => activePage === 'setup' ? 'new-interview' : activePage);
@@ -73,13 +78,7 @@ export default function Navbar({ activePage, setActivePage, userProfile, theme, 
       id: Date.now(),
       date: new Date().toISOString()
     };
-    try {
-      const existing = JSON.parse(localStorage.getItem('intervuex_feedbacks') || '[]');
-      existing.unshift(newFeedback);
-      localStorage.setItem('intervuex_feedbacks', JSON.stringify(existing));
-    } catch (err) {
-      console.error(err);
-    }
+    storageService.addFeedback(newFeedback);
     setFeedbackSubmitted(true);
   };
 
@@ -678,16 +677,35 @@ export default function Navbar({ activePage, setActivePage, userProfile, theme, 
                 flexDirection: 'column',
                 gap: '0.6rem'
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.4rem' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                     <MessageSquare size={15} style={{ color: 'var(--accent-cyan)' }} />
                     <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-primary)' }}>
                       Candidate Feedback
                     </span>
                   </div>
-                  <span className="badge badge-cyan" style={{ fontSize: '0.62rem', padding: '0.12rem 0.4rem' }}>
-                    ⭐ Review
-                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                    <button
+                      type="button"
+                      onClick={() => setAdminModalOpen(true)}
+                      className="btn btn-sm btn-ghost"
+                      style={{
+                        fontSize: '0.68rem',
+                        padding: '0.15rem 0.45rem',
+                        color: 'var(--accent-cyan)',
+                        border: '1px solid var(--accent-cyan)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.25rem'
+                      }}
+                      title="View all submitted reviews & feedback"
+                    >
+                      <Eye size={12} /> Admin View
+                    </button>
+                    <span className="badge badge-cyan" style={{ fontSize: '0.62rem', padding: '0.12rem 0.4rem' }}>
+                      ⭐ Review
+                    </span>
+                  </div>
                 </div>
 
                 {feedbackSubmitted ? (
@@ -707,15 +725,24 @@ export default function Navbar({ activePage, setActivePage, userProfile, theme, 
                       Thank You for Your Feedback!
                     </div>
                     <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>
-                      Your rating of {feedbackForm.rating} ★ has been recorded successfully.
+                      Your rating of {feedbackForm.rating} ★ has been recorded into storage.
                     </div>
-                    <button
-                      onClick={() => setFeedbackSubmitted(false)}
-                      className="btn btn-sm btn-ghost"
-                      style={{ fontSize: '0.72rem', marginTop: '0.3rem', padding: '0.25rem 0.6rem' }}
-                    >
-                      Submit Another Response
-                    </button>
+                    <div style={{ display: 'flex', gap: '0.4rem', marginTop: '0.3rem' }}>
+                      <button
+                        onClick={() => setAdminModalOpen(true)}
+                        className="btn btn-sm btn-secondary"
+                        style={{ fontSize: '0.72rem', padding: '0.25rem 0.6rem' }}
+                      >
+                        <Eye size={12} /> View All Reviews
+                      </button>
+                      <button
+                        onClick={() => setFeedbackSubmitted(false)}
+                        className="btn btn-sm btn-ghost"
+                        style={{ fontSize: '0.72rem', padding: '0.25rem 0.6rem' }}
+                      >
+                        New Response
+                      </button>
+                    </div>
                   </div>
                 ) : (
                   <form onSubmit={handleFeedbackSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -1107,6 +1134,12 @@ export default function Navbar({ activePage, setActivePage, userProfile, theme, 
           }
         }
       `}</style>
+
+      {/* Candidate Feedback & Reviews Admin Modal */}
+      <FeedbackAdminModal
+        isOpen={adminModalOpen}
+        onClose={() => setAdminModalOpen(false)}
+      />
     </>
   );
 }
