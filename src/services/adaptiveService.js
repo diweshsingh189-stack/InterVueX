@@ -3,7 +3,7 @@
  * Dynamically adjusts interview question difficulty based on the candidate's running answer performance.
  */
 
-import { QUESTIONS_DATABASE } from '../data/questionsData';
+import { QUESTIONS_DATABASE } from '../data/questionsData.js';
 
 export const adaptiveService = {
   /**

@@ -4,7 +4,7 @@
  * Communication, Completeness, and Confidence.
  * Supports both standard verbal/text questions and interactive coding executions.
  */
-import { executeCode } from './codeExecutionService';
+import { executeCode } from './codeExecutionService.js';
 
 export async function evaluateAnswer(questionObj, userAnswer, sessionContext = {}) {
   const isCoding = questionObj?.type === 'coding' || sessionContext?.typeId === 'coding';
@@ -76,23 +76,23 @@ async function evaluateCodingAnswer(questionObj, code, sessionContext) {
     technical = 9.5;
     relevance = 9.5;
     completeness = 9.5;
-    clarity = 8.5;
-    communication = 8.0;
-    confidence = 9.0;
+    clarity = 8.8;
+    communication = 8.5;
+    confidence = 9.2;
   } else if (testPassRatio >= 0.5) {
-    technical = 6.8;
-    relevance = 7.5;
-    completeness = 6.5;
-    clarity = 7.0;
+    technical = 7.2;
+    relevance = 7.8;
+    completeness = 7.0;
+    clarity = 7.2;
     communication = 7.0;
-    confidence = 6.5;
+    confidence = 7.0;
   } else {
-    technical = syntaxError ? 3.0 : 4.5;
-    relevance = 5.0;
-    completeness = 4.0;
+    technical = syntaxError ? 3.0 : 4.8;
+    relevance = 5.2;
+    completeness = 4.2;
     clarity = 5.5;
-    communication = 5.0;
-    confidence = 4.0;
+    communication = 5.2;
+    confidence = 4.5;
   }
 
   const overall = Number(((technical * 0.4) + (relevance * 0.2) + (completeness * 0.2) + (clarity * 0.1) + (confidence * 0.1)).toFixed(1));
@@ -107,7 +107,7 @@ async function evaluateCodingAnswer(questionObj, code, sessionContext) {
       status = 'Incorrect';
       verdict = syntaxError 
         ? `Compilation or syntax error: ${syntaxError}`
-        : `Failed all test cases. The output does not match expected results.`;
+        : `Failed test cases. The output does not match expected results.`;
     }
   }
 
@@ -142,10 +142,19 @@ async function evaluateCodingAnswer(questionObj, code, sessionContext) {
 }
 
 /**
+ * Normalizes words to stems for flexible semantic matching
+ */
+function getStem(w) {
+  return w.replace(/[^\w]/g, '').toLowerCase()
+    .replace(/(ing|tion|tions|ed|es|s|ity|ities|able|ible|ment|ments|ize|ised|ized)$/g, '');
+}
+
+/**
  * Evaluates Textual / Conceptual Technical & Behavioral Answers
  */
 function evaluateTextAnswer(questionObj, cleaned) {
-  const wordCount = cleaned.split(/\s+/).filter(Boolean).length;
+  const words = cleaned.split(/\s+/).filter(Boolean);
+  const wordCount = words.length;
 
   // Check if answer is too short
   if (wordCount < 5) {
@@ -170,36 +179,66 @@ function evaluateTextAnswer(questionObj, cleaned) {
   }
 
   const lowerAnswer = cleaned.toLowerCase();
-  const concepts = questionObj.keyConcepts || [];
+  const normalizedAnswerTokens = words.map(w => getStem(w)).filter(w => w.length >= 3);
   
-  // Concept match analysis
+  // 1. Key Concept & Vocabulary Matching
+  let concepts = questionObj.keyConcepts || [];
+  if (concepts.length === 0 && questionObj.idealAnswer) {
+    // Extract key words from ideal answer if keyConcepts is empty
+    const idealWords = questionObj.idealAnswer.split(/[,\s.]+/).filter(w => w.length > 4);
+    concepts = Array.from(new Set(idealWords)).slice(0, 6);
+  }
+
   const matchedList = [];
   const missingList = [];
 
   concepts.forEach(concept => {
-    const words = concept.toLowerCase().split(' ');
-    const hasMatch = words.some(w => w.length > 3 && lowerAnswer.includes(w)) || lowerAnswer.includes(concept.toLowerCase());
-    if (hasMatch) matchedList.push(concept);
-    else missingList.push(concept);
+    const rawConcept = concept.toLowerCase();
+    const conceptWords = rawConcept.split(/[\s\-_/]+/).filter(w => w.length >= 3);
+    
+    // Check if whole concept or any significant stem is present in candidate answer
+    const exactMatch = lowerAnswer.includes(rawConcept);
+    const stemMatch = conceptWords.some(cw => {
+      const stem = getStem(cw);
+      return stem.length >= 3 && (lowerAnswer.includes(stem) || normalizedAnswerTokens.includes(stem));
+    });
+
+    if (exactMatch || stemMatch) {
+      matchedList.push(concept);
+    } else {
+      missingList.push(concept);
+    }
   });
 
-  const conceptCoverage = concepts.length > 0 ? (matchedList.length / concepts.length) : 0.7;
+  const conceptCoverage = concepts.length > 0 ? (matchedList.length / concepts.length) : 0.8;
 
-  // Length and structural depth heuristics
-  const lengthScore = Math.min(10, Math.max(4, (wordCount / 35) * 6));
-  
-  // Check structural markers
-  const structureWords = ['because', 'for example', 'such as', 'trade-off', 'first', 'second', 'result', 'benefit', 'approach', 'mitigate', 'prevent', 'situation', 'task', 'action'];
-  const structureMatches = structureWords.filter(w => lowerAnswer.includes(w)).length;
-  const structureBonus = Math.min(2.0, structureMatches * 0.5);
+  // 2. Technical Vocabulary & Precision Bonus
+  const technicalIndicators = [
+    'latency', 'throughput', 'scalability', 'performance', 'caching', 'redis', 'database', 'sql', 'nosql',
+    'postgres', 'acid', 'concurrency', 'async', 'promise', 'memory', 'leak', 'index', 'btree', 'hash',
+    'algorithm', 'complexity', 'trade-off', 'tradeoff', 'microservice', 'api', 'rest', 'graphql',
+    'docker', 'kubernetes', 'cluster', 'load balancer', 'queue', 'kafka', 'event', 'state', 'hook',
+    'component', 'virtual dom', 'gc', 'garbage collection', 'thread', 'lock', 'deadlock', 'mutex',
+    'reconciliation', 'normalization', 'denormalization', 'partition', 'sharding', 'replica', 'failover'
+  ];
+  const techTermsFound = technicalIndicators.filter(term => lowerAnswer.includes(term)).length;
+  const techBonus = Math.min(2.5, techTermsFound * 0.4);
 
-  // Calculate dimension scores
-  let technical = Math.min(10, Math.max(3.5, (conceptCoverage * 6.5) + (structureBonus * 0.8) + (lengthScore * 0.2)));
-  let relevance = Math.min(10, Math.max(4.0, (conceptCoverage * 7.0) + 2.5));
-  let clarity = Math.min(10, Math.max(4.5, 6.0 + (structureBonus * 1.5) - (wordCount > 300 ? 1.0 : 0)));
-  let communication = Math.min(10, Math.max(4.0, 5.5 + structureBonus + (wordCount >= 25 && wordCount <= 180 ? 1.5 : 0.5)));
-  let completeness = Math.min(10, Math.max(3.0, (conceptCoverage * 6.0) + (lengthScore * 0.35)));
-  let confidence = Math.min(10, Math.max(4.0, 6.5 + (structureBonus * 1.0) - (lowerAnswer.includes('maybe') || lowerAnswer.includes('i guess') || lowerAnswer.includes('not sure') ? 2.0 : 0)));
+  // 3. Structural & Reasoning Quality (STAR method, causal words, quantified metrics)
+  const structuralWords = ['because', 'for example', 'such as', 'trade-off', 'first', 'second', 'result', 'benefit', 'approach', 'mitigate', 'prevent', 'situation', 'task', 'action', 'metric', 'reduced', 'increased', 'improved'];
+  const structureMatches = structuralWords.filter(w => lowerAnswer.includes(w)).length;
+  const structureBonus = Math.min(2.0, structureMatches * 0.45);
+
+  // 4. Word Count & Elaboration Quality
+  const lengthScore = Math.min(10, Math.max(5, (wordCount / 40) * 8));
+
+  // Calculate rubric dimension scores
+  let technical = Math.min(10, Math.max(4.0, (conceptCoverage * 6.5) + (techBonus * 0.9) + (structureBonus * 0.4) + (lengthScore * 0.15)));
+  let relevance = Math.min(10, Math.max(4.5, (conceptCoverage * 7.0) + (techBonus * 0.4) + 2.0));
+  let clarity = Math.min(10, Math.max(5.0, 6.2 + (structureBonus * 1.4) + (wordCount >= 30 && wordCount <= 250 ? 1.0 : 0)));
+  let communication = Math.min(10, Math.max(5.0, 6.0 + structureBonus + (wordCount >= 25 && wordCount <= 200 ? 1.5 : 0.5)));
+  let completeness = Math.min(10, Math.max(4.0, (conceptCoverage * 6.0) + (techBonus * 0.5) + (lengthScore * 0.25)));
+  let confidence = Math.min(10, Math.max(5.0, 7.0 + (structureBonus * 0.8) - (lowerAnswer.includes('maybe') || lowerAnswer.includes('i guess') || lowerAnswer.includes('not sure') ? 1.8 : 0)));
 
   technical = Number(technical.toFixed(1));
   relevance = Number(relevance.toFixed(1));
@@ -212,21 +251,21 @@ function evaluateTextAnswer(questionObj, cleaned) {
 
   let status = 'Correct';
   let verdict = 'Comprehensive and well-structured answer with strong technical depth.';
-  if (overall < 5.0) {
+  if (overall < 5.5) {
     status = 'Incorrect';
     verdict = 'Response lacks key technical concepts and foundational depth.';
   } else if (overall < 7.5) {
     status = 'Partially Correct';
-    verdict = 'Accurate high-level understanding, but missing critical production details or edge cases.';
+    verdict = 'Accurate high-level understanding, but missing deeper edge cases or concrete trade-offs.';
   }
 
   let doneWell = matchedList.length >= 2 
     ? `Strong articulation of core concepts (${matchedList.slice(0, 2).join(', ')}).`
-    : (structureMatches >= 2 ? 'Well-structured narrative with logical cause-and-effect explanations.' : 'Clear fundamental awareness.');
+    : (techTermsFound >= 2 ? `Solid inclusion of production engineering terms (${technicalIndicators.filter(t => lowerAnswer.includes(t)).slice(0, 2).join(', ')}).` : 'Clear fundamental awareness and problem breakdown.');
 
   let improvement = missingList.length > 0 
     ? `Key concepts to deepen: ${missingList.slice(0, 2).join(', ')}.`
-    : (wordCount < 30 ? 'Elaborate further with a concrete production example or architectural trade-off.' : 'Refine deeper edge-case coverage.');
+    : (wordCount < 30 ? 'Elaborate further with a concrete production example or architectural trade-off.' : 'Consider discussing edge cases and failure mode mitigations.');
 
   return {
     overallScore: Math.min(10, Math.max(1, overall)),
@@ -253,7 +292,7 @@ function evaluateTextAnswer(questionObj, cleaned) {
 function formatEvaluationResponse(apiResult, questionObj) {
   const overall = apiResult.overallScore || 7.0;
   let status = 'Correct';
-  if (overall < 5.0) status = 'Incorrect';
+  if (overall < 5.5) status = 'Incorrect';
   else if (overall < 7.5) status = 'Partially Correct';
 
   return {

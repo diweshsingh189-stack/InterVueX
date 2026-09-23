@@ -319,6 +319,7 @@ export default function InterviewRoom({ session, onFinishInterview, onExit, user
     const finalReport = {
       id: `inv-${Date.now().toString().slice(-6)}`,
       date: new Date().toISOString(),
+      candidateName: session.candidateName || userProfile?.name || 'Candidate',
       role: session.roleName,
       roleId: session.roleId,
       company: session.companyName || 'General Tech',
@@ -370,6 +371,7 @@ export default function InterviewRoom({ session, onFinishInterview, onExit, user
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', minWidth: 0, flex: '1 1 auto' }}>
           <div style={{ minWidth: 0 }}>
             <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', color: 'var(--accent-cyan)', fontWeight: 700, letterSpacing: '0.04em', wordBreak: 'break-word', lineHeight: 1.2 }}>
+              {session.candidateName ? <span style={{ color: 'var(--text-primary)' }}>{session.candidateName} &bull; </span> : null}
               {session.companyName && session.companyName !== 'All Companies' ? `${session.companyName} • ` : ''}
               {session.roleName} &bull; {session.typeName}
             </div>

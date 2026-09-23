@@ -83,7 +83,7 @@ export default function InterviewReport({ report, onRetake, onGoDashboard, onBro
           <span className="badge badge-cyan" style={{ marginBottom: '0.4rem' }}>Session Evaluation Report</span>
           <h1 style={{ fontSize: '2.2rem', color: 'var(--text-primary)' }}>Performance Scorecard</h1>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-            {report.role} &bull; {report.level} &bull; {report.type} ({formatDate(report.date)})
+            {report.candidateName ? <strong style={{ color: 'var(--accent-cyan)' }}>{report.candidateName} &bull; </strong> : ''}{report.role} &bull; {report.level} &bull; {report.type} ({formatDate(report.date)})
           </p>
         </div>
 

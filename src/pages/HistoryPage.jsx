@@ -91,16 +91,16 @@ export default function HistoryPage({ history = [], onViewReport, onStartNew, on
           </div>
         ) : (
           <div className="table-responsive" style={{ margin: 0 }}>
-            <table style={{ width: '100%', minWidth: '550px', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
+            <table style={{ width: '100%', minWidth: '850px', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
               <thead>
-                <tr style={{ backgroundColor: 'var(--bg-secondary)', borderBottom: '1px solid var(--border-subtle)', color: 'var(--text-muted)' }}>
-                  <th style={{ padding: '0.85rem 1rem' }}>Date</th>
+                <tr style={{ backgroundColor: 'var(--bg-secondary)', borderBottom: '1px solid var(--border-subtle)', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
+                  <th style={{ padding: '0.85rem 1rem', whiteSpace: 'nowrap' }}>Date</th>
                   <th style={{ padding: '1rem 1.25rem' }}>Role Track</th>
-                  <th style={{ padding: '1rem 1.25rem' }}>Format</th>
-                  <th style={{ padding: '1rem 1.25rem' }}>Difficulty</th>
-                  <th style={{ padding: '1rem 1.25rem' }}>Questions</th>
-                  <th style={{ padding: '1rem 1.25rem' }}>Overall Score</th>
-                  <th style={{ padding: '1rem 1.25rem', textAlign: 'right' }}>Action</th>
+                  <th style={{ padding: '1rem 1.25rem', whiteSpace: 'nowrap' }}>Format</th>
+                  <th style={{ padding: '1rem 1.25rem', whiteSpace: 'nowrap' }}>Difficulty</th>
+                  <th style={{ padding: '1rem 1.25rem', whiteSpace: 'nowrap' }}>Questions</th>
+                  <th style={{ padding: '1rem 1.25rem', whiteSpace: 'nowrap' }}>Overall Score</th>
+                  <th style={{ padding: '1rem 1.25rem', textAlign: 'right', whiteSpace: 'nowrap' }}>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -116,41 +116,43 @@ export default function HistoryPage({ history = [], onViewReport, onStartNew, on
                     onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-secondary)'}
                     onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                   >
-                    <td style={{ padding: '1rem 1.25rem', color: 'var(--text-secondary)' }}>
+                    <td style={{ padding: '1rem 1.25rem', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
                       {formatDate(item.date)}
                     </td>
                     <td style={{ padding: '1rem 1.25rem', fontWeight: 700, color: 'var(--text-primary)' }}>
                       {item.role}
                       <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)', fontWeight: 400 }}>{item.level}</div>
                     </td>
-                    <td style={{ padding: '1rem 1.25rem' }}>
+                    <td style={{ padding: '1rem 1.25rem', whiteSpace: 'nowrap' }}>
                       <span className="badge">{item.type}</span>
                     </td>
-                    <td style={{ padding: '1rem 1.25rem', textTransform: 'capitalize', color: 'var(--text-muted)' }}>
+                    <td style={{ padding: '1rem 1.25rem', textTransform: 'capitalize', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
                       {item.difficulty}
                     </td>
-                    <td style={{ padding: '1rem 1.25rem', color: 'var(--text-muted)' }}>
+                    <td style={{ padding: '1rem 1.25rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
                       {item.answeredCount || item.answers?.length || 5} Qs &bull; {formatTime(item.durationSeconds || 450)}
                     </td>
-                    <td style={{ padding: '1rem 1.25rem' }}>
-                      <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <td style={{ padding: '1rem 1.25rem', whiteSpace: 'nowrap' }}>
+                      <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', whiteSpace: 'nowrap' }}>
                         <span style={{
                           color: 'var(--accent-cyan)',
                           fontWeight: 800,
                           backgroundColor: 'var(--accent-cyan-light)',
                           padding: '0.25rem 0.65rem',
                           borderRadius: 'var(--radius-sm)',
-                          border: '1px solid rgba(6, 182, 212, 0.3)'
+                          border: '1px solid rgba(6, 182, 212, 0.3)',
+                          whiteSpace: 'nowrap',
+                          display: 'inline-block'
                         }}>
                           {item.overallScore} / 10
                         </span>
-                        <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)', whiteSpace: 'nowrap' }}>
                           {getScoreLabel(item.overallScore)}
                         </span>
                       </div>
                     </td>
-                    <td style={{ padding: '1rem 1.25rem', textAlign: 'right' }}>
-                      <button className="btn btn-sm btn-ghost" style={{ color: 'var(--accent-cyan)' }}>
+                    <td style={{ padding: '1rem 1.25rem', textAlign: 'right', whiteSpace: 'nowrap' }}>
+                      <button className="btn btn-sm btn-ghost" style={{ color: 'var(--accent-cyan)', whiteSpace: 'nowrap' }}>
                         View Report <ChevronRight size={14} />
                       </button>
                     </td>

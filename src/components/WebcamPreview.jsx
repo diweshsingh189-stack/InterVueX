@@ -1,38 +1,106 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Camera, CameraOff, Mic, MicOff, Volume2, UserCheck, Bot } from 'lucide-react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Camera, CameraOff, Mic, MicOff, Volume2, UserCheck, Bot, RefreshCw, AlertCircle } from 'lucide-react';
 
 export default function WebcamPreview({ isSpeaking = false, isListening = false }) {
-  const [cameraActive, setCameraActive] = useState(false);
+  const [cameraActive, setCameraActive] = useState(true);
+  const [cameraStatus, setCameraStatus] = useState('initializing'); // 'initializing' | 'active' | 'denied' | 'error' | 'off'
+  const [errorMessage, setErrorMessage] = useState('');
   const [micActive, setMicActive] = useState(true);
   const videoRef = useRef(null);
   const streamRef = useRef(null);
 
-  useEffect(() => {
-    if (cameraActive) {
-      navigator.mediaDevices?.getUserMedia({ video: true, audio: false })
-        .then((stream) => {
-          streamRef.current = stream;
-          if (videoRef.current) {
-            videoRef.current.srcObject = stream;
-          }
-        })
-        .catch((err) => {
-          console.warn('Camera access denied or unavailable:', err);
-          setCameraActive(false);
-        });
-    } else {
+  const startCamera = useCallback(async () => {
+    setCameraStatus('initializing');
+    setErrorMessage('');
+    
+    try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('Camera API not supported in this browser.');
+      }
+
+      // Stop any existing tracks before starting a new stream
       if (streamRef.current) {
         streamRef.current.getTracks().forEach(track => track.stop());
         streamRef.current = null;
       }
+
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          width: { ideal: 640 },
+          height: { ideal: 480 },
+          facingMode: 'user'
+        },
+        audio: false
+      });
+
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        try {
+          await videoRef.current.play();
+        } catch (playErr) {
+          console.warn('Autoplay prevented or interrupted:', playErr);
+        }
+      }
+      setCameraStatus('active');
+    } catch (err) {
+      console.warn('Camera access issue:', err);
+      if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+        setCameraStatus('denied');
+        setErrorMessage('Camera access was denied. Please allow camera access in browser permissions.');
+      } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+        setCameraStatus('error');
+        setErrorMessage('No camera device detected.');
+      } else {
+        setCameraStatus('error');
+        setErrorMessage(err.message || 'Unable to connect to camera.');
+      }
+    }
+  }, []);
+
+  const stopCamera = useCallback(() => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+    setCameraStatus('off');
+  }, []);
+
+  useEffect(() => {
+    if (cameraActive) {
+      startCamera();
+    } else {
+      stopCamera();
     }
 
     return () => {
       if (streamRef.current) {
         streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current = null;
       }
     };
-  }, [cameraActive]);
+  }, [cameraActive, startCamera, stopCamera]);
+
+  const toggleCamera = () => {
+    if (cameraActive && cameraStatus === 'active') {
+      setCameraActive(false);
+      stopCamera();
+    } else {
+      setCameraActive(true);
+      startCamera();
+    }
+  };
+
+  const handleVideoRef = (el) => {
+    videoRef.current = el;
+    if (el && streamRef.current && el.srcObject !== streamRef.current) {
+      el.srcObject = streamRef.current;
+      el.play().catch(() => {});
+    }
+  };
 
   return (
     <div className="webcam-preview-container" style={{
@@ -53,7 +121,7 @@ export default function WebcamPreview({ isSpeaking = false, isListening = false 
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        minHeight: '160px',
+        minHeight: '175px',
         position: 'relative',
         transition: 'all 0.3s ease',
         boxShadow: isSpeaking ? '0 0 15px var(--accent-cyan-glow)' : 'none'
@@ -88,7 +156,9 @@ export default function WebcamPreview({ isSpeaking = false, isListening = false 
           justifyContent: 'center',
           color: 'var(--accent-cyan)',
           marginTop: '1rem',
-          marginBottom: '0.75rem'
+          marginBottom: '0.75rem',
+          boxShadow: isSpeaking ? '0 0 12px rgba(6, 182, 212, 0.4)' : 'none',
+          transition: 'all 0.3s ease'
         }}>
           <Bot size={30} />
         </div>
@@ -114,7 +184,7 @@ export default function WebcamPreview({ isSpeaking = false, isListening = false 
 
       {/* Candidate Live Box */}
       <div style={{
-        backgroundColor: 'var(--surface-card)',
+        backgroundColor: '#090d16',
         border: isListening ? '1px solid var(--accent-cyan)' : '1px solid var(--border-subtle)',
         borderRadius: 'var(--radius-lg)',
         padding: '1.25rem',
@@ -122,89 +192,180 @@ export default function WebcamPreview({ isSpeaking = false, isListening = false 
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        minHeight: '160px',
+        minHeight: '175px',
         position: 'relative',
         overflow: 'hidden'
       }}>
+        {/* Top bar with candidate name and camera badge */}
         <div style={{
           position: 'absolute',
           top: '0.75rem',
           left: '0.75rem',
+          right: '0.75rem',
           display: 'flex',
+          justifyContent: 'space-between',
           alignItems: 'center',
-          gap: '0.4rem',
-          fontSize: '0.7rem',
-          color: 'var(--text-muted)',
-          backgroundColor: 'var(--bg-secondary)',
-          padding: '0.2rem 0.5rem',
-          borderRadius: 'var(--radius-full)',
-          border: '1px solid var(--border-subtle)',
-          zIndex: 2
+          zIndex: 3
         }}>
-          <UserCheck size={12} style={{ color: 'var(--accent-cyan)' }} />
-          <span>You (Candidate)</span>
-        </div>
-
-        {/* Camera stream or Placeholder */}
-        {cameraActive ? (
-          <video
-            ref={videoRef}
-            autoPlay
-            playsInline
-            muted
-            style={{
-              position: 'absolute',
-              inset: 0,
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover'
-            }}
-          />
-        ) : (
           <div style={{
-            width: '60px',
-            height: '60px',
-            borderRadius: '50%',
-            backgroundColor: 'var(--bg-secondary)',
-            border: '2px solid var(--border-subtle)',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
+            gap: '0.4rem',
+            fontSize: '0.7rem',
             color: 'var(--text-muted)',
-            marginTop: '1rem',
-            marginBottom: '0.75rem'
+            backgroundColor: 'rgba(15, 23, 42, 0.85)',
+            backdropFilter: 'blur(6px)',
+            padding: '0.2rem 0.55rem',
+            borderRadius: 'var(--radius-full)',
+            border: '1px solid var(--border-subtle)'
           }}>
-            <UserCheck size={28} />
+            <UserCheck size={12} style={{ color: 'var(--accent-cyan)' }} />
+            <span>You (Candidate)</span>
+          </div>
+
+          {/* Status pill */}
+          {cameraStatus === 'active' && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.35rem',
+              fontSize: '0.68rem',
+              color: '#10B981',
+              backgroundColor: 'rgba(16, 185, 129, 0.15)',
+              border: '1px solid rgba(16, 185, 129, 0.3)',
+              padding: '0.15rem 0.5rem',
+              borderRadius: 'var(--radius-full)',
+              fontWeight: 600
+            }}>
+              <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#10B981' }} />
+              <span>Live Cam</span>
+            </div>
+          )}
+        </div>
+
+        {/* Video feed element */}
+        <video
+          ref={handleVideoRef}
+          autoPlay
+          playsInline
+          muted
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            transform: 'scaleX(-1)', // Mirror selfie view
+            display: cameraStatus === 'active' ? 'block' : 'none',
+            zIndex: 1
+          }}
+        />
+
+        {/* Placeholder / Error / Loading UI */}
+        {cameraStatus === 'initializing' && (
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '0.5rem',
+            color: 'var(--text-muted)',
+            zIndex: 2,
+            marginTop: '0.5rem'
+          }}>
+            <RefreshCw size={24} style={{ animation: 'spin 1.5s linear infinite', color: 'var(--accent-cyan)' }} />
+            <span style={{ fontSize: '0.78rem' }}>Initializing camera...</span>
           </div>
         )}
 
+        {(cameraStatus === 'denied' || cameraStatus === 'error') && (
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            textAlign: 'center',
+            padding: '1rem',
+            zIndex: 2,
+            marginTop: '0.5rem'
+          }}>
+            <AlertCircle size={24} style={{ color: '#EF4444', marginBottom: '0.35rem' }} />
+            <span style={{ fontSize: '0.75rem', color: '#FCA5A5', marginBottom: '0.6rem', maxWidth: '200px', lineHeight: 1.3 }}>
+              {errorMessage || 'Camera access not available'}
+            </span>
+            <button
+              onClick={() => { setCameraActive(true); startCamera(); }}
+              className="btn btn-sm btn-secondary"
+              style={{ padding: '0.25rem 0.6rem', fontSize: '0.72rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}
+            >
+              <RefreshCw size={12} /> Retry Camera
+            </button>
+          </div>
+        )}
+
+        {cameraStatus === 'off' && (
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            zIndex: 2,
+            marginTop: '0.5rem'
+          }}>
+            <div style={{
+              width: '54px',
+              height: '54px',
+              borderRadius: '50%',
+              backgroundColor: 'var(--bg-secondary)',
+              border: '1px solid var(--border-subtle)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--text-muted)',
+              marginBottom: '0.4rem'
+            }}>
+              <CameraOff size={22} />
+            </div>
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Camera Off</span>
+          </div>
+        )}
+
+        {/* Bottom floating control bar */}
         <div style={{
           position: 'absolute',
           bottom: '0.75rem',
           display: 'flex',
           alignItems: 'center',
           gap: '0.5rem',
-          zIndex: 2,
+          zIndex: 3,
           backgroundColor: 'rgba(15, 23, 42, 0.85)',
-          padding: '0.25rem 0.6rem',
+          backdropFilter: 'blur(8px)',
+          padding: '0.25rem 0.65rem',
           borderRadius: 'var(--radius-full)',
           border: '1px solid var(--border-subtle)'
         }}>
           <button
-            onClick={() => setCameraActive(!cameraActive)}
+            onClick={toggleCamera}
             className="btn btn-ghost btn-sm"
-            style={{ padding: '0.2rem', color: cameraActive ? 'var(--accent-cyan)' : 'var(--text-dim)' }}
-            title={cameraActive ? 'Turn off camera' : 'Turn on camera'}
+            style={{
+              padding: '0.25rem',
+              color: cameraStatus === 'active' ? 'var(--accent-cyan)' : 'var(--text-dim)',
+              display: 'flex',
+              alignItems: 'center'
+            }}
+            title={cameraStatus === 'active' ? 'Turn off camera' : 'Turn on camera'}
           >
-            {cameraActive ? <Camera size={14} /> : <CameraOff size={14} />}
+            {cameraStatus === 'active' ? <Camera size={15} /> : <CameraOff size={15} />}
           </button>
           <button
             onClick={() => setMicActive(!micActive)}
             className="btn btn-ghost btn-sm"
-            style={{ padding: '0.2rem', color: micActive ? 'var(--accent-cyan)' : 'var(--text-dim)' }}
+            style={{
+              padding: '0.25rem',
+              color: micActive ? 'var(--accent-cyan)' : 'var(--text-dim)',
+              display: 'flex',
+              alignItems: 'center'
+            }}
             title={micActive ? 'Mic Active' : 'Mic Muted'}
           >
-            {micActive ? <Mic size={14} /> : <MicOff size={14} />}
+            {micActive ? <Mic size={15} /> : <MicOff size={15} />}
           </button>
           {isListening && (
             <span style={{ fontSize: '0.7rem', color: 'var(--accent-cyan)', fontWeight: 600 }}>

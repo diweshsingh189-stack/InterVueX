@@ -302,15 +302,15 @@ export default function Dashboard({ history = [], userProfile, onStartNew, onVie
           </div>
         ) : (
           <div className="table-responsive">
-            <table style={{ width: '100%', minWidth: '550px', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.875rem' }}>
+            <table style={{ width: '100%', minWidth: '700px', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.875rem' }}>
               <thead>
-                <tr style={{ borderBottom: '1px solid var(--border-subtle)', color: 'var(--text-muted)' }}>
-                  <th style={{ padding: '0.75rem 1rem' }}>Date</th>
+                <tr style={{ borderBottom: '1px solid var(--border-subtle)', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
+                  <th style={{ padding: '0.75rem 1rem', whiteSpace: 'nowrap' }}>Date</th>
                   <th style={{ padding: '0.75rem 1rem' }}>Role Track</th>
-                  <th style={{ padding: '0.75rem 1rem' }}>Round Type</th>
-                  <th style={{ padding: '0.75rem 1rem' }}>Difficulty</th>
-                  <th style={{ padding: '0.75rem 1rem' }}>Overall Score</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>Action</th>
+                  <th style={{ padding: '0.75rem 1rem', whiteSpace: 'nowrap' }}>Round Type</th>
+                  <th style={{ padding: '0.75rem 1rem', whiteSpace: 'nowrap' }}>Difficulty</th>
+                  <th style={{ padding: '0.75rem 1rem', whiteSpace: 'nowrap' }}>Overall Score</th>
+                  <th style={{ padding: '0.75rem 1rem', textAlign: 'right', whiteSpace: 'nowrap' }}>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -326,32 +326,34 @@ export default function Dashboard({ history = [], userProfile, onStartNew, onVie
                     onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-secondary)'}
                     onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                   >
-                    <td style={{ padding: '0.85rem 1rem', color: 'var(--text-secondary)' }}>
+                    <td style={{ padding: '0.85rem 1rem', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
                       {formatDate(item.date)}
                     </td>
                     <td style={{ padding: '0.85rem 1rem', fontWeight: 600, color: 'var(--text-primary)' }}>
                       {item.role}
                     </td>
-                    <td style={{ padding: '0.85rem 1rem' }}>
+                    <td style={{ padding: '0.85rem 1rem', whiteSpace: 'nowrap' }}>
                       <span className="badge">{item.type}</span>
                     </td>
-                    <td style={{ padding: '0.85rem 1rem', textTransform: 'capitalize', color: 'var(--text-muted)' }}>
+                    <td style={{ padding: '0.85rem 1rem', textTransform: 'capitalize', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
                       {item.difficulty}
                     </td>
-                    <td style={{ padding: '0.85rem 1rem' }}>
+                    <td style={{ padding: '0.85rem 1rem', whiteSpace: 'nowrap' }}>
                       <span style={{
                         color: 'var(--accent-cyan)',
                         fontWeight: 700,
                         backgroundColor: 'var(--accent-cyan-light)',
                         padding: '0.2rem 0.6rem',
                         borderRadius: 'var(--radius-sm)',
-                        border: '1px solid rgba(6, 182, 212, 0.3)'
+                        border: '1px solid rgba(6, 182, 212, 0.3)',
+                        whiteSpace: 'nowrap',
+                        display: 'inline-block'
                       }}>
                         {item.overallScore} / 10
                       </span>
                     </td>
-                    <td style={{ padding: '0.85rem 1rem', textAlign: 'right' }}>
-                      <button className="btn btn-sm btn-ghost" style={{ padding: '0.25rem 0.5rem', color: 'var(--accent-cyan)' }}>
+                    <td style={{ padding: '0.85rem 1rem', textAlign: 'right', whiteSpace: 'nowrap' }}>
+                      <button className="btn btn-sm btn-ghost" style={{ padding: '0.25rem 0.5rem', color: 'var(--accent-cyan)', whiteSpace: 'nowrap' }}>
                         Report <ChevronRight size={14} />
                       </button>
                     </td>

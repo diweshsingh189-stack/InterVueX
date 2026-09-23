@@ -15,7 +15,9 @@ import {
   CheckCircle2,
   Building2,
   BrainCircuit,
-  Clock
+  Clock,
+  UserCheck,
+  User
 } from 'lucide-react';
 import { 
   JOB_ROLES, 
@@ -24,8 +26,8 @@ import {
   DIFFICULTIES, 
   COMPANIES,
   getQuestionsForInterview 
-} from '../data/questionsData';
-import { resumeService } from '../services/resumeService';
+} from '../data/questionsData.js';
+import { resumeService, SAMPLE_CANDIDATES } from '../services/resumeService.js';
 import ProgressOverviewCard from '../components/ProgressOverviewCard';
 
 export default function InterviewSetup({ onStartInterview, userProfile, history = [] }) {
@@ -45,22 +47,34 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
   const [isAdaptive, setIsAdaptive] = useState(true);
   const [perQuestionTimeLimit, setPerQuestionTimeLimit] = useState(120); // 120s per question or 0 for untimed
 
-  // Resume mode state
-  const [resumeText, setResumeText] = useState('');
+  // Resume mode & Candidate Selection state
+  const [selectedCandidateId, setSelectedCandidateId] = useState(SAMPLE_CANDIDATES[0].id);
+  const [resumeText, setResumeText] = useState(SAMPLE_CANDIDATES[0].resumeText);
   const [fileName, setFileName] = useState('');
-  const [parsedResume, setParsedResume] = useState(null);
+  const [parsedResume, setParsedResume] = useState(() => resumeService.parseResumeText(SAMPLE_CANDIDATES[0].resumeText));
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+
+  const handleSelectCandidate = (candidate) => {
+    setSelectedCandidateId(candidate.id);
+    setFileName('');
+    setResumeText(candidate.resumeText);
+    analyzeResume(candidate.resumeText);
+  };
 
   const handleFileUpload = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setFileName(file.name);
+    setSelectedCandidateId('custom');
 
     const reader = new FileReader();
     reader.onload = (event) => {
       const content = event.target.result;
-      setResumeText(typeof content === 'string' ? content : '');
-      analyzeResume(typeof content === 'string' ? content : '');
+      const rawText = typeof content === 'string' ? content : '';
+      // Clean non-printable characters in case of binary file uploads
+      const sanitized = rawText.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, ' ');
+      setResumeText(sanitized);
+      analyzeResume(sanitized);
     };
     reader.readAsText(file);
   };
@@ -68,10 +82,11 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
   const analyzeResume = (textToAnalyze) => {
     setIsAnalyzing(true);
     setTimeout(() => {
-      const parsed = resumeService.parseResumeText(textToAnalyze || resumeText);
+      const text = textToAnalyze || resumeText;
+      const parsed = resumeService.parseResumeText(text);
       setParsedResume(parsed);
       setIsAnalyzing(false);
-    }, 400);
+    }, 300);
   };
 
   const handleLaunch = () => {
@@ -81,20 +96,30 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
     let typeObj = INTERVIEW_TYPES.find(t => t.id === selectedType);
     let compObj = COMPANIES.find(c => c.id === selectedCompany);
 
-    if (setupMode === 'resume' && parsedResume) {
-      questions = resumeService.generateResumeQuestions(parsedResume, questionCount);
-      roleObj = JOB_ROLES.find(r => r.id === parsedResume.roleId) || roleObj;
-      levelObj = EXPERIENCE_LEVELS.find(l => l.id === parsedResume.detectedLevel) || levelObj;
+    let activeParsed = parsedResume;
+    if (setupMode === 'resume') {
+      if (!activeParsed) {
+        activeParsed = resumeService.parseResumeText(resumeText || SAMPLE_CANDIDATES[0].resumeText);
+      }
+      questions = resumeService.generateResumeQuestions(activeParsed, questionCount);
+      roleObj = JOB_ROLES.find(r => r.id === activeParsed.roleId) || roleObj;
+      levelObj = EXPERIENCE_LEVELS.find(l => l.id === activeParsed.detectedLevel) || levelObj;
     } else {
       questions = getQuestionsForInterview(selectedRole, selectedType, selectedDifficulty, questionCount, selectedCompany);
     }
 
+    const selectedCandObj = SAMPLE_CANDIDATES.find(c => c.id === selectedCandidateId);
+    const candidateName = setupMode === 'resume'
+      ? (selectedCandObj ? selectedCandObj.name : (userProfile?.name || 'Selected Candidate'))
+      : (userProfile?.name || 'Candidate');
+
     const sessionConfig = {
-      roleId: setupMode === 'resume' && parsedResume ? parsedResume.roleId : selectedRole,
-      roleName: setupMode === 'resume' && parsedResume ? parsedResume.detectedRole : (roleObj ? roleObj.name : 'Software Developer'),
+      candidateName,
+      roleId: setupMode === 'resume' && activeParsed ? activeParsed.roleId : selectedRole,
+      roleName: setupMode === 'resume' && activeParsed ? activeParsed.detectedRole : (roleObj ? roleObj.name : 'Software Developer'),
       companyId: selectedCompany,
       companyName: compObj ? compObj.name : 'All Companies',
-      levelId: setupMode === 'resume' && parsedResume ? parsedResume.detectedLevel : selectedLevel,
+      levelId: setupMode === 'resume' && activeParsed ? activeParsed.detectedLevel : selectedLevel,
       levelName: levelObj ? levelObj.name : 'Intermediate',
       typeId: selectedType,
       typeName: typeObj ? typeObj.name : 'Technical',
@@ -104,7 +129,7 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
       isAdaptive,
       perQuestionTimeLimit,
       isResumeBased: setupMode === 'resume',
-      parsedResume: setupMode === 'resume' ? parsedResume : null,
+      parsedResume: setupMode === 'resume' ? activeParsed : null,
       startedAt: new Date().toISOString()
     };
 
@@ -122,7 +147,7 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
           Configure Your Interview Simulation
         </h1>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
-          Select custom role parameters, target company tracks, or upload your resume for tailored AI evaluation.
+          Select custom role parameters, target company tracks, or select/upload a candidate resume for tailored AI evaluation.
         </p>
       </div>
 
@@ -158,18 +183,110 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
             fontSize: '0.875rem'
           }}
         >
-          <FileText size={16} /> <span>Resume-Based Interview</span>
+          <FileText size={16} /> <span>Resume & Candidate Selection</span>
         </button>
       </div>
 
-      {/* RESUME MODE VIEW */}
+      {/* RESUME & CANDIDATE SELECTION VIEW */}
       {setupMode === 'resume' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', marginBottom: '2rem' }}>
+          {/* Candidate Profiles / Shortlisting Selector */}
+          <div className="card">
+            <div className="card-header" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1rem' }}>
+              <UserCheck size={22} style={{ color: 'var(--accent-cyan)' }} />
+              <div>
+                <h3 style={{ fontSize: '1.15rem', color: 'var(--text-primary)' }}>1. Select / Shortlist Candidate Profile</h3>
+                <p style={{ fontSize: '0.825rem', color: 'var(--text-muted)' }}>
+                  Pick a pre-screened candidate profile to immediately simulate their tailored technical interview.
+                </p>
+              </div>
+            </div>
+
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))',
+              gap: '0.85rem',
+              marginBottom: '1rem'
+            }}>
+              {SAMPLE_CANDIDATES.map((cand) => {
+                const isSelected = selectedCandidateId === cand.id;
+                return (
+                  <div
+                    key={cand.id}
+                    onClick={() => handleSelectCandidate(cand)}
+                    style={{
+                      backgroundColor: isSelected ? 'var(--accent-cyan-light)' : 'var(--bg-secondary)',
+                      border: isSelected ? '1.5px solid var(--accent-cyan)' : '1px solid var(--border-subtle)',
+                      borderRadius: 'var(--radius-md)',
+                      padding: '1rem',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                      boxShadow: isSelected ? '0 0 14px rgba(6, 182, 212, 0.15)' : 'none'
+                    }}
+                  >
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                          <span style={{ fontSize: '1.25rem' }}>{cand.avatar}</span>
+                          <strong style={{ fontSize: '0.95rem', color: isSelected ? 'var(--accent-cyan)' : 'var(--text-primary)' }}>
+                            {cand.name}
+                          </strong>
+                        </div>
+                        <span className="badge" style={{ fontSize: '0.7rem', textTransform: 'capitalize' }}>
+                          {cand.experienceLevel} ({cand.experienceYears}y)
+                        </span>
+                      </div>
+                      <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', fontWeight: 600, marginBottom: '0.4rem' }}>
+                        {cand.targetRole}
+                      </div>
+                      <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', lineHeight: '1.4', marginBottom: '0.65rem' }}>
+                        {cand.summary}
+                      </p>
+                    </div>
+
+                    <div>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem', marginBottom: '0.6rem' }}>
+                        {cand.skills.slice(0, 4).map((s, idx) => (
+                          <span key={idx} style={{
+                            fontSize: '0.68rem',
+                            backgroundColor: 'var(--surface-card)',
+                            border: '1px solid var(--border-subtle)',
+                            padding: '0.15rem 0.4rem',
+                            borderRadius: 'var(--radius-sm)',
+                            color: 'var(--text-secondary)'
+                          }}>
+                            {s}
+                          </span>
+                        ))}
+                        {cand.skills.length > 4 && (
+                          <span style={{ fontSize: '0.68rem', color: 'var(--text-dim)' }}>
+                            +{cand.skills.length - 4} more
+                          </span>
+                        )}
+                      </div>
+                      <button
+                        type="button"
+                        className={`btn btn-sm ${isSelected ? 'btn-primary' : 'btn-secondary'}`}
+                        style={{ width: '100%', fontSize: '0.75rem', padding: '0.35rem 0.6rem', justifyContent: 'center' }}
+                      >
+                        {isSelected ? <><CheckCircle2 size={13} /> Selected Candidate</> : 'Select Candidate'}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Upload or Custom Paste Box */}
           <div className="card">
             <div className="card-header" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
               <UploadCloud size={22} style={{ color: 'var(--accent-cyan)' }} />
               <div>
-                <h3 style={{ fontSize: '1.15rem', color: 'var(--text-primary)' }}>Upload or Paste Resume</h3>
+                <h3 style={{ fontSize: '1.15rem', color: 'var(--text-primary)' }}>2. Or Upload / Paste Custom Candidate Resume</h3>
                 <p style={{ fontSize: '0.825rem', color: 'var(--text-muted)' }}>
                   We parse technical skills, experience milestones, and projects to generate custom questions.
                 </p>
@@ -180,7 +297,7 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
             <div style={{
               border: '2px dashed var(--border-subtle)',
               borderRadius: 'var(--radius-lg)',
-              padding: '2rem 1.5rem',
+              padding: '1.75rem 1.25rem',
               textAlign: 'center',
               backgroundColor: 'var(--bg-secondary)',
               cursor: 'pointer',
@@ -194,9 +311,9 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
                 style={{ display: 'none' }}
               />
               <label htmlFor="resumeFileInput" style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
-                <UploadCloud size={32} style={{ color: 'var(--accent-cyan)' }} />
+                <UploadCloud size={30} style={{ color: 'var(--accent-cyan)' }} />
                 <span style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-primary)' }}>
-                  {fileName ? `Loaded: ${fileName}` : 'Click to Upload Resume (.txt, .md, .pdf)'}
+                  {fileName ? `Loaded File: ${fileName}` : 'Click to Upload Resume (.txt, .md, .pdf)'}
                 </span>
                 <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                   Secure and parsed locally in your browser.
@@ -210,7 +327,10 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
               <textarea
                 className="form-textarea"
                 value={resumeText}
-                onChange={(e) => setResumeText(e.target.value)}
+                onChange={(e) => {
+                  setResumeText(e.target.value);
+                  setSelectedCandidateId('custom');
+                }}
                 placeholder="Example: Software Developer with 3 years of experience in React, Node.js, PostgreSQL, Docker, AWS. Built scalable microservices, reduced API latency by 40%..."
                 style={{ minHeight: '120px' }}
               />
@@ -223,7 +343,7 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
               className="btn btn-secondary"
               style={{ borderColor: 'var(--accent-cyan)', color: 'var(--accent-cyan)' }}
             >
-              <Sparkles size={16} /> {isAnalyzing ? 'Analyzing Signals...' : 'Analyze Resume Signals'}
+              <Sparkles size={16} /> {isAnalyzing ? 'Analyzing Signals...' : 'Re-Analyze Resume Signals'}
             </button>
           </div>
 
@@ -232,7 +352,9 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
             <div className="card" style={{ border: '1px solid var(--accent-cyan)', backgroundColor: 'var(--surface-card)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
                 <CheckCircle2 size={18} style={{ color: 'var(--accent-cyan)' }} />
-                <h4 style={{ fontSize: '1.05rem', color: 'var(--text-primary)' }}>Resume Analysis Results</h4>
+                <h4 style={{ fontSize: '1.05rem', color: 'var(--text-primary)' }}>
+                  Resume Analysis Signals for {SAMPLE_CANDIDATES.find(c => c.id === selectedCandidateId)?.name || 'Custom Candidate'}
+                </h4>
               </div>
 
               <div className="grid-3" style={{ marginBottom: '1rem' }}>
@@ -242,16 +364,16 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
                 </div>
                 <div style={{ backgroundColor: 'var(--bg-secondary)', padding: '0.75rem', borderRadius: 'var(--radius-md)' }}>
                   <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Calibrated Level</div>
-                  <div style={{ fontWeight: 700, color: 'var(--text-primary)', textTransform: 'capitalize' }}>{parsedResume.detectedLevel}</div>
+                  <div style={{ fontWeight: 700, color: 'var(--text-primary)', textTransform: 'capitalize' }}>{parsedResume.detectedLevel} ({parsedResume.experienceYears} Years)</div>
                 </div>
                 <div style={{ backgroundColor: 'var(--bg-secondary)', padding: '0.75rem', borderRadius: 'var(--radius-md)' }}>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Detected Skills</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Extracted Skills</div>
                   <div style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{parsedResume.skills.length} Technical Skills</div>
                 </div>
               </div>
 
               <div>
-                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.4rem' }}>Key Skills Extracted:</div>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.4rem' }}>Extracted Skills & Domains:</div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
                   {parsedResume.skills.map((skill, i) => (
                     <span key={i} className="badge badge-cyan" style={{ fontSize: '0.75rem' }}>{skill}</span>
