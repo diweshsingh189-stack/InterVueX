@@ -19,10 +19,80 @@ export const COMMON_SKILLS = [
   'Spring Boot', 'REST API', 'GraphQL', 'Microservices', 'System Design',
   'Data Structures', 'Algorithms', 'Machine Learning', 'TensorFlow', 'PyTorch',
   'CI/CD', 'Linux', 'Redis', 'Kafka', 'Tailwind', 'DevOps', 'Pandas', 'Tableau',
-  'Vue.js', 'Angular', 'C#', '.NET', 'Kotlin', 'Swift', 'MySQL', 'DynamoDB'
+  'Vue.js', 'Angular', 'C#', '.NET', 'Kotlin', 'Swift', 'MySQL', 'DynamoDB',
+  'Ollama', 'FFmpeg', 'Whisper', 'RAG', 'Vector Embeddings', 'Cosine Similarity',
+  'Postman', 'Upstash', 'Scikit-learn', 'NumPy', 'OOP', 'DBMS'
 ];
 
 export const SAMPLE_CANDIDATES = [
+  {
+    id: 'candidate-vatsal-mishra',
+    name: 'Vatsal Mishra',
+    targetRole: 'Full Stack & AI Engineer',
+    roleId: 'fullstack-developer',
+    experienceLevel: 'intermediate',
+    experienceYears: 1,
+    skills: ['React', 'Node.js', 'Express', 'PostgreSQL', 'MongoDB', 'Redis', 'Python', 'C++', 'SQL', 'FastAPI', 'Docker', 'Git', 'REST API', 'System Design', 'Data Structures', 'Algorithms', 'RAG', 'Machine Learning', 'Tailwind', 'Pandas'],
+    avatar: '🚀',
+    summary: 'Full Stack & AI Engineer (B.Tech CSE, 8.0/10) with MERN internship, ICPC Regionalist, LeetCode 1654 rating, and builder of NanoLink & Local RAG systems.',
+    resumeText: `👤 VATSAL MISHRA
+Greater Noida, Uttar Pradesh, India | +91 8127858685 | vatsal.vns@gmail.com | LinkedIn | Github
+
+════════════════════════════════════════════════════════════════
+📌 EDUCATION
+════════════════════════════════════════════════════════════════
+B.Tech in Computer Science and Engineering                          2022 – 2026
+I.T.S Engineering College — GPA: 8.0/10                     Greater Noida, India
+
+════════════════════════════════════════════════════════════════
+📌 EXPERIENCE
+════════════════════════════════════════════════════════════════
+Software Engineer Intern (Sort String Solutions LLP)          Oct 2025 – Apr 2026
+  • Contributed to the development and maintenance of MERN stack applications by implementing features, fixing bugs, and improving functionality.
+  • Built responsive user interfaces and integrated RESTful APIs using MongoDB, Express.js, React.js, and Node.js.
+  • Collaborated with developers to enhance application performance and participated in testing, debugging, and code reviews for high-quality software delivery.
+  • Gained hands-on experience with real-world software development workflows, version control systems, and agile development practices.
+
+════════════════════════════════════════════════════════════════
+📌 TECHNICAL SKILLS
+════════════════════════════════════════════════════════════════
+  • Languages: C/C++, Python, JavaScript, Java, SQL
+  • Frontend: React.js, Tailwind CSS, shadcn/ui, HTML, CSS
+  • Backend: Node.js, Express.js, REST APIs
+  • Databases: MongoDB, MySQL, PostgreSQL, Redis
+  • Developer Tools: Git, GitHub, VS Code, Ollama, FFmpeg, Postman
+  • AI/ML: RAG, OpenAI Whisper, bge-m3, llama3.2, NumPy, Pandas, Scikit-learn, Vector Embeddings, Cosine Similarity
+  • System Design: Scalable Architecture, Load Balancing, Caching, Microservices, Database Sharding, CDN, CAP Theorem
+  • CS Fundamentals: Data Structures & Algorithms, OOP, Operating Systems, DBMS, Computer Networks
+
+════════════════════════════════════════════════════════════════
+📌 PROJECTS
+════════════════════════════════════════════════════════════════
+NanoLink | React.js, Node.js, Express.js, PostgreSQL, Upstash Redis
+  • A production-ready URL shortening web app that converts long URLs into compact short links.
+  • Built a highly scalable, full-stack service optimized for read-heavy workloads (100:1 ratio), capable of handling high-concurrency redirect traffic.
+  • Engineered a collision-free Base62 algorithm using sequential PostgreSQL IDs to guarantee O(1) short-code generation.
+  • Integrated an Upstash Redis cache-aside layer, decreasing latency by 95% and significantly relieving persistent database read loads.
+  • Implemented IP-based Rate Limiting to defend API infrastructure against DDoS attacks and malicious storage exhaustion.
+  • Designed a RESTful API with clear separation of concerns across route, controller, and service layers for maintainability and future scaling.
+
+Local RAG Video Search Engine | Python, llama3.2 (Local LLM), OpenAI Whisper, Pandas
+  • Architected a Retrieval-Augmented Generation (RAG) system using local LLMs to enable semantic search and Q&A over video course content without external API dependencies.
+  • Engineered a video ETL pipeline using FFmpeg, OpenAI Whisper, and bge-m3 for embedding generation.
+  • Implemented custom vector retrieval logic with Pandas and Cosine Similarity to identify relevant video segments.
+  • Integrated llama3.2 via Ollama to generate context-aware answers with precise timestamped navigation.
+  • Designed a zero-cost, fully offline AI assistant eliminating cloud API dependencies, ensuring complete data privacy and sub-second query response time.
+
+════════════════════════════════════════════════════════════════
+📌 ACHIEVEMENTS & CERTIFICATES
+════════════════════════════════════════════════════════════════
+  • ICPC Regionals: Certificate — Qualified for the Amritapuri Regionals, Kerala in the International Collegiate Programming Contest (ICPC) as part of team Binary Brain.
+  • LeetCode (VatsalMishra27): Peak contest rating of 1654 with 600+ problems solved; best contest rank of 2908 globally among thousands of participants.
+  • CodeChef (vatsalmishra27): Max Rating 1459; secured a global best rank of 279 in an official contest, showcasing strong problem-solving and analytical thinking under competitive pressure.
+  • GeeksforGeeks (vatsal_mishra27): Achieved a Contest Rating of 1558 in Data Structures & Algorithms challenges.
+  • Codeforces (Vatsal_Mishra): Reached a maximum rating of 1029 through consistent participation in algorithmic contests.
+  • Coursera: IBM Certified in React, focusing on UI development, state management, and hooks.`
+  },
   {
     id: 'candidate-alex-chen',
     name: 'Alex Chen',
@@ -269,8 +339,13 @@ export function formatResumeForDisplay(raw) {
     'PROJECTS',
     'KEY PROJECTS',
     'ACADEMIC PROJECTS',
-    'CERTIFICATIONS',
+    'ACHIEVEMENTS & CERTIFICATES',
+    'ACHIEVEMENTS AND CERTIFICATES',
     'ACHIEVEMENTS',
+    'CERTIFICATES & ACHIEVEMENTS',
+    'CERTIFICATIONS',
+    'AWARDS & ACHIEVEMENTS',
+    'HONORS & AWARDS',
     'PUBLICATIONS',
     'POSITIONS OF RESPONSIBILITY',
     'LEADERSHIP',
@@ -285,10 +360,10 @@ export function formatResumeForDisplay(raw) {
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
-    const normalizedHeader = line.toUpperCase().replace(/[^A-Z\s]/g, '').trim();
+    const normalizedHeader = line.toUpperCase().replace(/[^A-Z\s&]/g, '').trim();
 
     // Check if line is a section header (or starts with a section header)
-    const matchedSection = SECTION_KEYWORDS.find(sec => sec === normalizedHeader);
+    const matchedSection = SECTION_KEYWORDS.find(sec => sec === normalizedHeader || normalizedHeader === sec.replace('&', 'AND'));
 
     if (matchedSection) {
       formattedBlocks.push(`\n════════════════════════════════════════════════════════════════\n📌 ${matchedSection}\n════════════════════════════════════════════════════════════════`);

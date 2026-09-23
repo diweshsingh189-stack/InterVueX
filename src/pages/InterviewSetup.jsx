@@ -70,9 +70,9 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
 
     try {
       const extractedText = await resumeService.extractTextFromFile(file);
-      const clean = resumeService.cleanResumeText(extractedText);
-      setResumeText(clean);
-      const parsed = resumeService.parseResumeText(clean);
+      const formatted = resumeService.formatResumeForDisplay(extractedText);
+      setResumeText(formatted);
+      const parsed = resumeService.parseResumeText(formatted);
       setParsedResume(parsed);
     } catch (err) {
       console.error('File extraction failed:', err);
@@ -85,9 +85,9 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
     setIsAnalyzing(true);
     setTimeout(() => {
       const text = textToAnalyze || resumeText;
-      const clean = resumeService.cleanResumeText(text);
-      setResumeText(clean);
-      const parsed = resumeService.parseResumeText(clean);
+      const formatted = resumeService.formatResumeForDisplay(text);
+      setResumeText(formatted);
+      const parsed = resumeService.parseResumeText(formatted);
       setParsedResume(parsed);
       setIsAnalyzing(false);
     }, 250);
