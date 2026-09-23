@@ -4,6 +4,7 @@ import Footer from './components/Footer';
 import AuthModal from './components/AuthModal';
 import LandingPage from './pages/LandingPage';
 import InterviewSetup from './pages/InterviewSetup';
+import StartSessionWorkspace from './pages/StartSessionWorkspace';
 import InterviewRoom from './pages/InterviewRoom';
 import InterviewReport from './pages/InterviewReport';
 import Dashboard from './pages/Dashboard';
@@ -122,6 +123,15 @@ export default function App() {
             onStartInterview={handleStartInterview}
             userProfile={userProfile}
             history={history}
+          />
+        )}
+
+        {activePage === 'start-session' && (
+          <StartSessionWorkspace
+            onStartInterview={handleStartInterview}
+            userProfile={userProfile}
+            history={history}
+            onNavigateToSetup={() => setActivePage('setup')}
           />
         )}
 

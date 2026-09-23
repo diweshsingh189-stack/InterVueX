@@ -46,7 +46,9 @@ export default function Navbar({ activePage, setActivePage, userProfile, theme, 
 
   useEffect(() => {
     if (activePage === 'setup') {
-      setSelectedBtn(prev => (prev === 'start-session' || prev === 'new-interview') ? prev : 'new-interview');
+      setSelectedBtn('new-interview');
+    } else if (activePage === 'start-session') {
+      setSelectedBtn('start-session');
     } else {
       setSelectedBtn(activePage);
     }
@@ -237,11 +239,11 @@ export default function Navbar({ activePage, setActivePage, userProfile, theme, 
             gap: '0.45rem',
             flexShrink: 0
           }}>
-            {/* Action Button (Start Session - Activates & blinks ONLY when Start Session itself is clicked) */}
+            {/* Action Button (Start Session - Dedicated Quick Interview Launch Workspace) */}
             <button
-              onClick={() => handleNavClick('start-session', 'setup')}
+              onClick={() => handleNavClick('start-session', 'start-session')}
               className={`btn btn-sm btn-secondary ${selectedBtn === 'start-session' ? 'active-glow-pulse' : ''}`}
-              title="Start Interview Session"
+              title="Quick Interview Launch Workspace"
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -568,17 +570,17 @@ export default function Navbar({ activePage, setActivePage, userProfile, theme, 
                   </span>
                 </div>
                 <p style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', lineHeight: 1.35, margin: 0 }}>
-                  Launch full AI-powered mock interview simulation with real-time feedback.
+                  Fast-track technical interview simulation with calibrated candidate profile.
                 </p>
                 <button
                   onClick={() => {
-                    setActivePage('setup');
+                    setActivePage('start-session');
                     setDrawerOpen(false);
                   }}
                   className="btn btn-sm btn-primary"
                   style={{ width: '100%', justifyContent: 'center', fontWeight: 700 }}
                 >
-                  <Sparkles size={15} /> Start New Session
+                  <Sparkles size={15} /> Quick Launch Workspace
                 </button>
               </div>
             </div>
