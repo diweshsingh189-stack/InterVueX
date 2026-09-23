@@ -554,6 +554,10 @@ export default function InterviewRoom({ session, onFinishInterview, onExit, user
 
           <textarea
             className="form-textarea"
+            spellCheck={false}
+            autoCorrect="off"
+            autoCapitalize="off"
+            autoComplete="off"
             style={{
               minHeight: '150px',
               fontSize: '0.95rem',

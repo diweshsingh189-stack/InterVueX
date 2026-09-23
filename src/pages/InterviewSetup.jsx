@@ -352,6 +352,10 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
               <textarea
                 className="form-textarea"
                 value={resumeText}
+                spellCheck={false}
+                autoCorrect="off"
+                autoCapitalize="off"
+                autoComplete="off"
                 onChange={(e) => {
                   setResumeText(e.target.value);
                   setSelectedCandidateId('custom');
