@@ -5,6 +5,12 @@
  */
 
 import { QUESTIONS_DATABASE } from '../data/questionsData.js';
+import * as pdfjsLib from 'pdfjs-dist';
+
+// Configure PDF.js worker for client-side browser execution
+if (typeof window !== 'undefined' && pdfjsLib.GlobalWorkerOptions) {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js`;
+}
 
 export const COMMON_SKILLS = [
   'React', 'JavaScript', 'TypeScript', 'Node.js', 'Python', 'Java', 'C++', 'SQL',
@@ -12,7 +18,8 @@ export const COMMON_SKILLS = [
   'Git', 'HTML', 'CSS', 'Redux', 'Next.js', 'Express', 'Django', 'FastAPI',
   'Spring Boot', 'REST API', 'GraphQL', 'Microservices', 'System Design',
   'Data Structures', 'Algorithms', 'Machine Learning', 'TensorFlow', 'PyTorch',
-  'CI/CD', 'Linux', 'Redis', 'Kafka', 'Tailwind', 'DevOps', 'Pandas', 'Tableau'
+  'CI/CD', 'Linux', 'Redis', 'Kafka', 'Tailwind', 'DevOps', 'Pandas', 'Tableau',
+  'Vue.js', 'Angular', 'C#', '.NET', 'Kotlin', 'Swift', 'MySQL', 'DynamoDB'
 ];
 
 export const SAMPLE_CANDIDATES = [
@@ -109,16 +116,130 @@ Skills: Data Structures, Algorithms, C++, Java, SQL, Linux, Git, Object-Oriented
   }
 ];
 
+/**
+ * Sanitizes and cleans text by removing binary artifacts, PDF stream tokens,
+ * non-printable characters, and formatting clean paragraphs.
+ */
+export function cleanResumeText(raw) {
+  if (!raw || typeof raw !== 'string') return '';
+
+  let text = raw;
+
+  // Check if raw contains PDF internal binary signatures
+  const hasPdfSignatures = /%PDF|\bobj\b|\bendobj\b|\bstream\b|\bendstream\b|\bxref\b|FlateDecode/i.test(text);
+
+  if (hasPdfSignatures) {
+    // Strip PDF stream blocks and object descriptors
+    text = text
+      .replace(/%PDF-[0-9.]+/g, '')
+      .replace(/<<[\s\S]*?>>/g, ' ')
+      .replace(/\b\d+\s+\d+\s+obj\b[\s\S]*?\bendobj\b/gi, ' ')
+      .replace(/\bstream[\s\S]*?endstream\b/gi, ' ')
+      .replace(/\bxref[\s\S]*?trailer/gi, ' ')
+      .replace(/\bstartxref[\s\S]*?%%EOF/gi, ' ')
+      .replace(/\[<[0-9a-fA-F]+>\]/g, ' ')
+      .replace(/\/[\w\d]+/g, ' ');
+  }
+
+  // Remove non-printable control characters, corrupted unicode replacement characters
+  text = text
+    .replace(/\uFFFD/g, ' ')
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, ' ')
+    .replace(/[^\x20-\x7E\n\r\t•–—]/g, ' ');
+
+  // Format into clean, readable lines
+  const lines = text
+    .split(/\r?\n/)
+    .map(line => line.trim().replace(/\s+/g, ' '))
+    .filter(line => {
+      if (!line) return false;
+      // Filter out lines that look like raw binary noise
+      const words = line.split(' ');
+      const alphaCount = (line.match(/[a-zA-Z]/g) || []).length;
+      return alphaCount >= 2 && line.length >= 2;
+    });
+
+  return lines.join('\n');
+}
+
 export const resumeService = {
   getSampleCandidates() {
     return SAMPLE_CANDIDATES;
   },
 
   /**
+   * Extracts clean, readable text from uploaded File (.pdf, .txt, .md, .docx)
+   */
+  async extractTextFromFile(file) {
+    if (!file) return '';
+
+    const fileName = file.name.toLowerCase();
+    const isPdf = file.type === 'application/pdf' || fileName.endsWith('.pdf');
+
+    if (isPdf) {
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const loadingTask = pdfjsLib.getDocument({
+          data: new Uint8Array(arrayBuffer),
+          useSystemFonts: true,
+          disableFontFace: true
+        });
+        
+        const pdf = await loadingTask.promise;
+        const pageTextPromises = [];
+
+        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+          pageTextPromises.push(
+            pdf.getPage(pageNum).then(async (page) => {
+              const textContent = await page.getTextContent();
+              let lastY = null;
+              let text = '';
+              for (const item of textContent.items) {
+                if (lastY !== null && Math.abs(item.transform[5] - lastY) > 5) {
+                  text += '\n';
+                } else if (text.length > 0 && !text.endsWith('\n') && !text.endsWith(' ')) {
+                  text += ' ';
+                }
+                text += item.str;
+                lastY = item.transform[5];
+              }
+              return text;
+            })
+          );
+        }
+
+        const pages = await Promise.all(pageTextPromises);
+        const fullPdfText = pages.join('\n\n');
+        const cleaned = cleanResumeText(fullPdfText);
+
+        if (cleaned.trim().length >= 30) {
+          return cleaned;
+        }
+      } catch (pdfErr) {
+        console.warn('PDF.js text parsing encountered an error, applying fallback cleaner:', pdfErr);
+      }
+    }
+
+    // Standard text fallback for .txt, .md, or unparsed files
+    try {
+      const raw = await file.text();
+      return cleanResumeText(raw);
+    } catch {
+      return '';
+    }
+  },
+
+  cleanResumeText(text) {
+    return cleanResumeText(text);
+  },
+
+  /**
    * Parse resume text and extract candidate profile signals
    */
-  parseResumeText(text) {
-    if (!text || typeof text !== 'string') {
+  parseResumeText(rawText) {
+    const text = cleanResumeText(rawText);
+
+    if (!text || typeof text !== 'string' || text.trim().length < 15) {
       return {
         detectedRole: 'Software Developer',
         roleId: 'software-developer',
@@ -126,18 +247,17 @@ export const resumeService = {
         experienceYears: 2,
         detectedLevel: 'intermediate',
         projectHighlights: ['Web Application Development', 'API Design'],
-        rawLength: 0
+        rawLength: text ? text.length : 0
       };
     }
 
-    // Clean text and remove binary artifacts if any
-    const cleanText = text.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, ' ').toLowerCase();
+    const cleanLower = text.toLowerCase();
 
     // 1. Detect skills
     const detectedSkills = COMMON_SKILLS.filter(skill => {
       const escaped = skill.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const regex = new RegExp(`(^|[^a-zA-Z0-9])${escaped.toLowerCase()}([^a-zA-Z0-9]|$)`, 'i');
-      return regex.test(cleanText);
+      return regex.test(cleanLower);
     });
 
     // Ensure at least some default skills if none detected
@@ -149,16 +269,16 @@ export const resumeService = {
     let experienceYears = 2;
     let detectedLevel = 'intermediate';
 
-    if (/fresher|intern|student|graduate|entry[- ]level|0\s*years/i.test(cleanText)) {
+    if (/fresher|intern|student|graduate|entry[- ]level|0\s*years/i.test(cleanLower)) {
       experienceYears = 0;
       detectedLevel = 'fresher';
-    } else if (/\b([1-2]|one|two)\s*years?\b/i.test(cleanText) || /junior|beginner|associate/i.test(cleanText)) {
+    } else if (/\b([1-2]|one|two)\s*years?\b/i.test(cleanLower) || /junior|beginner|associate/i.test(cleanLower)) {
       experienceYears = 2;
       detectedLevel = 'beginner';
-    } else if (/\b([3-5]|three|four|five)\+?\s*years?\b/i.test(cleanText) || /intermediate|mid[- ]level/i.test(cleanText)) {
+    } else if (/\b([3-5]|three|four|five)\+?\s*years?\b/i.test(cleanLower) || /intermediate|mid[- ]level/i.test(cleanLower)) {
       experienceYears = 4;
       detectedLevel = 'intermediate';
-    } else if (/\b([6-9]|1[0-9]|six|seven|eight|nine|ten|senior|lead|architect|principal)\+?\s*years?\b/i.test(cleanText)) {
+    } else if (/\b([6-9]|1[0-9]|six|seven|eight|nine|ten|senior|lead|architect|principal)\+?\s*years?\b/i.test(cleanLower)) {
       experienceYears = 6;
       detectedLevel = 'advanced';
     }
@@ -167,30 +287,30 @@ export const resumeService = {
     let detectedRole = 'Software Developer';
     let roleId = 'software-developer';
 
-    if (/full[- ]stack|fullstack|mern|mean/i.test(cleanText) || (/(react|vue|angular|frontend)/i.test(cleanText) && /(node|express|django|backend|api)/i.test(cleanText))) {
+    if (/full[- ]stack|fullstack|mern|mean/i.test(cleanLower) || (/(react|vue|angular|frontend)/i.test(cleanLower) && /(node|express|django|backend|api)/i.test(cleanLower))) {
       detectedRole = 'Full Stack Developer';
       roleId = 'fullstack-developer';
-    } else if (/frontend|react|vue|angular|css|html|ui\/ux|web design/i.test(cleanText)) {
+    } else if (/frontend|react|vue|angular|css|html|ui\/ux|web design/i.test(cleanLower)) {
       detectedRole = 'Frontend Developer';
       roleId = 'frontend-developer';
-    } else if (/backend|api|server|microservice|database|sql|express|django|spring/i.test(cleanText)) {
+    } else if (/backend|api|server|microservice|database|sql|express|django|spring/i.test(cleanLower)) {
       detectedRole = 'Backend Developer';
       roleId = 'backend-developer';
-    } else if (/data\s*analyst|sql|tableau|power\s*bi|pandas|numpy|analytics/i.test(cleanText)) {
+    } else if (/data\s*analyst|sql|tableau|power\s*bi|pandas|numpy|analytics/i.test(cleanLower)) {
       detectedRole = 'Data Analyst';
       roleId = 'data-analyst';
-    } else if (/python|django|fastapi|flask/i.test(cleanText)) {
+    } else if (/python|django|fastapi|flask/i.test(cleanLower)) {
       detectedRole = 'Python Developer';
       roleId = 'python-developer';
-    } else if (/java|spring\s*boot|jvm|hibernate/i.test(cleanText)) {
+    } else if (/java|spring\s*boot|jvm|hibernate/i.test(cleanLower)) {
       detectedRole = 'Java Developer';
       roleId = 'java-developer';
-    } else if (/c\+\+|cpp|embedded|stl|low[- ]level/i.test(cleanText)) {
+    } else if (/c\+\+|cpp|embedded|stl|low[- ]level/i.test(cleanLower)) {
       detectedRole = 'C++ Developer';
       roleId = 'cpp-developer';
     }
 
-    // 4. Extract Project Highlights (simple sentence extraction mentioning project/built/developed)
+    // 4. Extract Project Highlights
     const sentences = text.split(/[.\n]/).map(s => s.trim()).filter(Boolean);
     const projectHighlights = sentences
       .filter(s => /built|developed|created|implemented|architected|designed|led|delivered|authored/i.test(s) && s.length > 20 && s.length < 140)

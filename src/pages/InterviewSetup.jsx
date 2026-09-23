@@ -61,32 +61,36 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
     analyzeResume(candidate.resumeText);
   };
 
-  const handleFileUpload = (e) => {
+  const handleFileUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setFileName(file.name);
     setSelectedCandidateId('custom');
+    setIsAnalyzing(true);
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const content = event.target.result;
-      const rawText = typeof content === 'string' ? content : '';
-      // Clean non-printable characters in case of binary file uploads
-      const sanitized = rawText.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, ' ');
-      setResumeText(sanitized);
-      analyzeResume(sanitized);
-    };
-    reader.readAsText(file);
+    try {
+      const extractedText = await resumeService.extractTextFromFile(file);
+      const clean = resumeService.cleanResumeText(extractedText);
+      setResumeText(clean);
+      const parsed = resumeService.parseResumeText(clean);
+      setParsedResume(parsed);
+    } catch (err) {
+      console.error('File extraction failed:', err);
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   const analyzeResume = (textToAnalyze) => {
     setIsAnalyzing(true);
     setTimeout(() => {
       const text = textToAnalyze || resumeText;
-      const parsed = resumeService.parseResumeText(text);
+      const clean = resumeService.cleanResumeText(text);
+      setResumeText(clean);
+      const parsed = resumeService.parseResumeText(clean);
       setParsedResume(parsed);
       setIsAnalyzing(false);
-    }, 300);
+    }, 250);
   };
 
   const handleLaunch = () => {
