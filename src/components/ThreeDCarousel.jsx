@@ -62,7 +62,7 @@ export default function ThreeDCarousel({
   currentSlide: controlledSlide, 
   onSlideChange,
   compact = false,
-  autoPlayInterval = 4500 
+  autoPlayInterval = 5000 
 }) {
   const [internalPage, setInternalPage] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
@@ -113,7 +113,7 @@ export default function ThreeDCarousel({
     }
 
     const startTime = performance.now();
-    const duration = 600; // 600ms realistic paper turn
+    const duration = 650; // 650ms realistic paper turn physics
 
     const animate = (now) => {
       const elapsed = now - startTime;
@@ -145,7 +145,7 @@ export default function ThreeDCarousel({
     }
 
     const startTime = performance.now();
-    const duration = 600;
+    const duration = 650;
 
     const animate = (now) => {
       const elapsed = now - startTime;
@@ -175,14 +175,14 @@ export default function ThreeDCarousel({
     }
   }, [activePage, isAnimatingFlip, isDragging, flipToNext, flipToPrev]);
 
-  // Auto-play timer
+  // Auto-play timer: Automatically turns to next page every 5 seconds
   useEffect(() => {
     if (isHovered || isDragging || isAnimatingFlip) return;
     const timer = setInterval(() => {
       flipToNext();
     }, autoPlayInterval);
     return () => clearInterval(timer);
-  }, [isHovered, isDragging, isAnimatingFlip, autoPlayInterval, flipToNext]);
+  }, [activePage, isHovered, isDragging, isAnimatingFlip, autoPlayInterval, flipToNext]);
 
   // ==========================================
   // Mouse & Touch Dragging Handlers
