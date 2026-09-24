@@ -160,7 +160,13 @@ export default function QuestionBank({ onStartCustomInterview }) {
                           (q.subject === selectedSubject) || 
                           (selectedSubject === 'coding-problems' && (q.subject === 'coding-problems' || q.type === 'coding')) ||
                           (selectedSubject === 'hr' && (q.subject === 'hr' || q.type === 'hr' || q.type === 'behavioral')) ||
-                          (selectedSubject === 'dsa' && (q.subject === 'dsa' || q.category?.includes('DSA') || q.category?.includes('Data Structures')));
+                          (selectedSubject === 'dsa' && (q.subject === 'dsa' || q.category?.includes('DSA') || q.category?.includes('Data Structures'))) ||
+                          (selectedSubject === 'aiml' && (q.subject === 'aiml' || q.category?.toLowerCase().includes('ai') || q.category?.toLowerCase().includes('machine learning'))) ||
+                          (selectedSubject === 'genai' && (q.subject === 'genai' || q.category?.toLowerCase().includes('generative') || q.category?.toLowerCase().includes('llm'))) ||
+                          (selectedSubject === 'cloud' && (q.subject === 'cloud' || q.category?.toLowerCase().includes('cloud'))) ||
+                          (selectedSubject === 'devops' && (q.subject === 'devops' || q.category?.toLowerCase().includes('devops') || q.category?.toLowerCase().includes('ci/cd'))) ||
+                          (selectedSubject === 'cybersecurity' && (q.subject === 'cybersecurity' || q.category?.toLowerCase().includes('security') || q.category?.toLowerCase().includes('cyber'))) ||
+                          (selectedSubject === 'git' && (q.subject === 'git' || q.category?.toLowerCase().includes('git')));
     
     return matchesSearch && matchesRole && matchesType && matchesDiff && matchesCompany && matchesSubject;
   });
@@ -233,9 +239,12 @@ export default function QuestionBank({ onStartCustomInterview }) {
       <div style={{
         display: 'flex',
         flexWrap: 'wrap',
-        gap: '0.5rem',
+        gap: '0.55rem',
         justifyContent: 'center',
-        marginBottom: '1.5rem'
+        alignItems: 'center',
+        maxWidth: '1000px',
+        margin: '0 auto 1.75rem auto',
+        padding: '0 0.5rem'
       }}>
         {CS_SUBJECTS.map(subj => {
           const isSelected = selectedSubject === subj.id;
@@ -247,9 +256,11 @@ export default function QuestionBank({ onStartCustomInterview }) {
               className={`btn btn-sm ${isSelected ? 'btn-primary' : 'btn-secondary'}`}
               style={{
                 borderRadius: 'var(--radius-full)',
-                padding: '0.35rem 0.85rem',
-                fontSize: '0.8rem',
-                transition: 'all 0.2s ease'
+                padding: '0.4rem 0.95rem',
+                fontSize: '0.82rem',
+                fontWeight: isSelected ? 600 : 400,
+                transition: 'all 0.2s ease',
+                boxShadow: isSelected ? '0 0 14px rgba(6, 182, 212, 0.4)' : 'none'
               }}
             >
               {subj.name}

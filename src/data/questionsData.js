@@ -73,7 +73,13 @@ export const CS_SUBJECTS = [
   { id: 'oop', name: 'OOP & Design Patterns' },
   { id: 'system-design', name: 'System Design' },
   { id: 'coding-problems', name: 'Coding Sandbox' },
-  { id: 'hr', name: 'HR / Behavioral' }
+  { id: 'hr', name: 'HR / Behavioral' },
+  { id: 'aiml', name: 'AI/ML Fundamentals' },
+  { id: 'genai', name: 'Generative AI & LLMs' },
+  { id: 'cloud', name: 'Cloud Computing' },
+  { id: 'devops', name: 'DevOps & CI/CD' },
+  { id: 'cybersecurity', name: 'Cybersecurity' },
+  { id: 'git', name: 'Git & Version Control' }
 ];
 
 export const QUESTIONS_DATABASE = [
