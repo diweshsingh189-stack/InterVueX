@@ -165,24 +165,40 @@ export default function ThreeDCarousel({
     requestAnimationFrame(animate);
   }, [activePage, isAnimatingFlip, isDragging, isSoundOn, triggerPageChange]);
 
-  // Handle direct dot click
+  // Handle direct dot click with animated transition
   const goToPage = useCallback((targetIdx) => {
     if (targetIdx === activePage || isAnimatingFlip || isDragging) return;
-    if (targetIdx > activePage) {
-      flipToNext();
-    } else {
-      flipToPrev();
-    }
-  }, [activePage, isAnimatingFlip, isDragging, flipToNext, flipToPrev]);
+    setHasInteracted(true);
+    setIsAnimatingFlip(true);
+    const direction = targetIdx > activePage ? 'next' : 'prev';
+    setAnimatingDirection(direction);
 
-  // Auto-play timer: Automatically turns to next page every 5 seconds
-  useEffect(() => {
-    if (isHovered || isDragging || isAnimatingFlip) return;
-    const timer = setInterval(() => {
-      flipToNext();
-    }, autoPlayInterval);
-    return () => clearInterval(timer);
-  }, [activePage, isHovered, isDragging, isAnimatingFlip, autoPlayInterval, flipToNext]);
+    if (isSoundOn) {
+      playPaperPageFlipSound(1.0);
+    }
+
+    const startTime = performance.now();
+    const duration = 550;
+
+    const animate = (now) => {
+      const elapsed = now - startTime;
+      const t = Math.min(1, elapsed / duration);
+      const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      setAnimatingProgress(eased);
+
+      if (t < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        setIsAnimatingFlip(false);
+        setAnimatingProgress(0);
+        setAnimatingDirection(null);
+        triggerPageChange(targetIdx);
+      }
+    };
+    requestAnimationFrame(animate);
+  }, [activePage, isAnimatingFlip, isDragging, isSoundOn, triggerPageChange]);
+
+  // Autoplay disabled: photo changes ONLY when clicked by user
 
   // ==========================================
   // Mouse & Touch Dragging Handlers
