@@ -21,7 +21,9 @@ import {
   Bot,
   Mic,
   Code2,
-  Trophy
+  Trophy,
+  XCircle,
+  AlertTriangle
 } from 'lucide-react';
 import { 
   JOB_ROLES, 
@@ -98,10 +100,14 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
   const [fileName, setFileName] = useState('');
   const [parsedResume, setParsedResume] = useState(() => resumeService.parseResumeText(SAMPLE_CANDIDATES[0].resumeText));
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [uploadError, setUploadError] = useState('');
+  const [uploadSuccess, setUploadSuccess] = useState('');
 
   const handleSelectCandidate = (candidate) => {
     setSelectedCandidateId(candidate.id);
     setFileName('');
+    setUploadError('');
+    setUploadSuccess(`Pre-screened Candidate Selected: ${candidate.name} (${candidate.targetRole})`);
     setResumeText(candidate.resumeText);
     analyzeResume(candidate.resumeText);
   };
@@ -109,31 +115,69 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
   const handleFileUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // 1. Strict validation against photos/images & non-resume files
+    const fileCheck = resumeService.validateResumeFile(file);
+    if (!fileCheck.valid) {
+      setUploadError(fileCheck.error);
+      setUploadSuccess('');
+      setFileName('');
+      e.target.value = '';
+      return;
+    }
+
+    setUploadError('');
+    setUploadSuccess('');
     setFileName(file.name);
     setSelectedCandidateId('custom');
     setIsAnalyzing(true);
 
     try {
       const extractedText = await resumeService.extractTextFromFile(file);
+      
+      // 2. Validate extracted text contents
+      const textCheck = resumeService.isLikelyResumeText(extractedText);
+      if (!textCheck.valid) {
+        setUploadError(`Not Accepted: ${textCheck.error}`);
+        setUploadSuccess('');
+        setIsAnalyzing(false);
+        e.target.value = '';
+        return;
+      }
+
       const formatted = resumeService.formatResumeForDisplay(extractedText);
       setResumeText(formatted);
       const parsed = resumeService.parseResumeText(formatted);
       setParsedResume(parsed);
+      setUploadError('');
+      setUploadSuccess(`Valid Resume Accepted: "${file.name}" successfully parsed (${formatted.trim().split(/\s+/).length} words, ${parsed.skills.length} skills detected).`);
     } catch (err) {
       console.error('File extraction failed:', err);
+      setUploadError('Not Accepted: Failed to read document. Please upload a standard PDF, Word (.docx), or Text resume.');
+      setUploadSuccess('');
     } finally {
       setIsAnalyzing(false);
+      e.target.value = '';
     }
   };
 
   const analyzeResume = (textToAnalyze) => {
+    const text = textToAnalyze || resumeText;
+    const textCheck = resumeService.isLikelyResumeText(text);
+    if (!textCheck.valid) {
+      setUploadError(`Not Accepted: ${textCheck.error}`);
+      setUploadSuccess('');
+      return;
+    }
+
+    setUploadError('');
     setIsAnalyzing(true);
     setTimeout(() => {
-      const text = textToAnalyze || resumeText;
       const formatted = resumeService.formatResumeForDisplay(text);
       setResumeText(formatted);
       const parsed = resumeService.parseResumeText(formatted);
       setParsedResume(parsed);
+      setUploadSuccess(`Resume Verified & Calibrated: Detected ${parsed.detectedRole} with ${parsed.skills.length} technical skills.`);
       setIsAnalyzing(false);
     }, 250);
   };
@@ -413,15 +457,91 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
               </div>
             </div>
 
+            {/* Validation Feedback Alert Banners */}
+            {uploadError && (
+              <div style={{
+                backgroundColor: 'rgba(239, 68, 68, 0.12)',
+                border: '1.5px solid #EF4444',
+                borderRadius: 'var(--radius-md)',
+                padding: '0.9rem 1.15rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.75rem',
+                marginBottom: '1.25rem',
+                boxShadow: '0 4px 20px rgba(239, 68, 68, 0.2)',
+                animation: 'fadeIn 0.2s ease'
+              }}>
+                <XCircle size={22} style={{ color: '#EF4444', flexShrink: 0 }} />
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 800, color: '#EF4444', fontSize: '0.92rem', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                    ❌ Not Accepted
+                  </div>
+                  <div style={{ fontSize: '0.84rem', color: '#FECACA', marginTop: '0.2rem', lineHeight: 1.45 }}>
+                    {uploadError}
+                  </div>
+                </div>
+                <button 
+                  type="button" 
+                  onClick={() => setUploadError('')}
+                  className="btn btn-sm btn-ghost" 
+                  style={{ color: '#EF4444', padding: '0.2rem 0.6rem', fontSize: '0.75rem', border: '1px solid rgba(239, 68, 68, 0.3)' }}
+                >
+                  Dismiss
+                </button>
+              </div>
+            )}
+
+            {uploadSuccess && (
+              <div style={{
+                backgroundColor: 'rgba(16, 185, 129, 0.12)',
+                border: '1.5px solid #10B981',
+                borderRadius: 'var(--radius-md)',
+                padding: '0.9rem 1.15rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.75rem',
+                marginBottom: '1.25rem',
+                boxShadow: '0 4px 20px rgba(16, 185, 129, 0.2)',
+                animation: 'fadeIn 0.2s ease'
+              }}>
+                <CheckCircle2 size={22} style={{ color: '#10B981', flexShrink: 0 }} />
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 800, color: '#10B981', fontSize: '0.92rem', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                    ✅ Resume Accepted & Verified
+                  </div>
+                  <div style={{ fontSize: '0.84rem', color: '#A7F3D0', marginTop: '0.2rem', lineHeight: 1.45 }}>
+                    {uploadSuccess}
+                  </div>
+                </div>
+                <button 
+                  type="button" 
+                  onClick={() => setUploadSuccess('')}
+                  className="btn btn-sm btn-ghost" 
+                  style={{ color: '#10B981', padding: '0.2rem 0.6rem', fontSize: '0.75rem', border: '1px solid rgba(16, 185, 129, 0.3)' }}
+                >
+                  Dismiss
+                </button>
+              </div>
+            )}
+
             {/* File Upload Box */}
             <div style={{
-              border: '2px dashed var(--border-subtle)',
+              border: uploadError 
+                ? '2px dashed #EF4444' 
+                : uploadSuccess 
+                  ? '2px solid #10B981' 
+                  : '2px dashed var(--border-subtle)',
               borderRadius: 'var(--radius-lg)',
               padding: '1.75rem 1.25rem',
               textAlign: 'center',
-              backgroundColor: 'var(--bg-secondary)',
+              backgroundColor: uploadError 
+                ? 'rgba(239, 68, 68, 0.04)' 
+                : uploadSuccess 
+                  ? 'rgba(16, 185, 129, 0.04)' 
+                  : 'var(--bg-secondary)',
               cursor: 'pointer',
-              marginBottom: '1.25rem'
+              marginBottom: '1.25rem',
+              transition: 'all 0.2s ease'
             }}>
               <input
                 type="file"
@@ -431,12 +551,12 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
                 style={{ display: 'none' }}
               />
               <label htmlFor="resumeFileInput" style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
-                <UploadCloud size={30} style={{ color: 'var(--accent-cyan)' }} />
-                <span style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-primary)' }}>
-                  {fileName ? `Loaded File: ${fileName}` : 'Click to Upload Resume (.txt, .md, .pdf)'}
+                <UploadCloud size={32} style={{ color: uploadError ? '#EF4444' : uploadSuccess ? '#10B981' : 'var(--accent-cyan)' }} />
+                <span style={{ fontWeight: 700, fontSize: '0.95rem', color: uploadError ? '#EF4444' : uploadSuccess ? '#10B981' : 'var(--text-primary)' }}>
+                  {fileName ? `Loaded File: ${fileName}` : 'Click to Upload Resume (.pdf, .doc, .docx, .txt)'}
                 </span>
                 <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                  Secure and parsed locally in your browser.
+                  ⚠️ Only genuine Resume documents (.pdf, .docx, .txt) are accepted. Photos, images, and non-resume files are strictly not allowed.
                 </span>
               </label>
             </div>

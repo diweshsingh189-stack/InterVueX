@@ -12,6 +12,92 @@ if (typeof window !== 'undefined' && pdfjsLib.GlobalWorkerOptions) {
   pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js`;
 }
 
+export const ALLOWED_RESUME_EXTENSIONS = ['.pdf', '.doc', '.docx', '.txt', '.md'];
+export const DISALLOWED_IMAGE_EXTENSIONS = [
+  '.png', '.jpg', '.jpeg', '.webp', '.gif', '.svg', '.bmp', '.ico', '.tiff', '.heic', '.avif',
+  '.mp4', '.mp3', '.avi', '.mov', '.zip', '.rar', '.tar', '.gz', '.exe', '.apk', '.dmg', '.iso',
+  '.xlsx', '.xls', '.csv', '.ppt', '.pptx'
+];
+
+/**
+ * Strict file validation: Only accepts genuine Resume formats (.pdf, .doc, .docx, .txt, .md).
+ * Instantly rejects photos, images, media, spreadsheets, or unsupported binaries.
+ */
+export function validateResumeFile(file) {
+  if (!file) {
+    return { valid: false, error: 'No file selected.' };
+  }
+
+  const name = file.name.toLowerCase();
+  const type = (file.type || '').toLowerCase();
+
+  // 1. Explicitly check for photo/image formats
+  const isImage = type.startsWith('image/') || 
+                  DISALLOWED_IMAGE_EXTENSIONS.some(ext => name.endsWith(ext) && (ext.includes('png') || ext.includes('jpg') || ext.includes('jpeg') || ext.includes('webp') || ext.includes('gif') || ext.includes('svg') || ext.includes('bmp') || ext.includes('heic')));
+  if (isImage) {
+    return {
+      valid: false,
+      error: 'Photos and image files cannot be uploaded as a resume. Please upload a PDF or Document (.pdf, .docx, .txt).'
+    };
+  }
+
+  // 2. Check for other non-resume media/archives
+  const isDisallowed = DISALLOWED_IMAGE_EXTENSIONS.some(ext => name.endsWith(ext)) ||
+                       type.startsWith('video/') || 
+                       type.startsWith('audio/') ||
+                       type.includes('zip') || 
+                       type.includes('spreadsheet') || 
+                       type.includes('excel');
+  if (isDisallowed) {
+    return {
+      valid: false,
+      error: 'Non-resume files are not allowed. Only Resume files (.pdf, .doc, .docx, .txt) are accepted.'
+    };
+  }
+
+  // 3. Verify allowed extensions
+  const hasAllowedExt = ALLOWED_RESUME_EXTENSIONS.some(ext => name.endsWith(ext));
+  if (!hasAllowedExt) {
+    return {
+      valid: false,
+      error: 'Unsupported file format. Only Resume files (.pdf, .doc, .docx, .txt) are accepted.'
+    };
+  }
+
+  return { valid: true };
+}
+
+/**
+ * Validates whether text possesses minimum resume characteristics (skills, experience, education).
+ */
+export function isLikelyResumeText(text) {
+  if (!text || typeof text !== 'string' || text.trim().length < 25) {
+    return {
+      valid: false,
+      error: 'Resume content is empty or too short. Please provide a detailed resume with education, skills, and experience.'
+    };
+  }
+
+  const lower = text.toLowerCase();
+  const resumeKeywords = [
+    'education', 'experience', 'skills', 'projects', 'work', 'developer', 'engineer',
+    'b.tech', 'bca', 'mca', 'b.sc', 'm.tech', 'university', 'college', 'school',
+    'technologies', 'certifications', 'achievements', 'responsibilities', 'summary',
+    'react', 'python', 'java', 'c++', 'javascript', 'node', 'sql', 'html', 'css',
+    'management', 'internship', 'analyst', 'git', 'design', 'aws', 'docker', 'database'
+  ];
+
+  const matches = resumeKeywords.filter(k => lower.includes(k)).length;
+  if (matches < 2) {
+    return {
+      valid: false,
+      error: 'Uploaded content does not contain recognizable resume signals (technical skills, experience milestones, or education).'
+    };
+  }
+
+  return { valid: true };
+}
+
 export const COMMON_SKILLS = [
   'React', 'JavaScript', 'TypeScript', 'Node.js', 'Python', 'Java', 'C++', 'SQL',
   'PostgreSQL', 'MongoDB', 'Docker', 'Kubernetes', 'AWS', 'Azure', 'GCP',
@@ -450,6 +536,14 @@ export const resumeService = {
     } catch {
       return '';
     }
+  },
+
+  validateResumeFile(file) {
+    return validateResumeFile(file);
+  },
+
+  isLikelyResumeText(text) {
+    return isLikelyResumeText(text);
   },
 
   cleanResumeText(text) {
