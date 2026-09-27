@@ -17,7 +17,11 @@ import {
   BrainCircuit,
   Clock,
   UserCheck,
-  User
+  User,
+  Bot,
+  Mic,
+  Code2,
+  Trophy
 } from 'lucide-react';
 import { 
   JOB_ROLES, 
@@ -70,6 +74,23 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
       if (initialConfig.questionCount) setQuestionCount(initialConfig.questionCount);
     }
   }, [initialConfig]);
+
+  // Helper to render distinct mode icon
+  const renderModeIcon = () => {
+    if (initialConfig?.iconKey === 'bot' || initialConfig?.type === 'technical') {
+      return <Bot size={24} style={{ color: '#38BDF8' }} />;
+    }
+    if (initialConfig?.iconKey === 'mic' || initialConfig?.type === 'behavioral') {
+      return <Mic size={24} style={{ color: '#C084FC' }} />;
+    }
+    if (initialConfig?.iconKey === 'code' || initialConfig?.type === 'coding') {
+      return <Code2 size={24} style={{ color: '#34D399' }} />;
+    }
+    if (initialConfig?.iconKey === 'mock' || initialConfig?.type === 'mixed') {
+      return <Building2 size={24} style={{ color: '#FBBF24' }} />;
+    }
+    return <Sparkles size={24} style={{ color: 'var(--accent-cyan)' }} />;
+  };
 
   // Resume mode & Candidate Selection state
   const [selectedCandidateId, setSelectedCandidateId] = useState(SAMPLE_CANDIDATES[0].id);
@@ -169,56 +190,81 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
       {/* Header */}
       <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
         <span className="badge badge-cyan" style={{ marginBottom: '0.5rem' }}>
-          Session Customization
+          {initialConfig?.modeName ? `${initialConfig.modeName} Setup` : 'Session Customization'}
         </span>
         <h1 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.4rem)', color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
-          Configure Your Interview Simulation
+          {initialConfig?.modeName ? initialConfig.modeName : 'Configure Your Interview Simulation'}
         </h1>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
-          Select custom role parameters, target company tracks, or select/upload a candidate resume for tailored AI evaluation.
+          {initialConfig?.modeDesc || 'Select custom role parameters, target company tracks, or select/upload a candidate resume for tailored AI evaluation.'}
         </p>
       </div>
 
       {/* Selected Mode Indicator Banner */}
       {initialConfig?.modeName && (
         <div style={{
-          backgroundColor: 'rgba(6, 182, 212, 0.12)',
-          border: '1px solid var(--accent-cyan)',
-          borderRadius: '14px',
-          padding: '0.85rem 1.25rem',
-          marginBottom: '1.75rem',
+          backgroundColor: initialConfig.type === 'behavioral' ? 'rgba(168, 85, 247, 0.12)' : 
+            initialConfig.type === 'coding' ? 'rgba(16, 185, 129, 0.12)' :
+            initialConfig.type === 'mixed' ? 'rgba(245, 158, 11, 0.12)' : 'rgba(6, 182, 212, 0.12)',
+          border: `1.5px solid ${
+            initialConfig.type === 'behavioral' ? '#A855F7' :
+            initialConfig.type === 'coding' ? '#10B981' :
+            initialConfig.type === 'mixed' ? '#F59E0B' : 'var(--accent-cyan)'
+          }`,
+          borderRadius: '16px',
+          padding: '1.15rem 1.5rem',
+          marginBottom: '2rem',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           flexWrap: 'wrap',
-          gap: '0.75rem',
-          boxShadow: '0 4px 20px rgba(6, 182, 212, 0.15)'
+          gap: '1rem',
+          boxShadow: '0 8px 30px rgba(0, 0, 0, 0.35)'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <div style={{
-              width: '36px',
-              height: '36px',
-              borderRadius: '10px',
-              backgroundColor: 'rgba(6, 182, 212, 0.2)',
+              width: '46px',
+              height: '46px',
+              borderRadius: '12px',
+              backgroundColor: 'rgba(255, 255, 255, 0.08)',
+              border: '1px solid rgba(255, 255, 255, 0.15)',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              color: 'var(--accent-cyan)'
+              justifyContent: 'center'
             }}>
-              <Sparkles size={18} />
+              {renderModeIcon()}
             </div>
             <div>
-              <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', color: 'var(--accent-cyan)', fontWeight: 800, letterSpacing: '0.06em' }}>
-                Active Mode Selected
+              <div style={{ 
+                fontSize: '0.725rem', 
+                textTransform: 'uppercase', 
+                color: initialConfig.type === 'behavioral' ? '#C084FC' : 
+                       initialConfig.type === 'coding' ? '#34D399' :
+                       initialConfig.type === 'mixed' ? '#FBBF24' : 'var(--accent-cyan)', 
+                fontWeight: 800, 
+                letterSpacing: '0.08em',
+                marginBottom: '0.2rem'
+              }}>
+                Active Simulation Mode
               </div>
-              <div style={{ fontSize: '1.05rem', fontWeight: 700, color: '#FFFFFF' }}>
+              <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#FFFFFF', letterSpacing: '-0.01em' }}>
                 {initialConfig.modeName}
+              </div>
+              <div style={{ fontSize: '0.84rem', color: '#94A3B8', marginTop: '0.2rem' }}>
+                {initialConfig.modeDesc || 'Configured from Dashboard: Choose your target engineering track & company below to begin.'}
               </div>
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span className="badge badge-cyan" style={{ fontSize: '0.78rem', textTransform: 'capitalize' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+            <span className="badge" style={{
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              color: '#FFFFFF',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              fontSize: '0.82rem',
+              padding: '0.35rem 0.75rem',
+              fontWeight: 600
+            }}>
               Format: {INTERVIEW_TYPES.find(t => t.id === selectedType)?.name || 'Technical'}
             </span>
           </div>
@@ -518,8 +564,10 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
             <div className="card-header" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
               <Briefcase size={20} style={{ color: 'var(--accent-cyan)' }} />
               <div>
-                <h3 style={{ fontSize: '1.15rem', color: 'var(--text-primary)' }}>1. Select Job Role</h3>
-                <p style={{ fontSize: '0.825rem', color: 'var(--text-muted)' }}>Tailors domain questions, architecture, and algorithms.</p>
+                <h3 style={{ fontSize: '1.15rem', color: 'var(--text-primary)' }}>1. Select Your Target Engineering Track</h3>
+                <p style={{ fontSize: '0.825rem', color: 'var(--text-muted)' }}>
+                  Choose which engineering discipline and curriculum you want to test for this {initialConfig?.modeName || 'interview'} simulation.
+                </p>
               </div>
             </div>
 
@@ -792,8 +840,8 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
               <div className="card-header" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
                 <Layers size={20} style={{ color: 'var(--accent-cyan)' }} />
                 <div>
-                  <h3 style={{ fontSize: '1.15rem', color: 'var(--text-primary)' }}>3. Interview Mode</h3>
-                  <p style={{ fontSize: '0.825rem', color: 'var(--text-muted)' }}>Technical, Coding, HR, Behavioral, or Mixed.</p>
+                  <h3 style={{ fontSize: '1.15rem', color: 'var(--text-primary)' }}>3. Interview Format & Rounds</h3>
+                  <p style={{ fontSize: '0.825rem', color: 'var(--text-muted)' }}>Technical, live coding, HR & leadership, voice & behavioral, or full mock simulation.</p>
                 </div>
               </div>
 
@@ -805,8 +853,8 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
                       key={type.id}
                       onClick={() => setSelectedType(type.id)}
                       style={{
-                        backgroundColor: isSelected ? 'rgba(6, 182, 212, 0.06)' : 'var(--bg-secondary)',
-                        border: isSelected ? '1.5px solid #06B6D4' : '1px solid var(--border-subtle)',
+                        backgroundColor: isSelected ? 'rgba(6, 182, 212, 0.08)' : 'var(--bg-secondary)',
+                        border: isSelected ? '1.5px solid var(--accent-cyan)' : '1px solid var(--border-subtle)',
                         borderRadius: 'var(--radius-md)',
                         padding: '0.75rem 1rem',
                         cursor: 'pointer',
@@ -814,7 +862,7 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
                         alignItems: 'center',
                         justifyContent: 'space-between',
                         gap: '0.75rem',
-                        boxShadow: isSelected ? '0 0 12px rgba(6, 182, 212, 0.12)' : 'none',
+                        boxShadow: isSelected ? '0 0 12px rgba(6, 182, 212, 0.15)' : 'none',
                         transition: 'all 0.2s ease'
                       }}
                     >
@@ -822,7 +870,7 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
                         <div style={{
                           fontWeight: 700,
                           fontSize: '0.92rem',
-                          color: isSelected ? '#22D3EE' : 'var(--text-primary)'
+                          color: isSelected ? 'var(--accent-cyan)' : 'var(--text-primary)'
                         }}>
                           {type.name}
                         </div>
@@ -837,12 +885,15 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
                       </div>
                       {isSelected && (
                         <div style={{
-                          width: '8px',
-                          height: '8px',
-                          borderRadius: '50%',
-                          backgroundColor: '#06B6D4',
-                          flexShrink: 0
-                        }} />
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.35rem',
+                          fontSize: '0.75rem',
+                          color: 'var(--accent-cyan)',
+                          fontWeight: 700
+                        }}>
+                          <CheckCircle2 size={15} /> Active
+                        </div>
                       )}
                     </div>
                   );
@@ -1052,11 +1103,11 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
             <Sparkles size={18} style={{ color: 'var(--accent-cyan)', flexShrink: 0 }} />
             <h4 style={{ fontSize: '1.05rem', color: 'var(--text-primary)' }}>
-              {setupMode === 'resume' ? 'Resume Simulation Configured' : 'Ready for Live Simulation'}
+              {initialConfig?.modeName ? `${initialConfig.modeName} Ready` : (setupMode === 'resume' ? 'Resume Simulation Configured' : 'Ready for Live Simulation')}
             </h4>
           </div>
           <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.5' }}>
-            Track: <strong style={{ color: 'var(--accent-cyan)' }}>{setupMode === 'resume' && parsedResume ? parsedResume.detectedRole : (JOB_ROLES.find(r => r.id === selectedRole)?.name)}</strong> &bull; Format: <strong style={{ color: 'var(--text-secondary)' }}>{INTERVIEW_TYPES.find(t => t.id === selectedType)?.name}</strong> &bull; Adaptive: <strong style={{ color: isAdaptive ? 'var(--accent-cyan)' : 'var(--text-dim)' }}>{isAdaptive ? 'Enabled' : 'Disabled'}</strong>
+            Mode: <strong style={{ color: 'var(--accent-cyan)' }}>{initialConfig?.modeName || 'Custom Simulation'}</strong> &bull; Format: <strong style={{ color: '#38BDF8' }}>{INTERVIEW_TYPES.find(t => t.id === selectedType)?.name}</strong> &bull; Track: <strong style={{ color: 'var(--text-secondary)' }}>{setupMode === 'resume' && parsedResume ? parsedResume.detectedRole : (JOB_ROLES.find(r => r.id === selectedRole)?.name)}</strong>
           </p>
         </div>
 
@@ -1065,7 +1116,7 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
           className="btn btn-primary btn-lg setup-launch-btn"
           style={{ flex: '1 1 200px' }}
         >
-          <Play size={18} /> Start Interview
+          <Play size={18} /> Start {initialConfig?.modeName || 'Interview'}
         </button>
       </div>
 

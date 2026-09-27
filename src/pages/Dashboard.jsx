@@ -141,9 +141,15 @@ export default function Dashboard({
     aggScores.completeness = Number((cp / history.length).toFixed(1));
   }
 
-  const handleLaunchMode = (modeType, modeName, role) => {
+  const handleLaunchMode = (modeType, modeName, modeDesc, iconKey) => {
     if (onStartNew) {
-      onStartNew({ type: modeType, modeName, role });
+      onStartNew({ 
+        type: modeType, 
+        modeName, 
+        modeDesc, 
+        iconKey,
+        isFromModeCard: true 
+      });
     }
   };
 
@@ -256,7 +262,12 @@ export default function Dashboard({
             {/* Pill 2: Real Interview Experience */}
             <button
               type="button"
-              onClick={() => onStartNew?.({ type: 'technical', modeName: 'AI Technical Interviewer' })}
+              onClick={() => handleLaunchMode(
+                'technical', 
+                'AI Technical Interviewer', 
+                'Real-time AI technical questions with intelligent dynamic evaluation, architecture analysis & instant feedback.',
+                'bot'
+              )}
               title="Click to start a realistic AI Interview simulation"
               style={{
                 display: 'inline-flex',
@@ -404,7 +415,12 @@ export default function Dashboard({
             </div>
 
             <button
-              onClick={() => onStartNew?.({ type: 'technical', modeName: 'AI Technical Interviewer' })}
+              onClick={() => handleLaunchMode(
+                'technical', 
+                'AI Technical Interviewer', 
+                'Real-time AI technical questions with intelligent dynamic evaluation, architecture analysis & instant feedback.',
+                'bot'
+              )}
               className="btn btn-primary btn-sm"
               style={{
                 padding: '0.45rem 0.95rem',
@@ -428,7 +444,7 @@ export default function Dashboard({
             Choose Your Interview Mode
           </h2>
           <p style={{ color: '#94A3B8', fontSize: '0.85rem' }}>
-            Select a mode and start your interview journey
+            Select a mode below to launch its dedicated interview simulation experience:
           </p>
         </div>
 
@@ -440,7 +456,12 @@ export default function Dashboard({
         }}>
           {/* Card 1: AI Interviewer */}
           <div 
-            onClick={() => handleLaunchMode('technical', 'AI Technical Interviewer')}
+            onClick={() => handleLaunchMode(
+              'technical', 
+              'AI Technical Interviewer', 
+              'Real-time AI technical questions with intelligent dynamic evaluation, architecture analysis & instant feedback.',
+              'bot'
+            )}
             style={{
               backgroundColor: '#070E1E',
               border: '1px solid rgba(6, 182, 212, 0.35)',
@@ -483,7 +504,7 @@ export default function Dashboard({
                 AI Interviewer
               </h3>
               <p style={{ fontSize: '0.84rem', color: '#CBD5E1', lineHeight: '1.45', marginBottom: '1.25rem', fontWeight: 500 }}>
-                Real-time AI questions with intelligent feedback
+                Real-time AI questions with intelligent feedback & code evaluation
               </p>
             </div>
 
@@ -506,7 +527,12 @@ export default function Dashboard({
 
           {/* Card 2: Voice Interview */}
           <div 
-            onClick={() => handleLaunchMode('behavioral', 'Live Voice & Behavioral Interview')}
+            onClick={() => handleLaunchMode(
+              'behavioral', 
+              'Live Voice & Behavioral Interview', 
+              'Speak your answers via microphone and get evaluated on communication, speech clarity & behavioral competencies.',
+              'mic'
+            )}
             style={{
               backgroundColor: '#100C1F',
               border: '1px solid rgba(168, 85, 247, 0.35)',
@@ -549,7 +575,7 @@ export default function Dashboard({
                 Voice Interview
               </h3>
               <p style={{ fontSize: '0.84rem', color: '#CBD5E1', lineHeight: '1.45', marginBottom: '1.25rem', fontWeight: 500 }}>
-                Speak your answers and get evaluated
+                Speak your answers via microphone and get evaluated
               </p>
             </div>
 
@@ -572,7 +598,12 @@ export default function Dashboard({
 
           {/* Card 3: Practice Mode */}
           <div 
-            onClick={() => handleLaunchMode('coding', 'Interactive Coding Practice Round')}
+            onClick={() => handleLaunchMode(
+              'coding', 
+              'Interactive Coding Practice Mode', 
+              'Solve hands-on coding and algorithmic questions interactively with instant evaluation and test verification.',
+              'code'
+            )}
             style={{
               backgroundColor: '#081715',
               border: '1px solid rgba(16, 185, 129, 0.35)',
@@ -638,7 +669,12 @@ export default function Dashboard({
 
           {/* Card 4: Mock Interview */}
           <div 
-            onClick={() => handleLaunchMode('mixed', 'Comprehensive Mock Interview Simulation')}
+            onClick={() => handleLaunchMode(
+              'mixed', 
+              'Comprehensive Mock Interview Simulation', 
+              'Full multi-round interview simulation covering Technical, System Design, and Behavioral rounds with complete scorecards.',
+              'mock'
+            )}
             style={{
               backgroundColor: '#1E1208',
               border: '1px solid rgba(245, 158, 11, 0.35)',
@@ -681,7 +717,7 @@ export default function Dashboard({
                 Mock Interview
               </h3>
               <p style={{ fontSize: '0.84rem', color: '#CBD5E1', lineHeight: '1.45', marginBottom: '1.25rem', fontWeight: 500 }}>
-                Full interview simulation with score & feedback
+                Full interview simulation with multi-round score & feedback
               </p>
             </div>
 
