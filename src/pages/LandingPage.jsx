@@ -96,7 +96,10 @@ export default function LandingPage({ setActivePage, onSelectTrack, onStartInter
               lineHeight: '1.18',
               letterSpacing: '-0.03em',
               marginBottom: '1rem',
-              color: 'var(--text-primary)'
+              color: 'var(--accent-cyan)',
+              background: 'linear-gradient(135deg, #06B6D4 0%, #38BDF8 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent'
             }}>
               Practice Smarter. <br />
               Interview Better.
