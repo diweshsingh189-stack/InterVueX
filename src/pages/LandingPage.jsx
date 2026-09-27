@@ -113,7 +113,7 @@ export default function LandingPage({ setActivePage, onSelectTrack, onStartInter
               Realistic, role-tailored technical and behavioral interview practice with instant rubric evaluation, speech recognition, and actionable feedback.
             </p>
 
-            {/* CTAs with Dynamic Active / Dark State Switching */}
+            {/* CTAs: Toggle active / dark state ONLY on user click */}
             <div className="hero-cta-group" style={{
               display: 'flex',
               flexWrap: 'wrap',
@@ -133,7 +133,6 @@ export default function LandingPage({ setActivePage, onSelectTrack, onStartInter
                     setActivePage('setup');
                   }
                 }}
-                onMouseEnter={() => setActiveCta('start')}
                 className={`btn btn-lg hero-btn ${activeCta === 'start' ? 'btn-primary' : 'btn-secondary'}`}
                 style={{
                   minWidth: '200px',
@@ -153,7 +152,6 @@ export default function LandingPage({ setActivePage, onSelectTrack, onStartInter
                   const el = document.getElementById('how-it-works');
                   el?.scrollIntoView({ behavior: 'smooth' });
                 }}
-                onMouseEnter={() => setActiveCta('explore')}
                 className={`btn btn-lg hero-btn ${activeCta === 'explore' ? 'btn-primary' : 'btn-secondary'}`}
                 style={{
                   minWidth: '180px',
