@@ -679,108 +679,7 @@ export default function ThreeDCarousel({
           </div>
 
           {/* ========================================================= */}
-          {/* NAVIGATION ARROWS */}
-          {/* ========================================================= */}
-          {/* PREVIOUS BUTTON (LEFT ARROW) */}
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              flipToPrev();
-            }}
-            onMouseDown={(e) => e.stopPropagation()}
-            onTouchStart={(e) => e.stopPropagation()}
-            type="button"
-            aria-label="Previous Page"
-            title="Turn to Previous Page (Left Arrow)"
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: compact ? '1rem' : '1.5rem',
-              transform: 'translateY(-50%)',
-              zIndex: 50,
-              backgroundColor: 'rgba(10, 15, 29, 0.92)',
-              border: '1.5px solid rgba(6, 182, 212, 0.6)',
-              color: '#ffffff',
-              borderRadius: '50%',
-              width: compact ? '32px' : '42px',
-              height: compact ? '32px' : '42px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              backdropFilter: 'blur(10px)',
-              transition: 'all 0.2s ease',
-              padding: 0,
-              boxShadow: '0 4px 18px rgba(0,0,0,0.8), 0 0 12px rgba(6, 182, 212, 0.35)'
-            }}
-            onMouseEnter={(e) => { 
-              e.currentTarget.style.backgroundColor = 'var(--accent-cyan)'; 
-              e.currentTarget.style.color = '#000';
-              e.currentTarget.style.transform = 'translateY(-50%) scale(1.12)';
-              e.currentTarget.style.boxShadow = '0 0 20px var(--accent-cyan)';
-            }}
-            onMouseLeave={(e) => { 
-              e.currentTarget.style.backgroundColor = 'rgba(10, 15, 29, 0.92)'; 
-              e.currentTarget.style.color = '#fff';
-              e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
-              e.currentTarget.style.boxShadow = '0 4px 18px rgba(0,0,0,0.8), 0 0 12px rgba(6, 182, 212, 0.35)';
-            }}
-          >
-            <ChevronLeft size={compact ? 18 : 22} />
-          </button>
-
-          {/* NEXT BUTTON (RIGHT ARROW) */}
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              flipToNext();
-            }}
-            onMouseDown={(e) => e.stopPropagation()}
-            onTouchStart={(e) => e.stopPropagation()}
-            type="button"
-            aria-label="Next Page"
-            title="Turn to Next Page (Right Arrow)"
-            style={{
-              position: 'absolute',
-              top: '50%',
-              right: compact ? '1rem' : '1.5rem',
-              transform: 'translateY(-50%)',
-              zIndex: 50,
-              backgroundColor: 'rgba(10, 15, 29, 0.92)',
-              border: '1.5px solid rgba(6, 182, 212, 0.6)',
-              color: '#ffffff',
-              borderRadius: '50%',
-              width: compact ? '32px' : '42px',
-              height: compact ? '32px' : '42px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              backdropFilter: 'blur(10px)',
-              transition: 'all 0.2s ease',
-              padding: 0,
-              boxShadow: '0 4px 18px rgba(0,0,0,0.8), 0 0 12px rgba(6, 182, 212, 0.35)'
-            }}
-            onMouseEnter={(e) => { 
-              e.currentTarget.style.backgroundColor = 'var(--accent-cyan)'; 
-              e.currentTarget.style.color = '#000';
-              e.currentTarget.style.transform = 'translateY(-50%) scale(1.12)';
-              e.currentTarget.style.boxShadow = '0 0 20px var(--accent-cyan)';
-            }}
-            onMouseLeave={(e) => { 
-              e.currentTarget.style.backgroundColor = 'rgba(10, 15, 29, 0.92)'; 
-              e.currentTarget.style.color = '#fff';
-              e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
-              e.currentTarget.style.boxShadow = '0 4px 18px rgba(0,0,0,0.8), 0 0 12px rgba(6, 182, 212, 0.35)';
-            }}
-          >
-            <ChevronRight size={compact ? 18 : 22} />
-          </button>
-
-          {/* ========================================================= */}
-          {/* BOTTOM RIGHT: SOUND TOGGLE & INTERACTIVE PAGE PILLS */}
+          {/* BOTTOM RIGHT: NAV ARROWS, SOUND TOGGLE & INTERACTIVE PAGE PILLS */}
           {/* ========================================================= */}
           <div style={{
             position: 'absolute',
@@ -789,14 +688,106 @@ export default function ThreeDCarousel({
             zIndex: 50,
             display: 'flex',
             alignItems: 'center',
-            gap: '0.45rem',
-            backgroundColor: 'rgba(10, 15, 29, 0.88)',
-            padding: '0.3rem 0.6rem',
+            gap: '0.4rem',
+            backgroundColor: 'rgba(10, 15, 29, 0.92)',
+            padding: '0.35rem 0.65rem',
             borderRadius: 'var(--radius-full)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255,255,255,0.14)',
-            boxShadow: '0 4px 16px rgba(0,0,0,0.6)'
+            backdropFilter: 'blur(12px)',
+            border: '1px solid rgba(6, 182, 212, 0.3)',
+            boxShadow: '0 6px 20px rgba(0,0,0,0.7), 0 0 15px rgba(6, 182, 212, 0.15)'
           }}>
+            {/* Prev Navigation Arrow Button */}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                flipToPrev();
+              }}
+              onMouseDown={(e) => e.stopPropagation()}
+              onTouchStart={(e) => e.stopPropagation()}
+              aria-label="Previous Page"
+              title="Previous Page (Left Arrow)"
+              style={{
+                background: 'rgba(255, 255, 255, 0.08)',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                borderRadius: '50%',
+                width: '24px',
+                height: '24px',
+                color: '#ffffff',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'all 0.2s ease',
+                padding: 0
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--accent-cyan)';
+                e.currentTarget.style.color = '#000000';
+                e.currentTarget.style.borderColor = 'var(--accent-cyan)';
+                e.currentTarget.style.boxShadow = '0 0 10px var(--accent-cyan)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.08)';
+                e.currentTarget.style.color = '#ffffff';
+                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
+            >
+              <ChevronLeft size={14} />
+            </button>
+
+            {/* Next Navigation Arrow Button */}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                flipToNext();
+              }}
+              onMouseDown={(e) => e.stopPropagation()}
+              onTouchStart={(e) => e.stopPropagation()}
+              aria-label="Next Page"
+              title="Next Page (Right Arrow)"
+              style={{
+                background: 'rgba(255, 255, 255, 0.08)',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                borderRadius: '50%',
+                width: '24px',
+                height: '24px',
+                color: '#ffffff',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'all 0.2s ease',
+                padding: 0
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--accent-cyan)';
+                e.currentTarget.style.color = '#000000';
+                e.currentTarget.style.borderColor = 'var(--accent-cyan)';
+                e.currentTarget.style.boxShadow = '0 0 10px var(--accent-cyan)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.08)';
+                e.currentTarget.style.color = '#ffffff';
+                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
+            >
+              <ChevronRight size={14} />
+            </button>
+
+            {/* Subtle Divider */}
+            <div style={{
+              width: '1px',
+              height: '14px',
+              backgroundColor: 'rgba(255, 255, 255, 0.2)',
+              margin: '0 0.1rem'
+            }} />
+
             {/* Soft Paper Turn Audio Toggle */}
             <button
               type="button"
@@ -819,10 +810,10 @@ export default function ThreeDCarousel({
                 alignItems: 'center',
                 justifyContent: 'center',
                 transition: 'color 0.2s ease',
-                marginRight: '0.25rem'
+                marginRight: '0.15rem'
               }}
             >
-              {isSoundOn ? <Volume2 size={14} /> : <VolumeX size={14} />}
+              {isSoundOn ? <Volume2 size={15} /> : <VolumeX size={15} />}
             </button>
 
             {/* Interactive Page Dots */}
