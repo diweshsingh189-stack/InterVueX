@@ -19,7 +19,7 @@ import {
 import { JOB_ROLES, INTERVIEW_TYPES } from '../data/questionsData';
 import ThreeDCarousel from '../components/ThreeDCarousel';
 
-export default function LandingPage({ setActivePage }) {
+export default function LandingPage({ setActivePage, onSelectTrack, onStartInterview }) {
   const [openFaq, setOpenFaq] = useState(null);
   const [currentSlide, setCurrentSlide] = useState(0);
 
@@ -271,7 +271,26 @@ export default function LandingPage({ setActivePage }) {
             <div 
               key={role.id} 
               className="card"
-              style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}
+              onClick={() => {
+                if (onSelectTrack) onSelectTrack(role.id);
+                else if (onStartInterview) onStartInterview({ role: role.id });
+                else setActivePage('setup');
+              }}
+              style={{ 
+                display: 'flex', 
+                flexDirection: 'column', 
+                justifyContent: 'space-between',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = 'var(--accent-cyan)';
+                e.currentTarget.style.transform = 'translateY(-3px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = 'var(--border-subtle)';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
             >
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
@@ -283,7 +302,13 @@ export default function LandingPage({ setActivePage }) {
                 </p>
               </div>
               <button
-                onClick={() => setActivePage('setup')}
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (onSelectTrack) onSelectTrack(role.id);
+                  else if (onStartInterview) onStartInterview({ role: role.id });
+                  else setActivePage('setup');
+                }}
                 className="btn btn-sm btn-secondary"
                 style={{ width: '100%', justifyContent: 'space-between' }}
               >

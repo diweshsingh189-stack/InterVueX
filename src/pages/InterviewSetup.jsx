@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Briefcase, 
   GraduationCap, 
@@ -30,22 +30,46 @@ import {
 import { resumeService, SAMPLE_CANDIDATES } from '../services/resumeService.js';
 import ProgressOverviewCard from '../components/ProgressOverviewCard';
 
-export default function InterviewSetup({ onStartInterview, userProfile, history = [] }) {
+export default function InterviewSetup({ onStartInterview, userProfile, history = [], initialConfig = null }) {
   // Mode selection: 'manual' | 'resume'
-  const [setupMode, setSetupMode] = useState('manual');
+  const [setupMode, setSetupMode] = useState(() => initialConfig?.mode || 'manual');
 
   // Manual configurations
-  const [selectedRole, setSelectedRole] = useState(userProfile?.targetRole ? 
-    (JOB_ROLES.find(r => r.name.toLowerCase() === userProfile.targetRole.toLowerCase())?.id || 'software-developer') 
-    : 'software-developer'
-  );
-  const [selectedCompany, setSelectedCompany] = useState('all');
-  const [selectedLevel, setSelectedLevel] = useState('intermediate');
-  const [selectedType, setSelectedType] = useState('technical');
-  const [selectedDifficulty, setSelectedDifficulty] = useState('medium');
-  const [questionCount, setQuestionCount] = useState(5);
+  const [selectedRole, setSelectedRole] = useState(() => {
+    if (initialConfig?.role) {
+      const match = JOB_ROLES.find(r => r.id === initialConfig.role || r.id.toLowerCase() === initialConfig.role.toLowerCase() || r.name.toLowerCase() === initialConfig.role.toLowerCase());
+      if (match) return match.id;
+    }
+    if (userProfile?.targetRole) {
+      const match = JOB_ROLES.find(r => r.name.toLowerCase() === userProfile.targetRole.toLowerCase() || r.id === userProfile.targetRole.toLowerCase());
+      if (match) return match.id;
+    }
+    return 'software-developer';
+  });
+
+  const [selectedCompany, setSelectedCompany] = useState(() => initialConfig?.company || 'all');
+  const [selectedLevel, setSelectedLevel] = useState(() => initialConfig?.level || 'intermediate');
+  const [selectedType, setSelectedType] = useState(() => initialConfig?.type || 'technical');
+  const [selectedDifficulty, setSelectedDifficulty] = useState(() => initialConfig?.difficulty || 'medium');
+  const [questionCount, setQuestionCount] = useState(() => initialConfig?.questionCount || 5);
   const [isAdaptive, setIsAdaptive] = useState(true);
   const [perQuestionTimeLimit, setPerQuestionTimeLimit] = useState(120); // 120s per question or 0 for untimed
+
+  // Sync state if initialConfig updates dynamically
+  useEffect(() => {
+    if (initialConfig) {
+      if (initialConfig.role) {
+        const match = JOB_ROLES.find(r => r.id === initialConfig.role || r.id.toLowerCase() === initialConfig.role.toLowerCase() || r.name.toLowerCase() === initialConfig.role.toLowerCase());
+        if (match) setSelectedRole(match.id);
+      }
+      if (initialConfig.company) setSelectedCompany(initialConfig.company);
+      if (initialConfig.level) setSelectedLevel(initialConfig.level);
+      if (initialConfig.type) setSelectedType(initialConfig.type);
+      if (initialConfig.difficulty) setSelectedDifficulty(initialConfig.difficulty);
+      if (initialConfig.mode) setSetupMode(initialConfig.mode);
+      if (initialConfig.questionCount) setQuestionCount(initialConfig.questionCount);
+    }
+  }, [initialConfig]);
 
   // Resume mode & Candidate Selection state
   const [selectedCandidateId, setSelectedCandidateId] = useState(SAMPLE_CANDIDATES[0].id);

@@ -21,6 +21,13 @@ export default function App() {
   const [activeSession, setActiveSession] = useState(() => storageService.getActiveSession());
   const [activeReport, setActiveReport] = useState(() => storageService.getLastReport() || storageService.getHistory()[0] || null);
   const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [setupConfig, setSetupConfig] = useState(null);
+
+  // Navigate to setup with custom initial configuration (e.g. role track or company)
+  const handleNavigateToSetup = (config = null) => {
+    setSetupConfig(config);
+    setActivePage('setup');
+  };
 
   // Sync theme with document attribute & storage
   useEffect(() => {
@@ -105,6 +112,8 @@ export default function App() {
         {activePage === 'landing' && (
           <LandingPage
             setActivePage={setActivePage}
+            onSelectTrack={(roleId) => handleNavigateToSetup({ role: roleId })}
+            onStartInterview={(config) => handleNavigateToSetup(config)}
           />
         )}
 
@@ -112,7 +121,7 @@ export default function App() {
           <Dashboard
             history={history}
             userProfile={userProfile}
-            onStartNew={() => setActivePage('setup')}
+            onStartNew={(config) => handleNavigateToSetup(config)}
             onViewReport={handleViewReport}
             onBrowseQuestions={() => setActivePage('questions')}
           />
@@ -120,6 +129,7 @@ export default function App() {
 
         {activePage === 'setup' && (
           <InterviewSetup
+            initialConfig={setupConfig}
             onStartInterview={handleStartInterview}
             userProfile={userProfile}
             history={history}
@@ -131,7 +141,7 @@ export default function App() {
             onStartInterview={handleStartInterview}
             userProfile={userProfile}
             history={history}
-            onNavigateToSetup={() => setActivePage('setup')}
+            onNavigateToSetup={(config) => handleNavigateToSetup(config)}
           />
         )}
 
