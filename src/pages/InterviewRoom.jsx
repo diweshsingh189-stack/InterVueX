@@ -87,10 +87,10 @@ export default function InterviewRoom({ session, onFinishInterview, onExit, user
     return () => clearInterval(qTimer);
   }, [currentIndex, timeLimit]);
 
-  // When question changes, speak question aloud & load existing answer if any
+  // Synchronize input and evaluation feedback when active question changes
   useEffect(() => {
     if (currentQuestion) {
-      // Load saved answer for this index
+      // Load saved answer for this question index or reset cleanly
       if (userAnswers[currentIndex]) {
         setCurrentText(userAnswers[currentIndex].userAnswer || userAnswers[currentIndex].text || '');
         setCurrentLanguage(userAnswers[currentIndex].language || 'javascript');
@@ -98,10 +98,11 @@ export default function InterviewRoom({ session, onFinishInterview, onExit, user
       } else {
         const defaultCode = getQuestionStarterCode(currentQuestion, 'javascript');
         setCurrentText(isCodingQuestion ? defaultCode : '');
+        setCurrentLanguage('javascript');
         setCurrentFeedback(null);
       }
 
-      // Voice read aloud
+      // Voice read aloud for the new question
       setIsSpeaking(true);
       speechService.speak(currentQuestion.question, () => {
         setIsSpeaking(false);
@@ -112,8 +113,9 @@ export default function InterviewRoom({ session, onFinishInterview, onExit, user
       speechService.stopSpeaking();
       speechService.stopListening();
       setIsListening(false);
+      setIsSpeaking(false);
     };
-  }, [currentIndex, currentQuestion, isCodingQuestion]);
+  }, [currentIndex, currentQuestion?.id, isCodingQuestion]);
 
   const handleToggleSpeak = () => {
     if (isSpeaking) {
@@ -152,29 +154,35 @@ export default function InterviewRoom({ session, onFinishInterview, onExit, user
   };
 
   const handleSubmitAnswer = async () => {
-    if (!currentText.trim() || isEvaluating) return;
+    const qIndex = currentIndex;
+    const targetQuestion = sessionQuestions[qIndex];
+    if (!targetQuestion) return;
+
+    const answerToEvaluate = currentText.trim();
+    if (!answerToEvaluate || isEvaluating) return;
+
     setIsEvaluating(true);
     speechService.stopListening();
     setIsListening(false);
 
     try {
       const evaluation = await evaluateAnswer(
-        currentQuestion,
-        currentText,
+        targetQuestion,
+        answerToEvaluate,
         { 
           apiKey: userProfile?.apiKey,
           language: currentLanguage,
-          typeId: isCodingQuestion ? 'coding' : (currentQuestion?.type || session?.typeId)
+          typeId: (session?.typeId === 'coding' || targetQuestion?.type === 'coding') ? 'coding' : (targetQuestion?.type || session?.typeId)
         }
       );
 
       const updatedAnswers = {
         ...userAnswers,
-        [currentIndex]: {
-          questionId: currentQuestion.id,
-          question: currentQuestion.question,
-          category: currentQuestion.category,
-          userAnswer: currentText.trim(),
+        [qIndex]: {
+          questionId: targetQuestion.id,
+          question: targetQuestion.question,
+          category: targetQuestion.category,
+          userAnswer: answerToEvaluate,
           language: currentLanguage,
           evaluation,
           timestamp: new Date().toISOString()
@@ -185,16 +193,16 @@ export default function InterviewRoom({ session, onFinishInterview, onExit, user
       setCurrentFeedback(evaluation);
 
       // Adaptive Difficulty Adjustment
-      if (session?.isAdaptive && currentIndex < totalQuestions - 1) {
+      if (session?.isAdaptive && qIndex < totalQuestions - 1) {
         const { nextDifficulty, reason } = adaptiveService.getNextDifficulty(
           evaluation.overallScore,
-          currentQuestion.difficulty || session.difficulty || 'medium'
+          targetQuestion.difficulty || session.difficulty || 'medium'
         );
 
         setAdaptiveNotice(reason);
 
         // Replace the next upcoming question with calibrated difficulty
-        const nextQ = sessionQuestions[currentIndex + 1];
+        const nextQ = sessionQuestions[qIndex + 1];
         if (nextQ && nextQ.difficulty !== nextDifficulty) {
           const replacement = adaptiveService.getAdaptiveReplacement(
             session.roleId,
@@ -205,7 +213,7 @@ export default function InterviewRoom({ session, onFinishInterview, onExit, user
 
           if (replacement) {
             const updatedList = [...sessionQuestions];
-            updatedList[currentIndex + 1] = replacement;
+            updatedList[qIndex + 1] = replacement;
             setSessionQuestions(updatedList);
           }
         }
@@ -221,46 +229,111 @@ export default function InterviewRoom({ session, onFinishInterview, onExit, user
     speechService.stopSpeaking();
     speechService.stopListening();
     setIsListening(false);
+    setIsSpeaking(false);
+    setAdaptiveNotice(null);
 
-    // Record skipped
+    const qToSkip = currentQuestion;
+    const skipIndex = currentIndex;
+    if (!qToSkip) return;
+
+    const skipEvaluation = {
+      overallScore: 0.0,
+      status: 'Incorrect',
+      statusLabel: 'Question Skipped',
+      verdict: 'Question was skipped without submitting a solution.',
+      scores: { technical: 0, relevance: 0, clarity: 0, communication: 0, completeness: 0, confidence: 0 },
+      doneWell: 'Identified unfamiliar territory quickly.',
+      improvement: 'Question was skipped. Review key concepts for this topic.',
+      suggestedApproach: qToSkip.idealAnswer || 'Prepare foundational definitions and system trade-offs.',
+      tip: qToSkip.tips || 'Even an incomplete attempt is better than skipping in real interviews.'
+    };
+
+    // Record skipped answer for this question
     const updatedAnswers = {
       ...userAnswers,
-      [currentIndex]: {
-        questionId: currentQuestion.id,
-        question: currentQuestion.question,
-        category: currentQuestion.category,
+      [skipIndex]: {
+        questionId: qToSkip.id,
+        question: qToSkip.question,
+        category: qToSkip.category,
         userAnswer: '[Skipped by candidate]',
-        evaluation: {
-          overallScore: 0.0,
-          status: 'Incorrect',
-          statusLabel: 'Question Skipped',
-          verdict: 'Question was skipped without submitting a solution.',
-          scores: { technical: 0, relevance: 0, clarity: 0, communication: 0, completeness: 0, confidence: 0 },
-          doneWell: 'Identified unfamiliar territory quickly.',
-          improvement: 'Question was skipped. Review key concepts for this topic.',
-          suggestedApproach: currentQuestion.idealAnswer || 'Prepare foundational definitions and system trade-offs.',
-          tip: currentQuestion.tips || 'Even an incomplete attempt is better than skipping in real interviews.'
-        },
+        language: currentLanguage,
+        evaluation: skipEvaluation,
         timestamp: new Date().toISOString()
       }
     };
 
     setUserAnswers(updatedAnswers);
 
-    if (currentIndex < totalQuestions - 1) {
-      setCurrentIndex(currentIndex + 1);
+    if (skipIndex < totalQuestions - 1) {
+      const nextIdx = skipIndex + 1;
+      setCurrentIndex(nextIdx);
+
+      if (updatedAnswers[nextIdx]) {
+        setCurrentText(updatedAnswers[nextIdx].userAnswer || updatedAnswers[nextIdx].text || '');
+        setCurrentLanguage(updatedAnswers[nextIdx].language || 'javascript');
+        setCurrentFeedback(updatedAnswers[nextIdx].evaluation || null);
+      } else {
+        const nextQ = sessionQuestions[nextIdx];
+        const isNextCoding = session?.typeId === 'coding' || nextQ?.type === 'coding';
+        const defaultCode = nextQ ? getQuestionStarterCode(nextQ, 'javascript') : '';
+        setCurrentText(isNextCoding ? defaultCode : '');
+        setCurrentLanguage('javascript');
+        setCurrentFeedback(null);
+      }
+    } else {
+      setCurrentFeedback(skipEvaluation);
     }
   };
 
   const handleNext = () => {
     if (currentIndex < totalQuestions - 1) {
-      setCurrentIndex(currentIndex + 1);
+      const nextIdx = currentIndex + 1;
+      speechService.stopSpeaking();
+      speechService.stopListening();
+      setIsListening(false);
+      setIsSpeaking(false);
+      setAdaptiveNotice(null);
+      setCurrentIndex(nextIdx);
+
+      // Cleanly load saved answer for target question or reset state completely
+      if (userAnswers[nextIdx]) {
+        setCurrentText(userAnswers[nextIdx].userAnswer || userAnswers[nextIdx].text || '');
+        setCurrentLanguage(userAnswers[nextIdx].language || 'javascript');
+        setCurrentFeedback(userAnswers[nextIdx].evaluation || null);
+      } else {
+        const nextQ = sessionQuestions[nextIdx];
+        const isNextCoding = session?.typeId === 'coding' || nextQ?.type === 'coding';
+        const defaultCode = nextQ ? getQuestionStarterCode(nextQ, 'javascript') : '';
+        setCurrentText(isNextCoding ? defaultCode : '');
+        setCurrentLanguage('javascript');
+        setCurrentFeedback(null);
+      }
     }
   };
 
   const handlePrev = () => {
     if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
+      const prevIdx = currentIndex - 1;
+      speechService.stopSpeaking();
+      speechService.stopListening();
+      setIsListening(false);
+      setIsSpeaking(false);
+      setAdaptiveNotice(null);
+      setCurrentIndex(prevIdx);
+
+      // Cleanly load saved answer for target question or reset state
+      if (userAnswers[prevIdx]) {
+        setCurrentText(userAnswers[prevIdx].userAnswer || userAnswers[prevIdx].text || '');
+        setCurrentLanguage(userAnswers[prevIdx].language || 'javascript');
+        setCurrentFeedback(userAnswers[prevIdx].evaluation || null);
+      } else {
+        const prevQ = sessionQuestions[prevIdx];
+        const isPrevCoding = session?.typeId === 'coding' || prevQ?.type === 'coding';
+        const defaultCode = prevQ ? getQuestionStarterCode(prevQ, 'javascript') : '';
+        setCurrentText(isPrevCoding ? defaultCode : '');
+        setCurrentLanguage('javascript');
+        setCurrentFeedback(null);
+      }
     }
   };
 
@@ -524,6 +597,7 @@ export default function InterviewRoom({ session, onFinishInterview, onExit, user
       {/* CODING MODE OR STANDARD RESPONSE WORKSPACE */}
       {isCodingQuestion ? (
         <CodingEditor
+          key={currentQuestion?.id || `coding-q-${currentIndex}`}
           question={currentQuestion}
           initialCode={currentText}
           onChangeCode={(code, lang) => {

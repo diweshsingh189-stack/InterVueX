@@ -1,19 +1,33 @@
 /**
  * InterVueX AI Evaluation Engine
- * Evaluates candidate answers on Relevance, Technical Accuracy, Clarity,
- * Communication, Completeness, and Confidence.
+ * Evaluates candidate answers strictly against the CURRENT question's
+ * key concepts, ideal answer, and domain validation requirements.
  * Supports both standard verbal/text questions and interactive coding executions.
  */
 import { executeCode } from './codeExecutionService.js';
 
 export async function evaluateAnswer(questionObj, userAnswer, sessionContext = {}) {
+  if (!questionObj) {
+    return {
+      overallScore: 0.0,
+      status: 'Incorrect',
+      statusLabel: 'No Question Context',
+      scores: { technical: 0, relevance: 0, clarity: 0, communication: 0, completeness: 0, confidence: 0 },
+      verdict: 'No question context provided for evaluation.',
+      doneWell: 'N/A',
+      improvement: 'Please ensure a valid question is selected.',
+      suggestedApproach: '',
+      tip: ''
+    };
+  }
+
   const isCoding = questionObj?.type === 'coding' || sessionContext?.typeId === 'coding';
   const cleaned = (userAnswer || '').trim();
 
   // If user provided a real Gemini API Key in settings, call Gemini directly
   if (sessionContext.apiKey) {
     try {
-      const apiResult = await callGeminiEvaluation(questionObj, userAnswer, sessionContext.apiKey);
+      const apiResult = await callGeminiEvaluation(questionObj, cleaned, sessionContext.apiKey);
       if (apiResult) return formatEvaluationResponse(apiResult, questionObj);
     } catch (err) {
       console.warn('Live API evaluation fallback to built-in semantic evaluator:', err);
@@ -22,7 +36,7 @@ export async function evaluateAnswer(questionObj, userAnswer, sessionContext = {
 
   // Handle Coding Evaluation
   if (isCoding) {
-    return evaluateCodingAnswer(questionObj, userAnswer, sessionContext);
+    return evaluateCodingAnswer(questionObj, cleaned, sessionContext);
   }
 
   // Handle Textual / Verbal Technical & Behavioral Evaluation
@@ -52,7 +66,7 @@ async function evaluateCodingAnswer(questionObj, code, sessionContext) {
       verdict: 'The submitted code is empty or incomplete.',
       doneWell: 'Opened the coding sandbox.',
       improvement: 'Write the complete algorithm and test against all visible test cases.',
-      suggestedApproach: questionObj.idealAnswer || 'Implement the optimal O(n) solution using two-pointer or hash map.',
+      suggestedApproach: questionObj.idealAnswer || 'Implement the optimal O(n) solution using appropriate data structures.',
       tip: questionObj.tips || 'Start by outlining the algorithmic steps in comments before writing code.',
       testSummary: '0 / 0 Test Cases Passed'
     };
@@ -87,12 +101,12 @@ async function evaluateCodingAnswer(questionObj, code, sessionContext) {
     communication = 7.0;
     confidence = 7.0;
   } else {
-    technical = syntaxError ? 3.0 : 4.8;
-    relevance = 5.2;
-    completeness = 4.2;
-    clarity = 5.5;
-    communication = 5.2;
-    confidence = 4.5;
+    technical = syntaxError ? 2.5 : 4.0;
+    relevance = 4.5;
+    completeness = 3.5;
+    clarity = 5.0;
+    communication = 4.5;
+    confidence = 4.0;
   }
 
   const overall = Number(((technical * 0.4) + (relevance * 0.2) + (completeness * 0.2) + (clarity * 0.1) + (confidence * 0.1)).toFixed(1));
@@ -107,7 +121,7 @@ async function evaluateCodingAnswer(questionObj, code, sessionContext) {
       status = 'Incorrect';
       verdict = syntaxError 
         ? `Compilation or syntax error: ${syntaxError}`
-        : `Failed test cases. The output does not match expected results.`;
+        : `Failed test cases. The output does not match expected results for this question.`;
     }
   }
 
@@ -141,6 +155,18 @@ async function evaluateCodingAnswer(questionObj, code, sessionContext) {
   };
 }
 
+const STOP_WORDS = new Set([
+  'a', 'an', 'the', 'and', 'or', 'but', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
+  'in', 'on', 'at', 'to', 'for', 'with', 'by', 'about', 'against', 'between', 'into', 'through',
+  'during', 'before', 'after', 'above', 'below', 'from', 'up', 'down', 'of', 'off', 'over', 'under',
+  'again', 'further', 'then', 'once', 'here', 'there', 'when', 'where', 'why', 'how', 'all', 'any',
+  'both', 'each', 'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own',
+  'same', 'so', 'than', 'too', 'very', 'can', 'will', 'just', 'should', 'now', 'what', 'which',
+  'who', 'whom', 'this', 'that', 'these', 'those', 'am', 'have', 'has', 'had', 'having', 'do', 'does',
+  'did', 'doing', 'would', 'could', 'explain', 'describe', 'difference', 'differences', 'concept',
+  'concepts', 'give', 'example', 'examples', 'using', 'used', 'mean', 'means', 'work', 'works', 'write'
+]);
+
 /**
  * Normalizes words to stems for flexible semantic matching
  */
@@ -150,29 +176,41 @@ function getStem(w) {
 }
 
 /**
- * Evaluates Textual / Conceptual Technical & Behavioral Answers
+ * Extracts meaningful non-stopword tokens
+ */
+function extractMeaningfulTokens(text) {
+  if (!text) return [];
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, ' ')
+    .split(/\s+/)
+    .filter(w => w.length >= 3 && !STOP_WORDS.has(w));
+}
+
+/**
+ * Evaluates Textual / Conceptual Technical & Behavioral Answers ONLY against the current question
  */
 function evaluateTextAnswer(questionObj, cleaned) {
   const words = cleaned.split(/\s+/).filter(Boolean);
   const wordCount = words.length;
 
-  // Check if answer is too short
-  if (wordCount < 5) {
+  // Check if answer is empty or too short to have substance
+  if (wordCount < 6) {
     return {
       overallScore: 2.0,
       status: 'Incorrect',
       statusLabel: 'Incomplete Response',
       scores: {
-        relevance: 2.0,
-        technical: 2.0,
-        clarity: 3.0,
-        communication: 2.5,
-        completeness: 1.5,
+        relevance: 1.5,
+        technical: 1.5,
+        clarity: 2.5,
+        communication: 2.0,
+        completeness: 1.0,
         confidence: 2.0
       },
-      verdict: 'Answer is too brief to evaluate technical depth or communication ability.',
+      verdict: 'Answer is too brief to evaluate technical depth or relevance to this question.',
       doneWell: 'Initiated a response.',
-      improvement: 'Elaborate on core concepts, mechanics, and trade-offs.',
+      improvement: 'Provide a structured explanation addressing the core mechanisms and trade-offs.',
       suggestedApproach: questionObj.idealAnswer || `Address: ${questionObj.keyConcepts ? questionObj.keyConcepts.join(', ') : 'the core problem and trade-offs'}.`,
       tip: questionObj.tips || 'Aim for at least 3-4 structured sentences covering concepts, mechanics, and concrete examples.'
     };
@@ -180,65 +218,128 @@ function evaluateTextAnswer(questionObj, cleaned) {
 
   const lowerAnswer = cleaned.toLowerCase();
   const normalizedAnswerTokens = words.map(w => getStem(w)).filter(w => w.length >= 3);
-  
-  // 1. Key Concept & Vocabulary Matching
-  let concepts = questionObj.keyConcepts || [];
+  const isBehavioral = questionObj.type === 'behavioral' || questionObj.type === 'hr';
+
+  // 1. Extract this question's key concepts
+  let concepts = Array.isArray(questionObj.keyConcepts) ? [...questionObj.keyConcepts] : [];
   if (concepts.length === 0 && questionObj.idealAnswer) {
-    // Extract key words from ideal answer if keyConcepts is empty
-    const idealWords = questionObj.idealAnswer.split(/[,\s.]+/).filter(w => w.length > 4);
-    concepts = Array.from(new Set(idealWords)).slice(0, 6);
+    const idealTokens = extractMeaningfulTokens(questionObj.idealAnswer);
+    concepts = Array.from(new Set(idealTokens)).slice(0, 6);
   }
 
-  const matchedList = [];
-  const missingList = [];
+  // 2. Extract question title keywords & ideal answer keywords
+  const questionKeywords = extractMeaningfulTokens(questionObj.question || '');
+  const idealKeywords = extractMeaningfulTokens(questionObj.idealAnswer || '');
+
+  // 3. Match candidate answer against THIS question's concepts
+  const matchedConcepts = [];
+  const missingConcepts = [];
 
   concepts.forEach(concept => {
     const rawConcept = concept.toLowerCase();
-    const conceptWords = rawConcept.split(/[\s\-_/]+/).filter(w => w.length >= 3);
-    
-    // Check if whole concept or any significant stem is present in candidate answer
+    const conceptTokens = extractMeaningfulTokens(rawConcept);
+
+    // Direct substring match
     const exactMatch = lowerAnswer.includes(rawConcept);
-    const stemMatch = conceptWords.some(cw => {
-      const stem = getStem(cw);
-      return stem.length >= 3 && (lowerAnswer.includes(stem) || normalizedAnswerTokens.includes(stem));
+    // Stem / token match
+    const tokenMatch = conceptTokens.length > 0 && conceptTokens.some(ct => {
+      const stem = getStem(ct);
+      return stem.length >= 3 && (lowerAnswer.includes(ct) || lowerAnswer.includes(stem) || normalizedAnswerTokens.includes(stem));
     });
 
-    if (exactMatch || stemMatch) {
-      matchedList.push(concept);
+    if (exactMatch || tokenMatch) {
+      matchedConcepts.push(concept);
     } else {
-      missingList.push(concept);
+      missingConcepts.push(concept);
     }
   });
 
-  const conceptCoverage = concepts.length > 0 ? (matchedList.length / concepts.length) : 0.8;
+  // Check matching against question prompt keywords
+  const matchedQuestionKeywords = questionKeywords.filter(qk => {
+    const stem = getStem(qk);
+    return lowerAnswer.includes(qk) || lowerAnswer.includes(stem) || normalizedAnswerTokens.includes(stem);
+  });
 
-  // 2. Technical Vocabulary & Precision Bonus
-  const technicalIndicators = [
-    'latency', 'throughput', 'scalability', 'performance', 'caching', 'redis', 'database', 'sql', 'nosql',
-    'postgres', 'acid', 'concurrency', 'async', 'promise', 'memory', 'leak', 'index', 'btree', 'hash',
-    'algorithm', 'complexity', 'trade-off', 'tradeoff', 'microservice', 'api', 'rest', 'graphql',
-    'docker', 'kubernetes', 'cluster', 'load balancer', 'queue', 'kafka', 'event', 'state', 'hook',
-    'component', 'virtual dom', 'gc', 'garbage collection', 'thread', 'lock', 'deadlock', 'mutex',
-    'reconciliation', 'normalization', 'denormalization', 'partition', 'sharding', 'replica', 'failover'
-  ];
-  const techTermsFound = technicalIndicators.filter(term => lowerAnswer.includes(term)).length;
-  const techBonus = Math.min(2.5, techTermsFound * 0.4);
+  // Check matching against ideal answer keywords
+  const matchedIdealKeywords = idealKeywords.filter(ik => {
+    const stem = getStem(ik);
+    return lowerAnswer.includes(ik) || lowerAnswer.includes(stem) || normalizedAnswerTokens.includes(stem);
+  });
 
-  // 3. Structural & Reasoning Quality (STAR method, causal words, quantified metrics)
-  const structuralWords = ['because', 'for example', 'such as', 'trade-off', 'first', 'second', 'result', 'benefit', 'approach', 'mitigate', 'prevent', 'situation', 'task', 'action', 'metric', 'reduced', 'increased', 'improved'];
+  const conceptCoverage = concepts.length > 0 ? (matchedConcepts.length / concepts.length) : 0;
+  const questionKeywordRatio = questionKeywords.length > 0 ? (matchedQuestionKeywords.length / questionKeywords.length) : 0;
+  const idealKeywordRatio = idealKeywords.length > 0 ? (matchedIdealKeywords.length / idealKeywords.length) : 0;
+
+  // 4. Behavioral STAR method checking
+  let starBonus = 0;
+  if (isBehavioral) {
+    const starIndicators = ['situation', 'task', 'action', 'result', 'impact', 'challenge', 'team', 'resolved', 'learned', 'outcome', 'lead', 'initiative', 'customer', 'conflict'];
+    const starMatches = starIndicators.filter(si => lowerAnswer.includes(si)).length;
+    starBonus = Math.min(2.0, starMatches * 0.4);
+  }
+
+  // 5. Structural & Reasoning Quality
+  const structuralWords = ['because', 'for example', 'such as', 'trade-off', 'tradeoff', 'first', 'second', 'result', 'benefit', 'approach', 'mitigate', 'prevent', 'furthermore', 'however', 'in contrast', 'architecture'];
   const structureMatches = structuralWords.filter(w => lowerAnswer.includes(w)).length;
-  const structureBonus = Math.min(2.0, structureMatches * 0.45);
+  const structureBonus = Math.min(1.5, structureMatches * 0.3);
 
-  // 4. Word Count & Elaboration Quality
-  const lengthScore = Math.min(10, Math.max(5, (wordCount / 40) * 8));
+  // 6. DETECT IRRELEVANT / WRONG-QUESTION ANSWERS
+  // If the answer matches almost none of this question's concepts, keywords, or ideal answer:
+  const isOffTopic = (conceptCoverage < 0.15 && questionKeywordRatio < 0.20 && idealKeywordRatio < 0.15 && matchedConcepts.length === 0);
 
-  // Calculate rubric dimension scores
-  let technical = Math.min(10, Math.max(4.0, (conceptCoverage * 6.5) + (techBonus * 0.9) + (structureBonus * 0.4) + (lengthScore * 0.15)));
-  let relevance = Math.min(10, Math.max(4.5, (conceptCoverage * 7.0) + (techBonus * 0.4) + 2.0));
-  let clarity = Math.min(10, Math.max(5.0, 6.2 + (structureBonus * 1.4) + (wordCount >= 30 && wordCount <= 250 ? 1.0 : 0)));
-  let communication = Math.min(10, Math.max(5.0, 6.0 + structureBonus + (wordCount >= 25 && wordCount <= 200 ? 1.5 : 0.5)));
-  let completeness = Math.min(10, Math.max(4.0, (conceptCoverage * 6.0) + (techBonus * 0.5) + (lengthScore * 0.25)));
-  let confidence = Math.min(10, Math.max(5.0, 7.0 + (structureBonus * 0.8) - (lowerAnswer.includes('maybe') || lowerAnswer.includes('i guess') || lowerAnswer.includes('not sure') ? 1.8 : 0)));
+  if (isOffTopic && !isBehavioral) {
+    return {
+      overallScore: 2.2,
+      status: 'Incorrect',
+      statusLabel: 'Irrelevant Answer',
+      scores: {
+        technical: 1.8,
+        relevance: 1.2,
+        clarity: 3.5,
+        communication: 3.2,
+        completeness: 1.0,
+        confidence: 2.0
+      },
+      verdict: `The submitted answer does not address this question (${questionObj.category || 'Topic'}). An answer from a different topic or question cannot be accepted.`,
+      doneWell: 'Submitted an articulate paragraph.',
+      improvement: missingConcepts.length > 0 
+        ? `Focus strictly on this question's requirements: ${missingConcepts.slice(0, 3).join(', ')}.`
+        : `Answer the specific requirements of: "${questionObj.question}".`,
+      suggestedApproach: questionObj.idealAnswer || 'Provide a structured solution focusing on the exact question requested.',
+      tip: questionObj.tips || 'Carefully read the question prompt and address its core technical concepts.',
+      matchedConcepts: [],
+      missingConcepts: concepts
+    };
+  }
+
+  // 7. Calculate Rubric Dimensions strictly for this question
+  let relevance = 0;
+  let technical = 0;
+  let completeness = 0;
+  let clarity = 0;
+  let communication = 0;
+  let confidence = 0;
+
+  if (isBehavioral) {
+    // Behavioral scoring
+    const relevanceBase = Math.max(2.0, (questionKeywordRatio * 4.0) + (idealKeywordRatio * 4.0) + starBonus);
+    relevance = Math.min(10, relevanceBase);
+    technical = Math.min(10, Math.max(2.0, (starBonus * 3.5) + (structureBonus * 1.5) + (wordCount >= 40 ? 3.0 : 1.5)));
+    completeness = Math.min(10, Math.max(2.0, (relevance * 0.5) + (starBonus * 2.0) + (wordCount >= 50 ? 2.5 : 1.0)));
+    clarity = Math.min(10, Math.max(4.0, 5.5 + structureBonus + (wordCount >= 30 ? 1.5 : 0)));
+    communication = Math.min(10, Math.max(4.0, 6.0 + (starBonus * 1.2) + structureBonus));
+    confidence = Math.min(10, Math.max(4.0, 6.5 + (lowerAnswer.includes('i was able') || lowerAnswer.includes('i achieved') ? 1.5 : 0) - (lowerAnswer.includes('maybe') || lowerAnswer.includes('i guess') ? 1.5 : 0)));
+  } else {
+    // Technical conceptual scoring
+    const lengthQuality = Math.min(2.5, (wordCount / 35) * 2.0);
+    
+    technical = Math.min(10, Math.max(1.5, (conceptCoverage * 7.0) + (idealKeywordRatio * 2.5) + (structureBonus * 0.5) + (lengthQuality * 0.5)));
+    relevance = Math.min(10, Math.max(1.2, (conceptCoverage * 6.5) + (questionKeywordRatio * 2.5) + (idealKeywordRatio * 2.0)));
+    completeness = Math.min(10, Math.max(1.0, (conceptCoverage * 7.5) + (idealKeywordRatio * 2.0) + (lengthQuality * 0.5)));
+    clarity = Math.min(10, Math.max(3.5, 5.2 + (structureBonus * 2.0) + (wordCount >= 20 ? 1.5 : 0)));
+    communication = Math.min(10, Math.max(3.5, 5.4 + structureBonus + (wordCount >= 20 ? 1.5 : 0)));
+    confidence = Math.min(10, Math.max(3.0, 6.5 + (structureBonus * 1.0) - (lowerAnswer.includes('maybe') || lowerAnswer.includes('i guess') || lowerAnswer.includes('not sure') ? 2.0 : 0)));
+  }
 
   technical = Number(technical.toFixed(1));
   relevance = Number(relevance.toFixed(1));
@@ -247,25 +348,34 @@ function evaluateTextAnswer(questionObj, cleaned) {
   completeness = Number(completeness.toFixed(1));
   confidence = Number(confidence.toFixed(1));
 
-  const overall = Number(((technical * 0.35) + (relevance * 0.25) + (clarity * 0.15) + (communication * 0.15) + (completeness * 0.10)).toFixed(1));
+  let overall = Number(((technical * 0.35) + (relevance * 0.25) + (clarity * 0.15) + (communication * 0.15) + (completeness * 0.10)).toFixed(1));
+
+  // If relevance is poor, penalize overall score
+  if (relevance < 4.0) {
+    overall = Math.min(overall, 3.8);
+  }
 
   let status = 'Correct';
   let verdict = 'Comprehensive and well-structured answer with strong technical depth.';
   if (overall < 5.5) {
     status = 'Incorrect';
-    verdict = 'Response lacks key technical concepts and foundational depth.';
-  } else if (overall < 7.5) {
+    verdict = isOffTopic 
+      ? 'Response does not sufficiently address the core concepts of this question.'
+      : 'Response lacks key technical mechanisms and depth required for this question.';
+  } else if (overall < 7.0) {
     status = 'Partially Correct';
-    verdict = 'Accurate high-level understanding, but missing deeper edge cases or concrete trade-offs.';
+    verdict = 'Accurate understanding of high-level concepts, but missing deeper edge cases or concrete trade-offs.';
   }
 
-  let doneWell = matchedList.length >= 2 
-    ? `Strong articulation of core concepts (${matchedList.slice(0, 2).join(', ')}).`
-    : (techTermsFound >= 2 ? `Solid inclusion of production engineering terms (${technicalIndicators.filter(t => lowerAnswer.includes(t)).slice(0, 2).join(', ')}).` : 'Clear fundamental awareness and problem breakdown.');
+  let doneWell = matchedConcepts.length >= 2 
+    ? `Strong articulation of core concepts (${matchedConcepts.slice(0, 2).join(', ')}).`
+    : (matchedConcepts.length === 1 
+      ? `Correctly identified ${matchedConcepts[0]}.`
+      : 'Clear communication style and foundational attempt.');
 
-  let improvement = missingList.length > 0 
-    ? `Key concepts to deepen: ${missingList.slice(0, 2).join(', ')}.`
-    : (wordCount < 30 ? 'Elaborate further with a concrete production example or architectural trade-off.' : 'Consider discussing edge cases and failure mode mitigations.');
+  let improvement = missingConcepts.length > 0 
+    ? `Key concepts to deepen for this question: ${missingConcepts.slice(0, 3).join(', ')}.`
+    : (wordCount < 35 ? 'Elaborate further with concrete architectural mechanisms and real-world trade-offs.' : 'Consider discussing edge cases, failure recovery, and performance trade-offs.');
 
   return {
     overallScore: Math.min(10, Math.max(1, overall)),
@@ -283,9 +393,9 @@ function evaluateTextAnswer(questionObj, cleaned) {
     doneWell,
     improvement,
     suggestedApproach: questionObj.idealAnswer || 'Begin with a concise definition, explain the underlying mechanism, and conclude with a production trade-off.',
-    tip: questionObj.tips || 'Keep responses structured using bullet points or chronological steps for optimal interviewer clarity.',
-    matchedConcepts: matchedList,
-    missingConcepts: missingList
+    tip: questionObj.tips || 'Structure responses using clear points covering definitions, architecture, and real-world trade-offs.',
+    matchedConcepts,
+    missingConcepts
   };
 }
 
@@ -299,7 +409,7 @@ function formatEvaluationResponse(apiResult, questionObj) {
     overallScore: overall,
     status,
     statusLabel: status,
-    verdict: apiResult.doneWell || (status === 'Correct' ? 'High-quality technical explanation.' : 'Needs refinement.'),
+    verdict: apiResult.verdict || apiResult.doneWell || (status === 'Correct' ? 'High-quality technical explanation.' : 'Needs refinement.'),
     scores: apiResult.scores || { technical: overall, relevance: overall, clarity: overall, communication: overall, completeness: overall, confidence: overall },
     doneWell: apiResult.doneWell || 'Addressed key points clearly.',
     improvement: apiResult.improvement || 'Incorporate more production trade-offs.',
@@ -313,9 +423,11 @@ async function callGeminiEvaluation(questionObj, userAnswer, apiKey) {
 Question: ${questionObj.question}
 Category: ${questionObj.category || 'Engineering'}
 Expected Key Concepts: ${questionObj.keyConcepts ? questionObj.keyConcepts.join(', ') : 'General technical competency'}
+Ideal Reference Answer: ${questionObj.idealAnswer || 'N/A'}
 Candidate's Answer: "${userAnswer}"
 
-Evaluate strictly and return JSON with this exact structure:
+Evaluate strictly against this specific question only. If the candidate answers an unrelated question or off-topic prompt, mark overallScore < 4.0 and status 'Incorrect'.
+Return JSON with this exact structure:
 {
   "overallScore": 8.5,
   "scores": {
@@ -326,6 +438,7 @@ Evaluate strictly and return JSON with this exact structure:
     "completeness": 8.5,
     "confidence": 8.5
   },
+  "verdict": "Clear summary verdict",
   "doneWell": "What the candidate did well in 1-2 sentences",
   "improvement": "What could be improved in 1-2 sentences",
   "suggestedApproach": "A concise model answer",
