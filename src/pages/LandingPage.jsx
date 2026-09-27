@@ -22,6 +22,7 @@ import ThreeDCarousel from '../components/ThreeDCarousel';
 export default function LandingPage({ setActivePage, onSelectTrack, onStartInterview }) {
   const [openFaq, setOpenFaq] = useState(null);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [activeCta, setActiveCta] = useState('start'); // 'start' | 'explore'
 
 
   const faqs = [
@@ -112,7 +113,7 @@ export default function LandingPage({ setActivePage, onSelectTrack, onStartInter
               Realistic, role-tailored technical and behavioral interview practice with instant rubric evaluation, speech recognition, and actionable feedback.
             </p>
 
-            {/* CTAs */}
+            {/* CTAs with Dynamic Active / Dark State Switching */}
             <div className="hero-cta-group" style={{
               display: 'flex',
               flexWrap: 'wrap',
@@ -121,20 +122,45 @@ export default function LandingPage({ setActivePage, onSelectTrack, onStartInter
               width: '100%',
               marginBottom: '0'
             }}>
+              {/* Start Interview Button */}
               <button
-                onClick={() => setActivePage('setup')}
-                className="btn btn-primary btn-lg hero-btn"
-                style={{ minWidth: '200px' }}
+                type="button"
+                onClick={() => {
+                  setActiveCta('start');
+                  if (onStartInterview) {
+                    onStartInterview();
+                  } else {
+                    setActivePage('setup');
+                  }
+                }}
+                onMouseEnter={() => setActiveCta('start')}
+                className={`btn btn-lg hero-btn ${activeCta === 'start' ? 'btn-primary' : 'btn-secondary'}`}
+                style={{
+                  minWidth: '200px',
+                  transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                  boxShadow: activeCta === 'start' ? '0 4px 20px rgba(6, 182, 212, 0.4)' : 'none',
+                  border: activeCta === 'start' ? '1px solid var(--accent-cyan)' : '1px solid rgba(255, 255, 255, 0.12)'
+                }}
               >
                 Start Interview <ArrowRight size={18} />
               </button>
+
+              {/* Explore Features Button */}
               <button
+                type="button"
                 onClick={() => {
+                  setActiveCta('explore');
                   const el = document.getElementById('how-it-works');
                   el?.scrollIntoView({ behavior: 'smooth' });
                 }}
-                className="btn btn-secondary btn-lg hero-btn"
-                style={{ minWidth: '180px' }}
+                onMouseEnter={() => setActiveCta('explore')}
+                className={`btn btn-lg hero-btn ${activeCta === 'explore' ? 'btn-primary' : 'btn-secondary'}`}
+                style={{
+                  minWidth: '180px',
+                  transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                  boxShadow: activeCta === 'explore' ? '0 4px 20px rgba(6, 182, 212, 0.4)' : 'none',
+                  border: activeCta === 'explore' ? '1px solid var(--accent-cyan)' : '1px solid rgba(255, 255, 255, 0.12)'
+                }}
               >
                 Explore Features
               </button>
