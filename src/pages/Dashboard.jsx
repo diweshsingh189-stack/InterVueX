@@ -343,61 +343,62 @@ export default function Dashboard({
           <div 
             onClick={() => handleLaunchMode('technical')}
             style={{
-              backgroundColor: 'rgba(15, 23, 42, 0.75)',
-              border: '1.5px solid rgba(6, 182, 212, 0.5)',
+              backgroundColor: '#070E1E',
+              border: '1px solid rgba(6, 182, 212, 0.35)',
               borderRadius: '14px',
               padding: '1.25rem',
               cursor: 'pointer',
-              transition: 'all 0.2s ease',
+              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
-              boxShadow: '0 4px 20px rgba(6, 182, 212, 0.12)'
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4)'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.transform = 'translateY(-3px)';
               e.currentTarget.style.borderColor = 'var(--accent-cyan)';
-              e.currentTarget.style.boxShadow = '0 8px 25px rgba(6, 182, 212, 0.2)';
+              e.currentTarget.style.boxShadow = '0 10px 30px rgba(6, 182, 212, 0.25)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.borderColor = 'rgba(6, 182, 212, 0.5)';
-              e.currentTarget.style.boxShadow = '0 4px 20px rgba(6, 182, 212, 0.12)';
+              e.currentTarget.style.borderColor = 'rgba(6, 182, 212, 0.35)';
+              e.currentTarget.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.4)';
             }}
           >
             <div>
               <div style={{
-                width: '42px',
-                height: '42px',
-                borderRadius: '10px',
-                backgroundColor: 'rgba(6, 182, 212, 0.18)',
+                width: '44px',
+                height: '44px',
+                borderRadius: '12px',
+                backgroundColor: 'rgba(6, 182, 212, 0.16)',
                 border: '1px solid rgba(6, 182, 212, 0.4)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: 'var(--accent-cyan)',
+                color: '#38BDF8',
                 marginBottom: '1rem'
               }}>
-                <Bot size={22} />
+                <Bot size={24} />
               </div>
-              <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#FFFFFF', marginBottom: '0.35rem' }}>
+              <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#FFFFFF', marginBottom: '0.4rem', letterSpacing: '-0.01em' }}>
                 AI Interviewer
               </h3>
-              <p style={{ fontSize: '0.8rem', color: '#94A3B8', lineHeight: '1.45', marginBottom: '1.25rem' }}>
-                Real-time AI questions with instant feedback.
+              <p style={{ fontSize: '0.84rem', color: '#CBD5E1', lineHeight: '1.45', marginBottom: '1.25rem', fontWeight: 500 }}>
+                Real-time AI questions with intelligent feedback
               </p>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
               <div style={{
-                width: '30px',
-                height: '30px',
+                width: '32px',
+                height: '32px',
                 borderRadius: '50%',
-                backgroundColor: 'rgba(6, 182, 212, 0.2)',
+                backgroundColor: 'rgba(6, 182, 212, 0.18)',
+                border: '1px solid rgba(6, 182, 212, 0.3)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: 'var(--accent-cyan)'
+                color: '#38BDF8'
               }}>
                 <ArrowRight size={15} />
               </div>
@@ -408,60 +409,62 @@ export default function Dashboard({
           <div 
             onClick={() => handleLaunchMode('behavioral')}
             style={{
-              backgroundColor: 'rgba(15, 23, 42, 0.65)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
+              backgroundColor: '#100C1F',
+              border: '1px solid rgba(168, 85, 247, 0.35)',
               borderRadius: '14px',
               padding: '1.25rem',
               cursor: 'pointer',
-              transition: 'all 0.2s ease',
+              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
               display: 'flex',
               flexDirection: 'column',
-              justifyContent: 'space-between'
+              justifyContent: 'space-between',
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4)'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.25)';
-              e.currentTarget.style.backgroundColor = 'rgba(20, 30, 55, 0.8)';
+              e.currentTarget.style.transform = 'translateY(-3px)';
+              e.currentTarget.style.borderColor = '#C084FC';
+              e.currentTarget.style.boxShadow = '0 10px 30px rgba(168, 85, 247, 0.25)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
-              e.currentTarget.style.backgroundColor = 'rgba(15, 23, 42, 0.65)';
+              e.currentTarget.style.borderColor = 'rgba(168, 85, 247, 0.35)';
+              e.currentTarget.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.4)';
             }}
           >
             <div>
               <div style={{
-                width: '42px',
-                height: '42px',
-                borderRadius: '10px',
-                backgroundColor: 'rgba(255, 255, 255, 0.06)',
-                border: '1px solid rgba(255, 255, 255, 0.12)',
+                width: '44px',
+                height: '44px',
+                borderRadius: '12px',
+                backgroundColor: 'rgba(168, 85, 247, 0.16)',
+                border: '1px solid rgba(168, 85, 247, 0.4)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#CBD5E1',
+                color: '#C084FC',
                 marginBottom: '1rem'
               }}>
-                <Mic size={22} />
+                <Mic size={24} />
               </div>
-              <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#FFFFFF', marginBottom: '0.35rem' }}>
+              <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#FFFFFF', marginBottom: '0.4rem', letterSpacing: '-0.01em' }}>
                 Voice Interview
               </h3>
-              <p style={{ fontSize: '0.8rem', color: '#94A3B8', lineHeight: '1.45', marginBottom: '1.25rem' }}>
-                Speak your answers and get evaluated.
+              <p style={{ fontSize: '0.84rem', color: '#CBD5E1', lineHeight: '1.45', marginBottom: '1.25rem', fontWeight: 500 }}>
+                Speak your answers and get evaluated
               </p>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
               <div style={{
-                width: '30px',
-                height: '30px',
+                width: '32px',
+                height: '32px',
                 borderRadius: '50%',
-                backgroundColor: 'rgba(255, 255, 255, 0.06)',
+                backgroundColor: 'rgba(168, 85, 247, 0.18)',
+                border: '1px solid rgba(168, 85, 247, 0.3)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#94A3B8'
+                color: '#C084FC'
               }}>
                 <ArrowRight size={15} />
               </div>
@@ -472,60 +475,62 @@ export default function Dashboard({
           <div 
             onClick={() => onBrowseQuestions?.()}
             style={{
-              backgroundColor: 'rgba(15, 23, 42, 0.65)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
+              backgroundColor: '#081715',
+              border: '1px solid rgba(16, 185, 129, 0.35)',
               borderRadius: '14px',
               padding: '1.25rem',
               cursor: 'pointer',
-              transition: 'all 0.2s ease',
+              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
               display: 'flex',
               flexDirection: 'column',
-              justifyContent: 'space-between'
+              justifyContent: 'space-between',
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4)'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.25)';
-              e.currentTarget.style.backgroundColor = 'rgba(20, 30, 55, 0.8)';
+              e.currentTarget.style.transform = 'translateY(-3px)';
+              e.currentTarget.style.borderColor = '#34D399';
+              e.currentTarget.style.boxShadow = '0 10px 30px rgba(16, 185, 129, 0.25)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
-              e.currentTarget.style.backgroundColor = 'rgba(15, 23, 42, 0.65)';
+              e.currentTarget.style.borderColor = 'rgba(16, 185, 129, 0.35)';
+              e.currentTarget.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.4)';
             }}
           >
             <div>
               <div style={{
-                width: '42px',
-                height: '42px',
-                borderRadius: '10px',
-                backgroundColor: 'rgba(255, 255, 255, 0.06)',
-                border: '1px solid rgba(255, 255, 255, 0.12)',
+                width: '44px',
+                height: '44px',
+                borderRadius: '12px',
+                backgroundColor: 'rgba(16, 185, 129, 0.16)',
+                border: '1px solid rgba(16, 185, 129, 0.4)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#CBD5E1',
+                color: '#34D399',
                 marginBottom: '1rem'
               }}>
-                <Code2 size={22} />
+                <Code2 size={24} />
               </div>
-              <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#FFFFFF', marginBottom: '0.35rem' }}>
+              <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#FFFFFF', marginBottom: '0.4rem', letterSpacing: '-0.01em' }}>
                 Practice Mode
               </h3>
-              <p style={{ fontSize: '0.8rem', color: '#94A3B8', lineHeight: '1.45', marginBottom: '1.25rem' }}>
-                Practice with questions and get detailed feedback.
+              <p style={{ fontSize: '0.84rem', color: '#CBD5E1', lineHeight: '1.45', marginBottom: '1.25rem', fontWeight: 500 }}>
+                Solve coding questions and get instant results
               </p>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
               <div style={{
-                width: '30px',
-                height: '30px',
+                width: '32px',
+                height: '32px',
                 borderRadius: '50%',
-                backgroundColor: 'rgba(255, 255, 255, 0.06)',
+                backgroundColor: 'rgba(16, 185, 129, 0.18)',
+                border: '1px solid rgba(16, 185, 129, 0.3)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#94A3B8'
+                color: '#34D399'
               }}>
                 <ArrowRight size={15} />
               </div>
@@ -536,60 +541,62 @@ export default function Dashboard({
           <div 
             onClick={() => handleLaunchMode('mixed')}
             style={{
-              backgroundColor: 'rgba(15, 23, 42, 0.65)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
+              backgroundColor: '#1E1208',
+              border: '1px solid rgba(245, 158, 11, 0.35)',
               borderRadius: '14px',
               padding: '1.25rem',
               cursor: 'pointer',
-              transition: 'all 0.2s ease',
+              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
               display: 'flex',
               flexDirection: 'column',
-              justifyContent: 'space-between'
+              justifyContent: 'space-between',
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4)'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.25)';
-              e.currentTarget.style.backgroundColor = 'rgba(20, 30, 55, 0.8)';
+              e.currentTarget.style.transform = 'translateY(-3px)';
+              e.currentTarget.style.borderColor = '#FBBF24';
+              e.currentTarget.style.boxShadow = '0 10px 30px rgba(245, 158, 11, 0.25)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
-              e.currentTarget.style.backgroundColor = 'rgba(15, 23, 42, 0.65)';
+              e.currentTarget.style.borderColor = 'rgba(245, 158, 11, 0.35)';
+              e.currentTarget.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.4)';
             }}
           >
             <div>
               <div style={{
-                width: '42px',
-                height: '42px',
-                borderRadius: '10px',
-                backgroundColor: 'rgba(255, 255, 255, 0.06)',
-                border: '1px solid rgba(255, 255, 255, 0.12)',
+                width: '44px',
+                height: '44px',
+                borderRadius: '12px',
+                backgroundColor: 'rgba(245, 158, 11, 0.16)',
+                border: '1px solid rgba(245, 158, 11, 0.4)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#CBD5E1',
+                color: '#FBBF24',
                 marginBottom: '1rem'
               }}>
-                <Building2 size={22} />
+                <Building2 size={24} />
               </div>
-              <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#FFFFFF', marginBottom: '0.35rem' }}>
+              <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#FFFFFF', marginBottom: '0.4rem', letterSpacing: '-0.01em' }}>
                 Mock Interview
               </h3>
-              <p style={{ fontSize: '0.8rem', color: '#94A3B8', lineHeight: '1.45', marginBottom: '1.25rem' }}>
-                Full interview simulation with score & feedback.
+              <p style={{ fontSize: '0.84rem', color: '#CBD5E1', lineHeight: '1.45', marginBottom: '1.25rem', fontWeight: 500 }}>
+                Full interview simulation with score & feedback
               </p>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
               <div style={{
-                width: '30px',
-                height: '30px',
+                width: '32px',
+                height: '32px',
                 borderRadius: '50%',
-                backgroundColor: 'rgba(255, 255, 255, 0.06)',
+                backgroundColor: 'rgba(245, 158, 11, 0.18)',
+                border: '1px solid rgba(245, 158, 11, 0.3)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#94A3B8'
+                color: '#FBBF24'
               }}>
                 <ArrowRight size={15} />
               </div>
