@@ -333,68 +333,82 @@ export default function Dashboard({
           </div>
         </div>
 
-        {/* Right Hero Visual / Quick Launcher Card */}
+        {/* Right Hero Visual Card with Full Uncropped Photo */}
         <div style={{
           position: 'relative',
           borderRadius: '16px',
           overflow: 'hidden',
-          background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(15, 23, 42, 0.9) 55%, rgba(10, 15, 29, 0.98) 100%)',
-          border: '1px solid rgba(6, 182, 212, 0.3)',
-          boxShadow: '0 12px 35px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08)',
+          backgroundColor: '#070C18',
+          border: '1px solid rgba(6, 182, 212, 0.35)',
+          boxShadow: '0 12px 35px rgba(0, 0, 0, 0.6)',
           display: 'flex',
           flexDirection: 'column',
-          justifyContent: 'space-between',
-          padding: '1.4rem',
-          minHeight: '190px'
+          justifyContent: 'flex-end',
+          minHeight: '250px',
+          aspectRatio: '16 / 9',
+          width: '100%'
         }}>
-          {/* Top Row: Live status indicator + Badge */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.4rem',
-              backgroundColor: 'rgba(6, 182, 212, 0.16)',
-              border: '1px solid rgba(6, 182, 212, 0.35)',
-              color: '#38BDF8',
-              fontSize: '0.72rem',
-              fontWeight: 800,
-              textTransform: 'uppercase',
-              letterSpacing: '0.08em',
-              padding: '0.25rem 0.65rem',
-              borderRadius: '9999px'
-            }}>
-              <Sparkles size={12} style={{ color: 'var(--accent-cyan)' }} />
-              Next-Gen Simulator
-            </div>
+          {/* Main Photo */}
+          <img 
+            src="/interview-slide-1.jpg" 
+            alt="InterVueX AI Interview Simulator"
+            style={{
+              position: 'absolute',
+              inset: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              objectPosition: 'center center',
+              display: 'block'
+            }}
+          />
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.75rem', color: '#34D399', fontWeight: 600 }}>
-              <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#34D399', boxShadow: '0 0 8px #34D399' }} />
-              AI Active
-            </div>
-          </div>
+          {/* Smooth Bottom Vignette Overlay */}
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(to top, rgba(7, 12, 24, 0.95) 0%, rgba(7, 12, 24, 0.35) 45%, transparent 100%)',
+            pointerEvents: 'none'
+          }} />
 
-          {/* Middle: Title & Subtitle */}
-          <div style={{ margin: '0.85rem 0' }}>
-            <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#FFFFFF', letterSpacing: '-0.02em', marginBottom: '0.3rem' }}>
-              Ready to level up your career?
-            </h3>
-            <p style={{ fontSize: '0.82rem', color: '#94A3B8', lineHeight: '1.45', margin: 0 }}>
-              Start an interactive interview simulation with real-time feedback.
-            </p>
-          </div>
-
-          {/* Bottom Row: Quick Stats & Start Button */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
-            <div style={{ fontSize: '0.78rem', color: '#CBD5E1' }}>
-              Target: <strong style={{ color: '#FFFFFF' }}>{userProfile?.targetRole || 'Full Stack Developer'}</strong>
+          {/* Bottom Floating Info & Action Bar */}
+          <div style={{
+            position: 'relative',
+            zIndex: 2,
+            padding: '1rem 1.25rem',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-end',
+            gap: '0.75rem',
+            backgroundColor: 'rgba(7, 12, 24, 0.75)',
+            backdropFilter: 'blur(8px)',
+            borderTop: '1px solid rgba(255, 255, 255, 0.1)'
+          }}>
+            <div>
+              <div style={{
+                fontSize: '0.7rem',
+                textTransform: 'uppercase',
+                color: 'var(--accent-cyan)',
+                fontWeight: 800,
+                letterSpacing: '0.08em',
+                marginBottom: '0.2rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.35rem'
+              }}>
+                <Sparkles size={11} /> Next-Gen Simulator
+              </div>
+              <div style={{ fontSize: '0.975rem', fontWeight: 700, color: '#FFFFFF', letterSpacing: '-0.01em' }}>
+                Ready to level up your career?
+              </div>
             </div>
 
             <button
               onClick={() => onStartNew?.()}
-              className="btn btn-primary"
+              className="btn btn-primary btn-sm"
               style={{
-                padding: '0.45rem 1rem',
-                fontSize: '0.825rem',
+                padding: '0.45rem 0.95rem',
+                fontSize: '0.8rem',
                 whiteSpace: 'nowrap',
                 boxShadow: '0 4px 15px rgba(6, 182, 212, 0.35)'
               }}
