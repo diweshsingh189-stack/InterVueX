@@ -5,8 +5,7 @@ import {
   Volume2, 
   VolumeX, 
   BookOpen,
-  Sparkles,
-  Hand
+  Sparkles
 } from 'lucide-react';
 import { playPaperPageFlipSound } from '../utils/soundEffects';
 
@@ -678,31 +677,6 @@ export default function ThreeDCarousel({
               </span>
             </div>
           </div>
-
-          {/* Initial Drag/Swipe Tooltip (Fades out once user interacts) */}
-          {!hasInteracted && (
-            <div style={{
-              position: 'absolute',
-              top: '1rem',
-              right: '1rem',
-              zIndex: 16,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.35rem',
-              backgroundColor: 'rgba(7, 12, 24, 0.85)',
-              border: '1px solid rgba(6, 182, 212, 0.5)',
-              padding: '0.25rem 0.6rem',
-              borderRadius: 'var(--radius-full)',
-              color: 'var(--accent-cyan)',
-              fontSize: '0.7rem',
-              fontWeight: 600,
-              boxShadow: '0 0 14px rgba(6, 182, 212, 0.3)',
-              animation: 'pulse 2s infinite ease-in-out',
-              pointerEvents: 'none'
-            }}>
-              <Hand size={12} /> Drag or swipe page to flip
-            </div>
-          )}
 
           {/* ========================================================= */}
           {/* NAVIGATION ARROWS */}
