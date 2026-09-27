@@ -61,6 +61,16 @@ export default function InterviewRoom({ session, onFinishInterview, onExit, user
   const totalQuestions = sessionQuestions.length;
   const isCodingQuestion = session?.typeId === 'coding' || currentQuestion?.type === 'coding';
 
+  const userAnswersRef = useRef(userAnswers);
+  userAnswersRef.current = userAnswers;
+
+  // Sync sessionQuestions if prop changes
+  useEffect(() => {
+    if (session?.questions && session.questions.length > 0) {
+      setSessionQuestions(session.questions);
+    }
+  }, [session?.questions]);
+
   // Overall session timer
   useEffect(() => {
     const timer = setInterval(() => {
@@ -87,27 +97,38 @@ export default function InterviewRoom({ session, onFinishInterview, onExit, user
     return () => clearInterval(qTimer);
   }, [currentIndex, timeLimit]);
 
-  // Synchronize input and evaluation feedback when active question changes
+  // Synchronize input, evaluation feedback, and voice when active question index changes
   useEffect(() => {
-    if (currentQuestion) {
-      // Load saved answer for this question index or reset cleanly
-      if (userAnswers[currentIndex]) {
-        setCurrentText(userAnswers[currentIndex].userAnswer || userAnswers[currentIndex].text || '');
-        setCurrentLanguage(userAnswers[currentIndex].language || 'javascript');
-        setCurrentFeedback(userAnswers[currentIndex].evaluation || null);
-      } else {
-        const defaultCode = getQuestionStarterCode(currentQuestion, 'javascript');
-        setCurrentText(isCodingQuestion ? defaultCode : '');
-        setCurrentLanguage('javascript');
-        setCurrentFeedback(null);
-      }
+    const q = sessionQuestions[currentIndex];
+    if (!q) return;
 
-      // Voice read aloud for the new question
-      setIsSpeaking(true);
-      speechService.speak(currentQuestion.question, () => {
-        setIsSpeaking(false);
-      });
+    // Reset voice & notifications
+    speechService.stopSpeaking();
+    speechService.stopListening();
+    setIsListening(false);
+    setIsSpeaking(false);
+    setAdaptiveNotice(null);
+
+    // Retrieve latest stored answer for this index or reset completely
+    const saved = userAnswersRef.current[currentIndex];
+    const isCoding = session?.typeId === 'coding' || q?.type === 'coding';
+
+    if (saved) {
+      setCurrentText(saved.userAnswer || saved.text || '');
+      setCurrentLanguage(saved.language || 'javascript');
+      setCurrentFeedback(saved.evaluation || null);
+    } else {
+      const defaultCode = isCoding ? getQuestionStarterCode(q, 'javascript') : '';
+      setCurrentText(defaultCode);
+      setCurrentLanguage('javascript');
+      setCurrentFeedback(null);
     }
+
+    // Voice read aloud for the current question
+    setIsSpeaking(true);
+    speechService.speak(q.question, () => {
+      setIsSpeaking(false);
+    });
 
     return () => {
       speechService.stopSpeaking();
@@ -115,7 +136,7 @@ export default function InterviewRoom({ session, onFinishInterview, onExit, user
       setIsListening(false);
       setIsSpeaking(false);
     };
-  }, [currentIndex, currentQuestion?.id, isCodingQuestion]);
+  }, [currentIndex, sessionQuestions]);
 
   const handleToggleSpeak = () => {
     if (isSpeaking) {
@@ -176,20 +197,21 @@ export default function InterviewRoom({ session, onFinishInterview, onExit, user
         }
       );
 
-      const updatedAnswers = {
-        ...userAnswers,
-        [qIndex]: {
-          questionId: targetQuestion.id,
-          question: targetQuestion.question,
-          category: targetQuestion.category,
-          userAnswer: answerToEvaluate,
-          language: currentLanguage,
-          evaluation,
-          timestamp: new Date().toISOString()
-        }
+      const updatedRecord = {
+        questionId: targetQuestion.id,
+        question: targetQuestion.question,
+        category: targetQuestion.category,
+        userAnswer: answerToEvaluate,
+        language: currentLanguage,
+        evaluation,
+        timestamp: new Date().toISOString()
       };
 
-      setUserAnswers(updatedAnswers);
+      setUserAnswers(prev => ({
+        ...prev,
+        [qIndex]: updatedRecord
+      }));
+
       setCurrentFeedback(evaluation);
 
       // Adaptive Difficulty Adjustment
@@ -212,9 +234,11 @@ export default function InterviewRoom({ session, onFinishInterview, onExit, user
           );
 
           if (replacement) {
-            const updatedList = [...sessionQuestions];
-            updatedList[qIndex + 1] = replacement;
-            setSessionQuestions(updatedList);
+            setSessionQuestions(prevList => {
+              const updatedList = [...prevList];
+              updatedList[qIndex + 1] = replacement;
+              return updatedList;
+            });
           }
         }
       }
@@ -249,8 +273,8 @@ export default function InterviewRoom({ session, onFinishInterview, onExit, user
     };
 
     // Record skipped answer for this question
-    const updatedAnswers = {
-      ...userAnswers,
+    setUserAnswers(prev => ({
+      ...prev,
       [skipIndex]: {
         questionId: qToSkip.id,
         question: qToSkip.question,
@@ -260,26 +284,10 @@ export default function InterviewRoom({ session, onFinishInterview, onExit, user
         evaluation: skipEvaluation,
         timestamp: new Date().toISOString()
       }
-    };
-
-    setUserAnswers(updatedAnswers);
+    }));
 
     if (skipIndex < totalQuestions - 1) {
-      const nextIdx = skipIndex + 1;
-      setCurrentIndex(nextIdx);
-
-      if (updatedAnswers[nextIdx]) {
-        setCurrentText(updatedAnswers[nextIdx].userAnswer || updatedAnswers[nextIdx].text || '');
-        setCurrentLanguage(updatedAnswers[nextIdx].language || 'javascript');
-        setCurrentFeedback(updatedAnswers[nextIdx].evaluation || null);
-      } else {
-        const nextQ = sessionQuestions[nextIdx];
-        const isNextCoding = session?.typeId === 'coding' || nextQ?.type === 'coding';
-        const defaultCode = nextQ ? getQuestionStarterCode(nextQ, 'javascript') : '';
-        setCurrentText(isNextCoding ? defaultCode : '');
-        setCurrentLanguage('javascript');
-        setCurrentFeedback(null);
-      }
+      setCurrentIndex(prev => prev + 1);
     } else {
       setCurrentFeedback(skipEvaluation);
     }
@@ -287,53 +295,13 @@ export default function InterviewRoom({ session, onFinishInterview, onExit, user
 
   const handleNext = () => {
     if (currentIndex < totalQuestions - 1) {
-      const nextIdx = currentIndex + 1;
-      speechService.stopSpeaking();
-      speechService.stopListening();
-      setIsListening(false);
-      setIsSpeaking(false);
-      setAdaptiveNotice(null);
-      setCurrentIndex(nextIdx);
-
-      // Cleanly load saved answer for target question or reset state completely
-      if (userAnswers[nextIdx]) {
-        setCurrentText(userAnswers[nextIdx].userAnswer || userAnswers[nextIdx].text || '');
-        setCurrentLanguage(userAnswers[nextIdx].language || 'javascript');
-        setCurrentFeedback(userAnswers[nextIdx].evaluation || null);
-      } else {
-        const nextQ = sessionQuestions[nextIdx];
-        const isNextCoding = session?.typeId === 'coding' || nextQ?.type === 'coding';
-        const defaultCode = nextQ ? getQuestionStarterCode(nextQ, 'javascript') : '';
-        setCurrentText(isNextCoding ? defaultCode : '');
-        setCurrentLanguage('javascript');
-        setCurrentFeedback(null);
-      }
+      setCurrentIndex(prev => prev + 1);
     }
   };
 
   const handlePrev = () => {
     if (currentIndex > 0) {
-      const prevIdx = currentIndex - 1;
-      speechService.stopSpeaking();
-      speechService.stopListening();
-      setIsListening(false);
-      setIsSpeaking(false);
-      setAdaptiveNotice(null);
-      setCurrentIndex(prevIdx);
-
-      // Cleanly load saved answer for target question or reset state
-      if (userAnswers[prevIdx]) {
-        setCurrentText(userAnswers[prevIdx].userAnswer || userAnswers[prevIdx].text || '');
-        setCurrentLanguage(userAnswers[prevIdx].language || 'javascript');
-        setCurrentFeedback(userAnswers[prevIdx].evaluation || null);
-      } else {
-        const prevQ = sessionQuestions[prevIdx];
-        const isPrevCoding = session?.typeId === 'coding' || prevQ?.type === 'coding';
-        const defaultCode = prevQ ? getQuestionStarterCode(prevQ, 'javascript') : '';
-        setCurrentText(isPrevCoding ? defaultCode : '');
-        setCurrentLanguage('javascript');
-        setCurrentFeedback(null);
-      }
+      setCurrentIndex(prev => prev - 1);
     }
   };
 
