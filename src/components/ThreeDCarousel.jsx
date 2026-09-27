@@ -96,107 +96,33 @@ export default function ThreeDCarousel({
       onSlideChange(safeIndex);
     }
     setInternalPage(safeIndex);
+    setIsAnimatingFlip(false);
+    setAnimatingProgress(0);
+    setAnimatingDirection(null);
+    setIsDragging(false);
+    setDragProgress(0);
     if (isSoundOn) {
       playPaperPageFlipSound(1.1);
     }
   }, [totalPages, onSlideChange, isSoundOn]);
 
-  // Programmatic Animated Page Turn (Smooth Physics Animation)
+  // Turn to Next Page on button / swipe click
   const flipToNext = useCallback(() => {
-    if (isAnimatingFlip || isDragging) return;
     setHasInteracted(true);
-    setIsAnimatingFlip(true);
-    setAnimatingDirection('next');
-    
-    if (isSoundOn) {
-      playPaperPageFlipSound(1.0);
-    }
+    triggerPageChange(activePage + 1);
+  }, [activePage, triggerPageChange]);
 
-    const startTime = performance.now();
-    const duration = 650; // 650ms realistic paper turn physics
-
-    const animate = (now) => {
-      const elapsed = now - startTime;
-      const t = Math.min(1, elapsed / duration);
-      // Realistic smooth quintic paper flip easing
-      const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-      setAnimatingProgress(eased);
-
-      if (t < 1) {
-        requestAnimationFrame(animate);
-      } else {
-        setIsAnimatingFlip(false);
-        setAnimatingProgress(0);
-        setAnimatingDirection(null);
-        triggerPageChange(activePage + 1);
-      }
-    };
-    requestAnimationFrame(animate);
-  }, [activePage, isAnimatingFlip, isDragging, isSoundOn, triggerPageChange]);
-
+  // Turn to Previous Page on button / swipe click
   const flipToPrev = useCallback(() => {
-    if (isAnimatingFlip || isDragging) return;
     setHasInteracted(true);
-    setIsAnimatingFlip(true);
-    setAnimatingDirection('prev');
+    triggerPageChange(activePage - 1);
+  }, [activePage, triggerPageChange]);
 
-    if (isSoundOn) {
-      playPaperPageFlipSound(1.0);
-    }
-
-    const startTime = performance.now();
-    const duration = 650;
-
-    const animate = (now) => {
-      const elapsed = now - startTime;
-      const t = Math.min(1, elapsed / duration);
-      const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-      setAnimatingProgress(eased);
-
-      if (t < 1) {
-        requestAnimationFrame(animate);
-      } else {
-        setIsAnimatingFlip(false);
-        setAnimatingProgress(0);
-        setAnimatingDirection(null);
-        triggerPageChange(activePage - 1);
-      }
-    };
-    requestAnimationFrame(animate);
-  }, [activePage, isAnimatingFlip, isDragging, isSoundOn, triggerPageChange]);
-
-  // Handle direct dot click with animated transition
+  // Direct dot / page jump on click
   const goToPage = useCallback((targetIdx) => {
-    if (targetIdx === activePage || isAnimatingFlip || isDragging) return;
     setHasInteracted(true);
-    setIsAnimatingFlip(true);
-    const direction = targetIdx > activePage ? 'next' : 'prev';
-    setAnimatingDirection(direction);
-
-    if (isSoundOn) {
-      playPaperPageFlipSound(1.0);
-    }
-
-    const startTime = performance.now();
-    const duration = 550;
-
-    const animate = (now) => {
-      const elapsed = now - startTime;
-      const t = Math.min(1, elapsed / duration);
-      const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-      setAnimatingProgress(eased);
-
-      if (t < 1) {
-        requestAnimationFrame(animate);
-      } else {
-        setIsAnimatingFlip(false);
-        setAnimatingProgress(0);
-        setAnimatingDirection(null);
-        triggerPageChange(targetIdx);
-      }
-    };
-    requestAnimationFrame(animate);
-  }, [activePage, isAnimatingFlip, isDragging, isSoundOn, triggerPageChange]);
+    triggerPageChange(targetIdx);
+  }, [triggerPageChange]);
 
   // Autoplay disabled: photo changes ONLY when clicked by user
 
@@ -781,96 +707,102 @@ export default function ThreeDCarousel({
           {/* ========================================================= */}
           {/* NAVIGATION ARROWS */}
           {/* ========================================================= */}
-          {/* PREVIOUS BUTTON */}
+          {/* PREVIOUS BUTTON (LEFT ARROW) */}
           <button
             onClick={(e) => {
+              e.preventDefault();
               e.stopPropagation();
               flipToPrev();
             }}
+            onMouseDown={(e) => e.stopPropagation()}
+            onTouchStart={(e) => e.stopPropagation()}
             type="button"
             aria-label="Previous Page"
             title="Turn to Previous Page (Left Arrow)"
             style={{
               position: 'absolute',
               top: '50%',
-              left: compact ? '1.5rem' : '2.1rem',
+              left: compact ? '1rem' : '1.5rem',
               transform: 'translateY(-50%)',
-              zIndex: 20,
-              backgroundColor: 'rgba(10, 15, 29, 0.85)',
-              border: '1px solid rgba(255,255,255,0.22)',
+              zIndex: 50,
+              backgroundColor: 'rgba(10, 15, 29, 0.92)',
+              border: '1.5px solid rgba(6, 182, 212, 0.6)',
               color: '#ffffff',
               borderRadius: '50%',
-              width: compact ? '28px' : '36px',
-              height: compact ? '28px' : '36px',
+              width: compact ? '32px' : '42px',
+              height: compact ? '32px' : '42px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
-              backdropFilter: 'blur(8px)',
-              transition: 'all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1)',
+              backdropFilter: 'blur(10px)',
+              transition: 'all 0.2s ease',
               padding: 0,
-              boxShadow: '0 4px 14px rgba(0,0,0,0.6)'
+              boxShadow: '0 4px 18px rgba(0,0,0,0.8), 0 0 12px rgba(6, 182, 212, 0.35)'
             }}
             onMouseEnter={(e) => { 
               e.currentTarget.style.backgroundColor = 'var(--accent-cyan)'; 
               e.currentTarget.style.color = '#000';
-              e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
-              e.currentTarget.style.boxShadow = '0 0 16px var(--accent-cyan)';
+              e.currentTarget.style.transform = 'translateY(-50%) scale(1.12)';
+              e.currentTarget.style.boxShadow = '0 0 20px var(--accent-cyan)';
             }}
             onMouseLeave={(e) => { 
-              e.currentTarget.style.backgroundColor = 'rgba(10, 15, 29, 0.85)'; 
+              e.currentTarget.style.backgroundColor = 'rgba(10, 15, 29, 0.92)'; 
               e.currentTarget.style.color = '#fff';
               e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
-              e.currentTarget.style.boxShadow = '0 4px 14px rgba(0,0,0,0.6)';
+              e.currentTarget.style.boxShadow = '0 4px 18px rgba(0,0,0,0.8), 0 0 12px rgba(6, 182, 212, 0.35)';
             }}
           >
-            <ChevronLeft size={compact ? 15 : 19} />
+            <ChevronLeft size={compact ? 18 : 22} />
           </button>
 
-          {/* NEXT BUTTON */}
+          {/* NEXT BUTTON (RIGHT ARROW) */}
           <button
             onClick={(e) => {
+              e.preventDefault();
               e.stopPropagation();
               flipToNext();
             }}
+            onMouseDown={(e) => e.stopPropagation()}
+            onTouchStart={(e) => e.stopPropagation()}
             type="button"
             aria-label="Next Page"
             title="Turn to Next Page (Right Arrow)"
             style={{
               position: 'absolute',
               top: '50%',
-              right: compact ? '0.5rem' : '0.85rem',
+              right: compact ? '1rem' : '1.5rem',
               transform: 'translateY(-50%)',
-              zIndex: 20,
-              backgroundColor: 'rgba(10, 15, 29, 0.85)',
-              border: '1px solid rgba(255,255,255,0.22)',
+              zIndex: 50,
+              backgroundColor: 'rgba(10, 15, 29, 0.92)',
+              border: '1.5px solid rgba(6, 182, 212, 0.6)',
               color: '#ffffff',
               borderRadius: '50%',
-              width: compact ? '28px' : '36px',
-              height: compact ? '28px' : '36px',
+              width: compact ? '32px' : '42px',
+              height: compact ? '32px' : '42px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
-              backdropFilter: 'blur(8px)',
-              transition: 'all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1)',
+              backdropFilter: 'blur(10px)',
+              transition: 'all 0.2s ease',
               padding: 0,
-              boxShadow: '0 4px 14px rgba(0,0,0,0.6)'
+              boxShadow: '0 4px 18px rgba(0,0,0,0.8), 0 0 12px rgba(6, 182, 212, 0.35)'
             }}
             onMouseEnter={(e) => { 
               e.currentTarget.style.backgroundColor = 'var(--accent-cyan)'; 
               e.currentTarget.style.color = '#000';
-              e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
-              e.currentTarget.style.boxShadow = '0 0 16px var(--accent-cyan)';
+              e.currentTarget.style.transform = 'translateY(-50%) scale(1.12)';
+              e.currentTarget.style.boxShadow = '0 0 20px var(--accent-cyan)';
             }}
             onMouseLeave={(e) => { 
-              e.currentTarget.style.backgroundColor = 'rgba(10, 15, 29, 0.85)'; 
+              e.currentTarget.style.backgroundColor = 'rgba(10, 15, 29, 0.92)'; 
               e.currentTarget.style.color = '#fff';
               e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
-              e.currentTarget.style.boxShadow = '0 4px 14px rgba(0,0,0,0.6)';
+              e.currentTarget.style.boxShadow = '0 4px 18px rgba(0,0,0,0.8), 0 0 12px rgba(6, 182, 212, 0.35)';
             }}
           >
-            <ChevronRight size={compact ? 15 : 19} />
+            <ChevronRight size={compact ? 18 : 22} />
           </button>
 
           {/* ========================================================= */}
@@ -880,7 +812,7 @@ export default function ThreeDCarousel({
             position: 'absolute',
             bottom: compact ? '0.5rem' : '0.75rem',
             right: compact ? '0.55rem' : '0.85rem',
-            zIndex: 20,
+            zIndex: 50,
             display: 'flex',
             alignItems: 'center',
             gap: '0.45rem',
@@ -895,9 +827,12 @@ export default function ThreeDCarousel({
             <button
               type="button"
               onClick={(e) => {
+                e.preventDefault();
                 e.stopPropagation();
                 setIsSoundOn(prev => !prev);
               }}
+              onMouseDown={(e) => e.stopPropagation()}
+              onTouchStart={(e) => e.stopPropagation()}
               title={isSoundOn ? 'Mute Realistic Page Flip Audio' : 'Unmute Realistic Page Flip Audio'}
               aria-label="Toggle page turn audio"
               style={{
@@ -922,9 +857,12 @@ export default function ThreeDCarousel({
                 key={slide.id}
                 type="button"
                 onClick={(e) => {
+                  e.preventDefault();
                   e.stopPropagation();
                   goToPage(idx);
                 }}
+                onMouseDown={(e) => e.stopPropagation()}
+                onTouchStart={(e) => e.stopPropagation()}
                 aria-label={`Flip to Page ${idx + 1}: ${slide.title}`}
                 title={`Page ${idx + 1}: ${slide.title}`}
                 style={{
