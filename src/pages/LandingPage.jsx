@@ -95,14 +95,17 @@ export default function LandingPage({ setActivePage, onSelectTrack, onStartInter
               fontWeight: 800,
               lineHeight: '1.18',
               letterSpacing: '-0.03em',
-              marginBottom: '1rem',
-              color: 'var(--accent-cyan)',
-              background: 'linear-gradient(135deg, #06B6D4 0%, #38BDF8 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent'
+              marginBottom: '1rem'
             }}>
-              Practice Smarter. <br />
-              Interview Better.
+              <span style={{ color: '#FFFFFF' }}>Practice Smarter.</span> <br />
+              <span style={{
+                color: 'var(--accent-cyan)',
+                background: 'linear-gradient(135deg, #06B6D4 0%, #38BDF8 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent'
+              }}>
+                Interview Better.
+              </span>
             </h1>
 
             {/* Subtitle */}
