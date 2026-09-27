@@ -14,8 +14,11 @@ if (typeof window !== 'undefined' && pdfjsLib.GlobalWorkerOptions) {
 
 export const ALLOWED_RESUME_EXTENSIONS = ['.pdf', '.doc', '.docx', '.txt', '.md'];
 export const DISALLOWED_IMAGE_EXTENSIONS = [
-  '.png', '.jpg', '.jpeg', '.webp', '.gif', '.svg', '.bmp', '.ico', '.tiff', '.heic', '.avif',
-  '.mp4', '.mp3', '.avi', '.mov', '.zip', '.rar', '.tar', '.gz', '.exe', '.apk', '.dmg', '.iso',
+  '.png', '.jpg', '.jpeg', '.webp', '.gif', '.svg', '.bmp', '.ico', '.tiff', '.tif', '.heic', '.heif', '.avif',
+  '.jfif', '.pjpeg', '.pjp', '.raw', '.cr2', '.nef', '.dng', '.psd', '.ai', '.eps',
+  '.mp4', '.mp3', '.avi', '.mov', '.mkv', '.webm', '.flv',
+  '.zip', '.rar', '.tar', '.gz', '.7z',
+  '.exe', '.apk', '.dmg', '.iso', '.bat', '.cmd', '.sh',
   '.xlsx', '.xls', '.csv', '.ppt', '.pptx'
 ];
 
@@ -25,33 +28,36 @@ export const DISALLOWED_IMAGE_EXTENSIONS = [
  */
 export function validateResumeFile(file) {
   if (!file) {
-    return { valid: false, error: 'No file selected.' };
+    return { valid: false, error: '❌ NOT ACCEPTED: No file selected.' };
   }
 
-  const name = file.name.toLowerCase();
-  const type = (file.type || '').toLowerCase();
+  const name = (file.name || '').toLowerCase().trim();
+  const type = (file.type || '').toLowerCase().trim();
 
-  // 1. Explicitly check for photo/image formats
-  const isImage = type.startsWith('image/') || 
-                  DISALLOWED_IMAGE_EXTENSIONS.some(ext => name.endsWith(ext) && (ext.includes('png') || ext.includes('jpg') || ext.includes('jpeg') || ext.includes('webp') || ext.includes('gif') || ext.includes('svg') || ext.includes('bmp') || ext.includes('heic')));
-  if (isImage) {
+  // 1. Explicitly check for photo/image formats by MIME or extension
+  const isImageMime = type.startsWith('image/') || type.includes('image');
+  const isImageExt = /\.(png|jpe?g|webp|gif|svg|bmp|ico|tiff?|heic|heif|avif|jfif|pjpeg|pjp|raw|cr2|nef|dng|psd|ai|eps)$/i.test(name);
+  
+  if (isImageMime || isImageExt) {
     return {
       valid: false,
-      error: 'Photos and image files cannot be uploaded as a resume. Please upload a PDF or Document (.pdf, .docx, .txt).'
+      error: '❌ NOT ACCEPTED: Photos and image files cannot be uploaded as a resume. Only valid Resume documents (.pdf, .doc, .docx, .txt) are accepted.'
     };
   }
 
-  // 2. Check for other non-resume media/archives
-  const isDisallowed = DISALLOWED_IMAGE_EXTENSIONS.some(ext => name.endsWith(ext)) ||
-                       type.startsWith('video/') || 
-                       type.startsWith('audio/') ||
-                       type.includes('zip') || 
-                       type.includes('spreadsheet') || 
-                       type.includes('excel');
-  if (isDisallowed) {
+  // 2. Check for other media, archives, binaries, spreadsheets
+  const isMediaOrArchive = type.startsWith('video/') || 
+                           type.startsWith('audio/') || 
+                           type.includes('zip') || 
+                           type.includes('compressed') ||
+                           type.includes('spreadsheet') || 
+                           type.includes('excel') ||
+                           type.includes('presentation') ||
+                           DISALLOWED_IMAGE_EXTENSIONS.some(ext => name.endsWith(ext));
+  if (isMediaOrArchive) {
     return {
       valid: false,
-      error: 'Non-resume files are not allowed. Only Resume files (.pdf, .doc, .docx, .txt) are accepted.'
+      error: '❌ NOT ACCEPTED: Non-resume file format. Only valid Resume documents (.pdf, .doc, .docx, .txt) are accepted.'
     };
   }
 
@@ -60,7 +66,7 @@ export function validateResumeFile(file) {
   if (!hasAllowedExt) {
     return {
       valid: false,
-      error: 'Unsupported file format. Only Resume files (.pdf, .doc, .docx, .txt) are accepted.'
+      error: '❌ NOT ACCEPTED: Only Resume files with .pdf, .doc, .docx, or .txt extensions are allowed.'
     };
   }
 
@@ -74,24 +80,34 @@ export function isLikelyResumeText(text) {
   if (!text || typeof text !== 'string' || text.trim().length < 25) {
     return {
       valid: false,
-      error: 'Resume content is empty or too short. Please provide a detailed resume with education, skills, and experience.'
+      error: '❌ NOT ACCEPTED: Resume content is empty or too short. Please provide a detailed resume with education, skills, and experience.'
     };
   }
 
   const lower = text.toLowerCase();
+
+  // Check if someone pasted base64 image data or binary noise
+  if (text.startsWith('data:image/') || /^[a-za-z0-9+/=]{100,}$/i.test(text.replace(/\s+/g, '').substring(0, 120))) {
+    return {
+      valid: false,
+      error: '❌ NOT ACCEPTED: Image data / binary stream detected. Photos cannot be processed as text resumes.'
+    };
+  }
+
   const resumeKeywords = [
     'education', 'experience', 'skills', 'projects', 'work', 'developer', 'engineer',
     'b.tech', 'bca', 'mca', 'b.sc', 'm.tech', 'university', 'college', 'school',
     'technologies', 'certifications', 'achievements', 'responsibilities', 'summary',
     'react', 'python', 'java', 'c++', 'javascript', 'node', 'sql', 'html', 'css',
-    'management', 'internship', 'analyst', 'git', 'design', 'aws', 'docker', 'database'
+    'management', 'internship', 'analyst', 'git', 'design', 'aws', 'docker', 'database',
+    'curriculum', 'profile', 'contact', 'email', 'phone', 'linkedin', 'github'
   ];
 
   const matches = resumeKeywords.filter(k => lower.includes(k)).length;
   if (matches < 2) {
     return {
       valid: false,
-      error: 'Uploaded content does not contain recognizable resume signals (technical skills, experience milestones, or education).'
+      error: '❌ NOT ACCEPTED: Uploaded document does not contain recognizable resume signals (technical skills, experience milestones, or education).'
     };
   }
 

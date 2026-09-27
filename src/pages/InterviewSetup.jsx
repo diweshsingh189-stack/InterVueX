@@ -100,6 +100,7 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
   const [fileName, setFileName] = useState('');
   const [parsedResume, setParsedResume] = useState(() => resumeService.parseResumeText(SAMPLE_CANDIDATES[0].resumeText));
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const [uploadError, setUploadError] = useState('');
   const [uploadSuccess, setUploadSuccess] = useState('');
 
@@ -112,23 +113,28 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
     analyzeResume(candidate.resumeText);
   };
 
-  const handleFileUpload = async (e) => {
-    const file = e.target.files?.[0];
+  const processFile = async (file) => {
     if (!file) return;
+
+    // Reset native input element value so same file can be re-triggered if needed
+    const fileInputEl = document.getElementById('resumeFileInput');
+    if (fileInputEl) fileInputEl.value = '';
 
     // 1. Strict validation against photos/images & non-resume files
     const fileCheck = resumeService.validateResumeFile(file);
     if (!fileCheck.valid) {
       setUploadError(fileCheck.error);
       setUploadSuccess('');
-      setFileName('');
-      e.target.value = '';
+      setFileName(`❌ Rejected: ${file.name}`);
+      setResumeText(''); // Strictly clear any previous text
+      setParsedResume(null); // Strictly clear parsed signals card
+      setSelectedCandidateId('');
       return;
     }
 
     setUploadError('');
     setUploadSuccess('');
-    setFileName(file.name);
+    setFileName(`📄 ${file.name}`);
     setSelectedCandidateId('custom');
     setIsAnalyzing(true);
 
@@ -138,10 +144,13 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
       // 2. Validate extracted text contents
       const textCheck = resumeService.isLikelyResumeText(extractedText);
       if (!textCheck.valid) {
-        setUploadError(`Not Accepted: ${textCheck.error}`);
+        setUploadError(textCheck.error);
         setUploadSuccess('');
+        setFileName(`❌ Rejected: ${file.name}`);
+        setResumeText('');
+        setParsedResume(null);
+        setSelectedCandidateId('');
         setIsAnalyzing(false);
-        e.target.value = '';
         return;
       }
 
@@ -153,20 +162,31 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
       setUploadSuccess(`Valid Resume Accepted: "${file.name}" successfully parsed (${formatted.trim().split(/\s+/).length} words, ${parsed.skills.length} skills detected).`);
     } catch (err) {
       console.error('File extraction failed:', err);
-      setUploadError('Not Accepted: Failed to read document. Please upload a standard PDF, Word (.docx), or Text resume.');
+      setUploadError('❌ NOT ACCEPTED: Failed to read document. Please upload a standard PDF, Word (.docx), or Text resume.');
       setUploadSuccess('');
+      setFileName(`❌ Rejected: ${file.name}`);
+      setResumeText('');
+      setParsedResume(null);
+      setSelectedCandidateId('');
     } finally {
       setIsAnalyzing(false);
-      e.target.value = '';
+    }
+  };
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      processFile(file);
     }
   };
 
   const analyzeResume = (textToAnalyze) => {
-    const text = textToAnalyze || resumeText;
+    const text = textToAnalyze !== undefined ? textToAnalyze : resumeText;
     const textCheck = resumeService.isLikelyResumeText(text);
     if (!textCheck.valid) {
-      setUploadError(`Not Accepted: ${textCheck.error}`);
+      setUploadError(textCheck.error);
       setUploadSuccess('');
+      setParsedResume(null);
       return;
     }
 
@@ -183,6 +203,13 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
   };
 
   const handleLaunch = () => {
+    if (setupMode === 'resume') {
+      if (!resumeText.trim() || !parsedResume) {
+        setUploadError('❌ NOT ACCEPTED: Please select a pre-screened candidate or upload a valid resume (.pdf, .docx, .txt) before launching the simulation.');
+        return;
+      }
+    }
+
     let questions = [];
     let roleObj = JOB_ROLES.find(r => r.id === selectedRole);
     let levelObj = EXPERIENCE_LEVELS.find(l => l.id === selectedLevel);
@@ -524,39 +551,65 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
               </div>
             )}
 
-            {/* File Upload Box */}
-            <div style={{
-              border: uploadError 
-                ? '2px dashed #EF4444' 
-                : uploadSuccess 
-                  ? '2px solid #10B981' 
-                  : '2px dashed var(--border-subtle)',
-              borderRadius: 'var(--radius-lg)',
-              padding: '1.75rem 1.25rem',
-              textAlign: 'center',
-              backgroundColor: uploadError 
-                ? 'rgba(239, 68, 68, 0.04)' 
-                : uploadSuccess 
-                  ? 'rgba(16, 185, 129, 0.04)' 
-                  : 'var(--bg-secondary)',
-              cursor: 'pointer',
-              marginBottom: '1.25rem',
-              transition: 'all 0.2s ease'
-            }}>
+            {/* File Upload Box with Drag & Drop */}
+            <div 
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setIsDragging(true);
+              }}
+              onDragLeave={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setIsDragging(false);
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setIsDragging(false);
+                const file = e.dataTransfer.files?.[0];
+                if (file) {
+                  processFile(file);
+                }
+              }}
+              style={{
+                border: isDragging
+                  ? '2px dashed var(--accent-cyan)'
+                  : uploadError 
+                    ? '2px dashed #EF4444' 
+                    : uploadSuccess 
+                      ? '2px solid #10B981' 
+                      : '2px dashed var(--border-subtle)',
+                borderRadius: 'var(--radius-lg)',
+                padding: '1.75rem 1.25rem',
+                textAlign: 'center',
+                backgroundColor: isDragging
+                  ? 'rgba(6, 182, 212, 0.08)'
+                  : uploadError 
+                    ? 'rgba(239, 68, 68, 0.06)' 
+                    : uploadSuccess 
+                      ? 'rgba(16, 185, 129, 0.04)' 
+                      : 'var(--bg-secondary)',
+                cursor: 'pointer',
+                marginBottom: '1.25rem',
+                transition: 'all 0.2s ease',
+                transform: isDragging ? 'scale(1.01)' : 'none'
+              }}
+            >
               <input
                 type="file"
                 id="resumeFileInput"
-                accept=".txt,.md,.pdf,.doc,.docx"
+                accept=".pdf,.doc,.docx,.txt,.md,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,text/markdown"
                 onChange={handleFileUpload}
                 style={{ display: 'none' }}
               />
               <label htmlFor="resumeFileInput" style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
-                <UploadCloud size={32} style={{ color: uploadError ? '#EF4444' : uploadSuccess ? '#10B981' : 'var(--accent-cyan)' }} />
+                <UploadCloud size={34} style={{ color: uploadError ? '#EF4444' : uploadSuccess ? '#10B981' : isDragging ? 'var(--accent-cyan)' : 'var(--accent-cyan)' }} />
                 <span style={{ fontWeight: 700, fontSize: '0.95rem', color: uploadError ? '#EF4444' : uploadSuccess ? '#10B981' : 'var(--text-primary)' }}>
-                  {fileName ? `Loaded File: ${fileName}` : 'Click to Upload Resume (.pdf, .doc, .docx, .txt)'}
+                  {fileName ? fileName : 'Click or Drag & Drop to Upload Resume (.pdf, .doc, .docx, .txt)'}
                 </span>
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                  ⚠️ Only genuine Resume documents (.pdf, .docx, .txt) are accepted. Photos, images, and non-resume files are strictly not allowed.
+                <span style={{ fontSize: '0.8rem', color: uploadError ? '#FCA5A5' : 'var(--text-muted)' }}>
+                  ⚠️ Only genuine Resume documents (.pdf, .docx, .txt) are accepted. Photos, images, and other media files are strictly blocked.
                 </span>
               </label>
             </div>
