@@ -99,7 +99,7 @@ export default function LandingPage({ setActivePage, onSelectTrack, onStartInter
               color: 'var(--text-primary)'
             }}>
               Practice Smarter. <br />
-              <span style={{ color: 'var(--accent-cyan)' }}>Interview Better.</span>
+              Interview Better.
             </h1>
 
             {/* Subtitle */}
