@@ -141,9 +141,9 @@ export default function Dashboard({
     aggScores.completeness = Number((cp / history.length).toFixed(1));
   }
 
-  const handleLaunchMode = (modeType) => {
+  const handleLaunchMode = (modeType, modeName, role) => {
     if (onStartNew) {
-      onStartNew({ type: modeType });
+      onStartNew({ type: modeType, modeName, role });
     }
   };
 
@@ -185,7 +185,7 @@ export default function Dashboard({
             lineHeight: 1.2,
             marginBottom: '0.4rem'
           }}>
-            Hello, <span style={{ color: 'var(--accent-cyan)' }}>{userProfile?.name || 'Diwesh'}</span> 👋
+            Hello, <span style={{ color: 'var(--accent-cyan)' }}>{userProfile?.name || 'Diwesh Singh'}</span> 👋
           </h1>
 
           <h2 style={{
@@ -256,7 +256,7 @@ export default function Dashboard({
             {/* Pill 2: Real Interview Experience */}
             <button
               type="button"
-              onClick={() => onStartNew?.({ type: 'technical' })}
+              onClick={() => onStartNew?.({ type: 'technical', modeName: 'AI Technical Interviewer' })}
               title="Click to start a realistic AI Interview simulation"
               style={{
                 display: 'inline-flex',
@@ -317,7 +317,7 @@ export default function Dashboard({
                 e.currentTarget.style.borderColor = '#10B981';
                 e.currentTarget.style.color = '#FFFFFF';
                 e.currentTarget.style.transform = 'translateY(-2px) scale(1.03)';
-                e.currentTarget.style.boxShadow = '0 4px 14px rgba(16, 185, 129, 0.25)';
+                e.currentTarget.style.boxShadow = '0 4px 14px rgba(168, 85, 247, 0.25)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.backgroundColor = 'rgba(30, 41, 59, 0.85)';
@@ -404,7 +404,7 @@ export default function Dashboard({
             </div>
 
             <button
-              onClick={() => onStartNew?.()}
+              onClick={() => onStartNew?.({ type: 'technical', modeName: 'AI Technical Interviewer' })}
               className="btn btn-primary btn-sm"
               style={{
                 padding: '0.45rem 0.95rem',
@@ -440,7 +440,7 @@ export default function Dashboard({
         }}>
           {/* Card 1: AI Interviewer */}
           <div 
-            onClick={() => handleLaunchMode('technical')}
+            onClick={() => handleLaunchMode('technical', 'AI Technical Interviewer')}
             style={{
               backgroundColor: '#070E1E',
               border: '1px solid rgba(6, 182, 212, 0.35)',
@@ -506,7 +506,7 @@ export default function Dashboard({
 
           {/* Card 2: Voice Interview */}
           <div 
-            onClick={() => handleLaunchMode('behavioral')}
+            onClick={() => handleLaunchMode('behavioral', 'Live Voice & Behavioral Interview')}
             style={{
               backgroundColor: '#100C1F',
               border: '1px solid rgba(168, 85, 247, 0.35)',
@@ -572,7 +572,7 @@ export default function Dashboard({
 
           {/* Card 3: Practice Mode */}
           <div 
-            onClick={() => onBrowseQuestions?.()}
+            onClick={() => handleLaunchMode('coding', 'Interactive Coding Practice Round')}
             style={{
               backgroundColor: '#081715',
               border: '1px solid rgba(16, 185, 129, 0.35)',
@@ -638,7 +638,7 @@ export default function Dashboard({
 
           {/* Card 4: Mock Interview */}
           <div 
-            onClick={() => handleLaunchMode('mixed')}
+            onClick={() => handleLaunchMode('mixed', 'Comprehensive Mock Interview Simulation')}
             style={{
               backgroundColor: '#1E1208',
               border: '1px solid rgba(245, 158, 11, 0.35)',

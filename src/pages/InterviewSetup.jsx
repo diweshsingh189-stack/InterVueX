@@ -167,7 +167,7 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
   return (
     <div style={{ maxWidth: '980px', margin: '0 auto', paddingBottom: '3rem' }}>
       {/* Header */}
-      <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+      <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
         <span className="badge badge-cyan" style={{ marginBottom: '0.5rem' }}>
           Session Customization
         </span>
@@ -178,6 +178,52 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
           Select custom role parameters, target company tracks, or select/upload a candidate resume for tailored AI evaluation.
         </p>
       </div>
+
+      {/* Selected Mode Indicator Banner */}
+      {initialConfig?.modeName && (
+        <div style={{
+          backgroundColor: 'rgba(6, 182, 212, 0.12)',
+          border: '1px solid var(--accent-cyan)',
+          borderRadius: '14px',
+          padding: '0.85rem 1.25rem',
+          marginBottom: '1.75rem',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '0.75rem',
+          boxShadow: '0 4px 20px rgba(6, 182, 212, 0.15)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <div style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '10px',
+              backgroundColor: 'rgba(6, 182, 212, 0.2)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--accent-cyan)'
+            }}>
+              <Sparkles size={18} />
+            </div>
+            <div>
+              <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', color: 'var(--accent-cyan)', fontWeight: 800, letterSpacing: '0.06em' }}>
+                Active Mode Selected
+              </div>
+              <div style={{ fontSize: '1.05rem', fontWeight: 700, color: '#FFFFFF' }}>
+                {initialConfig.modeName}
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <span className="badge badge-cyan" style={{ fontSize: '0.78rem', textTransform: 'capitalize' }}>
+              Format: {INTERVIEW_TYPES.find(t => t.id === selectedType)?.name || 'Technical'}
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Mode Switcher Tabs */}
       <div className="setup-mode-tabs" style={{
