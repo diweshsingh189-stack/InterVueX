@@ -12,19 +12,19 @@ if (typeof window !== 'undefined' && pdfjsLib.GlobalWorkerOptions) {
   pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js`;
 }
 
-export const ALLOWED_RESUME_EXTENSIONS = ['.pdf', '.doc', '.docx', '.txt', '.md'];
+export const ALLOWED_RESUME_EXTENSIONS = ['.pdf', '.doc', '.docx', '.txt'];
 export const DISALLOWED_IMAGE_EXTENSIONS = [
   '.png', '.jpg', '.jpeg', '.webp', '.gif', '.svg', '.bmp', '.ico', '.tiff', '.tif', '.heic', '.heif', '.avif',
   '.jfif', '.pjpeg', '.pjp', '.raw', '.cr2', '.nef', '.dng', '.psd', '.ai', '.eps',
   '.mp4', '.mp3', '.avi', '.mov', '.mkv', '.webm', '.flv',
   '.zip', '.rar', '.tar', '.gz', '.7z',
   '.exe', '.apk', '.dmg', '.iso', '.bat', '.cmd', '.sh',
-  '.xlsx', '.xls', '.csv', '.ppt', '.pptx'
+  '.xlsx', '.xls', '.csv', '.ppt', '.pptx', '.json', '.xml', '.yaml', '.yml', '.md', '.log', '.config'
 ];
 
 /**
- * Strict file validation: Only accepts genuine Resume formats (.pdf, .doc, .docx, .txt, .md).
- * Instantly rejects photos, images, media, spreadsheets, or unsupported binaries.
+ * Strict file validation: Only accepts genuine Resume formats (.pdf, .doc, .docx, .txt).
+ * Instantly rejects photos, images, READMEs, media, spreadsheets, or unsupported binaries.
  */
 export function validateResumeFile(file) {
   if (!file) {
@@ -41,11 +41,21 @@ export function validateResumeFile(file) {
   if (isImageMime || isImageExt) {
     return {
       valid: false,
-      error: '❌ NOT ACCEPTED: Photos and image files cannot be uploaded as a resume. Only valid Resume documents (.pdf, .doc, .docx, .txt) are accepted.'
+      error: '❌ NOT ACCEPTED: Photos and image files cannot be uploaded as a resume. Please upload a genuine Resume document (.pdf, .doc, .docx, .txt).'
     };
   }
 
-  // 2. Check for other media, archives, binaries, spreadsheets
+  // 2. Reject Documentation files (README, LICENSE, CHANGELOG, etc.) and code/config files
+  const isDocOrConfigFile = /^(readme|license|changelog|contributing|package|tsconfig|manifest|dockerfile|\.env)/i.test(name) ||
+                            /\.(md|markdown|json|yaml|yml|xml|html|css|js|jsx|ts|tsx|py|cpp|c|java|go|rs|sql|sh|bat)$/i.test(name);
+  if (isDocOrConfigFile) {
+    return {
+      valid: false,
+      error: '❌ NOT ACCEPTED: Documentation/code files (like README, Markdown, JSON) cannot be uploaded as a resume. Only genuine candidate resumes (.pdf, .docx, .txt) are accepted.'
+    };
+  }
+
+  // 3. Check for other media, archives, binaries, spreadsheets
   const isMediaOrArchive = type.startsWith('video/') || 
                            type.startsWith('audio/') || 
                            type.includes('zip') || 
@@ -61,7 +71,7 @@ export function validateResumeFile(file) {
     };
   }
 
-  // 3. Verify allowed extensions
+  // 4. Verify allowed extensions (.pdf, .doc, .docx, .txt only)
   const hasAllowedExt = ALLOWED_RESUME_EXTENSIONS.some(ext => name.endsWith(ext));
   if (!hasAllowedExt) {
     return {
@@ -74,19 +84,20 @@ export function validateResumeFile(file) {
 }
 
 /**
- * Validates whether text possesses minimum resume characteristics (skills, experience, education).
+ * Validates whether text possesses authentic resume characteristics:
+ * Requires structural pillars (Education, Experience/Projects, Skills) and candidate information.
  */
 export function isLikelyResumeText(text) {
-  if (!text || typeof text !== 'string' || text.trim().length < 25) {
+  if (!text || typeof text !== 'string' || text.trim().length < 60) {
     return {
       valid: false,
-      error: '❌ NOT ACCEPTED: Resume content is empty or too short. Please provide a detailed resume with education, skills, and experience.'
+      error: '❌ NOT ACCEPTED: Resume content is too short. Please upload a full candidate resume.'
     };
   }
 
   const lower = text.toLowerCase();
 
-  // Check if someone pasted base64 image data or binary noise
+  // 1. Block base64 image data or binary streams
   if (text.startsWith('data:image/') || /^[a-za-z0-9+/=]{100,}$/i.test(text.replace(/\s+/g, '').substring(0, 120))) {
     return {
       valid: false,
@@ -94,20 +105,40 @@ export function isLikelyResumeText(text) {
     };
   }
 
-  const resumeKeywords = [
-    'education', 'experience', 'skills', 'projects', 'work', 'developer', 'engineer',
-    'b.tech', 'bca', 'mca', 'b.sc', 'm.tech', 'university', 'college', 'school',
-    'technologies', 'certifications', 'achievements', 'responsibilities', 'summary',
-    'react', 'python', 'java', 'c++', 'javascript', 'node', 'sql', 'html', 'css',
-    'management', 'internship', 'analyst', 'git', 'design', 'aws', 'docker', 'database',
-    'curriculum', 'profile', 'contact', 'email', 'phone', 'linkedin', 'github'
-  ];
-
-  const matches = resumeKeywords.filter(k => lower.includes(k)).length;
-  if (matches < 2) {
+  // 2. Block documentation / repository files (README patterns)
+  const isReadmeOrProjectDoc = (lower.includes('# ') || lower.includes('## ')) && 
+    (lower.includes('installation') || lower.includes('getting started') || lower.includes('npm install') || lower.includes('git clone') || lower.includes('contributing') || lower.includes('table of contents') || lower.includes('badge'));
+  if (isReadmeOrProjectDoc) {
     return {
       valid: false,
-      error: '❌ NOT ACCEPTED: Uploaded document does not contain recognizable resume signals (technical skills, experience milestones, or education).'
+      error: '❌ NOT ACCEPTED: This document appears to be project documentation or a README file. Please upload a candidate resume.'
+    };
+  }
+
+  // 3. Check for core Resume Pillars:
+  // Pillar A: Education & Academic Qualifications
+  const educationKeywords = ['education', 'b.tech', 'm.tech', 'bachelor', 'master', 'degree', 'university', 'college', 'school', 'bca', 'mca', 'b.sc', 'm.sc', 'gpa', 'cgpa', 'academics', 'coursework'];
+  const hasEducation = educationKeywords.some(k => lower.includes(k));
+
+  // Pillar B: Experience, Work History, or Key Projects
+  const experienceKeywords = ['experience', 'projects', 'internship', 'intern', 'work history', 'employment', 'responsibilities', 'contributed', 'developed', 'built', 'implemented', 'engineered', 'architected'];
+  const hasExperience = experienceKeywords.some(k => lower.includes(k));
+
+  // Pillar C: Technical Skills & Competencies
+  const skillKeywords = [
+    'skills', 'technologies', 'technical skills', 'languages', 'react', 'python', 'java', 'c++', 'javascript',
+    'node', 'sql', 'html', 'css', 'docker', 'aws', 'git', 'database', 'rest api', 'mongodb', 'postgresql', 'backend', 'frontend', 'fullstack'
+  ];
+  const skillMatchCount = skillKeywords.filter(k => lower.includes(k)).length;
+  const hasSkills = skillMatchCount >= 2;
+
+  // Must have at least 2 out of 3 structural pillars to be considered a genuine resume
+  const pillarScore = (hasEducation ? 1 : 0) + (hasExperience ? 1 : 0) + (hasSkills ? 1 : 0);
+
+  if (pillarScore < 2) {
+    return {
+      valid: false,
+      error: '❌ NOT ACCEPTED: Uploaded file lacks standard resume structure. A valid resume must include Education, Experience/Projects, and Technical Skills.'
     };
   }
 

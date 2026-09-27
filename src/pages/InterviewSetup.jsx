@@ -599,7 +599,7 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
               <input
                 type="file"
                 id="resumeFileInput"
-                accept=".pdf,.doc,.docx,.txt,.md,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,text/markdown"
+                accept=".pdf,.doc,.docx,.txt,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain"
                 onChange={handleFileUpload}
                 style={{ display: 'none' }}
               />
@@ -609,7 +609,7 @@ export default function InterviewSetup({ onStartInterview, userProfile, history 
                   {fileName ? fileName : 'Click or Drag & Drop to Upload Resume (.pdf, .doc, .docx, .txt)'}
                 </span>
                 <span style={{ fontSize: '0.8rem', color: uploadError ? '#FCA5A5' : 'var(--text-muted)' }}>
-                  ⚠️ Only genuine Resume documents (.pdf, .docx, .txt) are accepted. Photos, images, and other media files are strictly blocked.
+                  ⚠️ Only genuine Resume documents (.pdf, .docx, .txt) with Education, Experience, and Skills are accepted. Photos, markdown/README, and other media files are strictly blocked.
                 </span>
               </label>
             </div>
