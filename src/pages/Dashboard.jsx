@@ -208,55 +208,128 @@ export default function Dashboard({
             Practice real interview questions, get instant feedback, and build the confidence you need to get hired.
           </p>
 
-          {/* 3 Value Pills */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>
-            <span style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.4rem',
-              backgroundColor: 'rgba(6, 182, 212, 0.12)',
-              border: '1px solid rgba(6, 182, 212, 0.3)',
-              color: '#38BDF8',
-              fontSize: '0.78rem',
-              fontWeight: 600,
-              padding: '0.35rem 0.75rem',
-              borderRadius: '9999px'
-            }}>
-              <Sparkles size={13} style={{ color: 'var(--accent-cyan)' }} />
+          {/* 3 Interactive Value Pills */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem', alignItems: 'center' }}>
+            {/* Pill 1: AI Feedback */}
+            <button
+              type="button"
+              onClick={() => {
+                setShowDeepAnalytics(true);
+                setTimeout(() => {
+                  const el = document.getElementById('deep-analytics-section');
+                  el?.scrollIntoView({ behavior: 'smooth' });
+                }, 50);
+              }}
+              title="Click to view AI Rubric & Feedback Breakdown"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.45rem',
+                backgroundColor: 'rgba(6, 182, 212, 0.15)',
+                border: '1px solid rgba(6, 182, 212, 0.45)',
+                color: '#38BDF8',
+                fontSize: '0.8rem',
+                fontWeight: 600,
+                padding: '0.4rem 0.85rem',
+                borderRadius: '9999px',
+                cursor: 'pointer',
+                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                boxShadow: '0 2px 8px rgba(6, 182, 212, 0.15)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(6, 182, 212, 0.25)';
+                e.currentTarget.style.borderColor = 'var(--accent-cyan)';
+                e.currentTarget.style.transform = 'translateY(-2px) scale(1.03)';
+                e.currentTarget.style.boxShadow = '0 4px 14px rgba(6, 182, 212, 0.35)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(6, 182, 212, 0.15)';
+                e.currentTarget.style.borderColor = 'rgba(6, 182, 212, 0.45)';
+                e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                e.currentTarget.style.boxShadow = '0 2px 8px rgba(6, 182, 212, 0.15)';
+              }}
+            >
+              <Sparkles size={14} style={{ color: 'var(--accent-cyan)' }} />
               AI Feedback
-            </span>
+            </button>
 
-            <span style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.4rem',
-              backgroundColor: 'rgba(30, 41, 59, 0.8)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              color: '#E2E8F0',
-              fontSize: '0.78rem',
-              fontWeight: 600,
-              padding: '0.35rem 0.75rem',
-              borderRadius: '9999px'
-            }}>
-              <Briefcase size={13} style={{ color: '#94A3B8' }} />
+            {/* Pill 2: Real Interview Experience */}
+            <button
+              type="button"
+              onClick={() => onStartNew?.({ type: 'technical' })}
+              title="Click to start a realistic AI Interview simulation"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.45rem',
+                backgroundColor: 'rgba(30, 41, 59, 0.85)',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                color: '#F1F5F9',
+                fontSize: '0.8rem',
+                fontWeight: 600,
+                padding: '0.4rem 0.85rem',
+                borderRadius: '9999px',
+                cursor: 'pointer',
+                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(51, 65, 85, 0.95)';
+                e.currentTarget.style.borderColor = '#A855F7';
+                e.currentTarget.style.color = '#FFFFFF';
+                e.currentTarget.style.transform = 'translateY(-2px) scale(1.03)';
+                e.currentTarget.style.boxShadow = '0 4px 14px rgba(168, 85, 247, 0.25)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(30, 41, 59, 0.85)';
+                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+                e.currentTarget.style.color = '#F1F5F9';
+                e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.3)';
+              }}
+            >
+              <Briefcase size={14} style={{ color: '#C084FC' }} />
               Real Interview Experience
-            </span>
+            </button>
 
-            <span style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.4rem',
-              backgroundColor: 'rgba(30, 41, 59, 0.8)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              color: '#E2E8F0',
-              fontSize: '0.78rem',
-              fontWeight: 600,
-              padding: '0.35rem 0.75rem',
-              borderRadius: '9999px'
-            }}>
-              <Target size={13} style={{ color: '#94A3B8' }} />
+            {/* Pill 3: Personalized Roadmap */}
+            <button
+              type="button"
+              onClick={() => onBrowseQuestions?.()}
+              title="Click to open your Personalized Practice Questions Roadmap"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.45rem',
+                backgroundColor: 'rgba(30, 41, 59, 0.85)',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                color: '#F1F5F9',
+                fontSize: '0.8rem',
+                fontWeight: 600,
+                padding: '0.4rem 0.85rem',
+                borderRadius: '9999px',
+                cursor: 'pointer',
+                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(51, 65, 85, 0.95)';
+                e.currentTarget.style.borderColor = '#10B981';
+                e.currentTarget.style.color = '#FFFFFF';
+                e.currentTarget.style.transform = 'translateY(-2px) scale(1.03)';
+                e.currentTarget.style.boxShadow = '0 4px 14px rgba(16, 185, 129, 0.25)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(30, 41, 59, 0.85)';
+                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+                e.currentTarget.style.color = '#F1F5F9';
+                e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.3)';
+              }}
+            >
+              <Target size={14} style={{ color: '#34D399' }} />
               Personalized Roadmap
-            </span>
+            </button>
           </div>
         </div>
 
@@ -927,12 +1000,16 @@ export default function Dashboard({
       {/* ========================================================= */}
       {/* 6. EXPANDABLE DEEP-DIVE ANALYTICS & SKILLS RADAR          */}
       {/* ========================================================= */}
-      <div style={{
-        backgroundColor: 'rgba(15, 23, 42, 0.6)',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
-        borderRadius: '16px',
-        padding: '1.25rem 1.5rem'
-      }}>
+      <div 
+        id="deep-analytics-section"
+        style={{
+          backgroundColor: 'rgba(15, 23, 42, 0.6)',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          borderRadius: '16px',
+          padding: '1.25rem 1.5rem',
+          scrollMarginTop: '2rem'
+        }}
+      >
         <div 
           onClick={() => setShowDeepAnalytics(prev => !prev)}
           style={{
